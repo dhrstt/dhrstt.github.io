@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Escape: Labor des Professor Kohlenstoff</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:ital,wght@0,300;0,400;0,600;1,300&display=swap');
+:root{--bg:#0a0e1a;--panel:#0f1628;--panel2:#141d35;--border:#1e3a5f;--glow:#00d4ff;--glow2:#ff6b35;--glow3:#39ff14;--danger:#ff2244;--text:#c8e0ff;--textdim:#5a7a9a;--gold:#ffd700;--success:#00ff88}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Exo 2',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;background-image:radial-gradient(ellipse at 10% 20%,rgba(0,80,160,.15) 0%,transparent 50%),radial-gradient(ellipse at 90% 80%,rgba(0,180,120,.08) 0%,transparent 50%)}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:1000}
+.screen{display:none;animation:fadeIn .6s ease}.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.lab-header{background:var(--panel);border-bottom:2px solid var(--border);padding:.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 2px 20px rgba(0,212,255,.1)}
+.lab-title{font-family:'Orbitron',monospace;font-size:clamp(.7rem,2.5vw,1rem);color:var(--glow);text-shadow:0 0 10px var(--glow);letter-spacing:.08em}
+.progress-bar-wrap{display:flex;align-items:center;gap:.6rem;flex:1;max-width:300px;margin:0 1rem}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--textdim);white-space:nowrap}
+.progress-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--glow),var(--glow3));border-radius:3px;transition:width .8s ease;box-shadow:0 0 8px var(--glow)}
+.room-indicator{font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--glow2);text-shadow:0 0 6px var(--glow2)}
+.container{max-width:820px;margin:0 auto;padding:1.5rem 1rem 3rem}
+.room-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1.8rem;margin-bottom:1.5rem;box-shadow:0 0 30px rgba(0,80,160,.2),inset 0 1px 0 rgba(255,255,255,.05);position:relative;overflow:hidden}
+.room-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--glow),transparent)}
+.room-number{font-family:'Orbitron',monospace;font-size:.65rem;color:var(--textdim);letter-spacing:.2em;text-transform:uppercase;margin-bottom:.4rem}
+.room-title{font-family:'Orbitron',monospace;font-size:clamp(1rem,3vw,1.5rem);color:var(--glow);text-shadow:0 0 15px rgba(0,212,255,.4);margin-bottom:1.2rem;line-height:1.3}
+.story-text{background:var(--panel2);border-left:3px solid var(--glow2);border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin-bottom:1.5rem;font-style:italic;font-weight:300;color:#a0c0e0;line-height:1.7;font-size:.95rem}
+.story-text .speaker{font-family:'Share Tech Mono',monospace;font-style:normal;color:var(--glow2);font-size:.8rem;display:block;margin-bottom:.4rem}
+.task-label{font-family:'Orbitron',monospace;font-size:.7rem;color:var(--glow3);letter-spacing:.15em;margin-bottom:.8rem;text-shadow:0 0 8px var(--glow3);margin-top:1.2rem}
+.choices{display:grid;gap:.6rem;margin-bottom:1.2rem}
+.choice-btn{background:var(--panel2);border:1.5px solid var(--border);border-radius:8px;padding:.9rem 1.2rem;color:var(--text);font-family:'Exo 2',sans-serif;font-size:.95rem;cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:center;gap:.8rem}
+.choice-btn:hover{border-color:var(--glow);background:rgba(0,212,255,.08);transform:translateX(4px)}
+.choice-btn.correct{border-color:var(--success);background:rgba(0,255,136,.12);color:var(--success);animation:correctPulse .5s ease}
+.choice-btn.wrong{border-color:var(--danger);background:rgba(255,34,68,.12);color:var(--danger);animation:shake .4s ease}
+@keyframes correctPulse{0%,100%{transform:none}50%{transform:scale(1.02)}}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.choice-icon{width:28px;height:28px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:.8rem;flex-shrink:0}
+.feedback{margin-top:.8rem;padding:.7rem 1rem;border-radius:8px;font-size:.9rem;display:none;animation:fadeIn .3s ease}
+.feedback.show{display:block}
+.feedback.ok{background:rgba(0,255,136,.1);border:1px solid var(--success);color:var(--success)}
+.feedback.err{background:rgba(255,34,68,.1);border:1px solid var(--danger);color:var(--danger)}
+.btn-primary{background:linear-gradient(135deg,#0066cc,#0044aa);border:1px solid var(--glow);border-radius:8px;padding:.75rem 1.5rem;color:#fff;font-family:'Orbitron',monospace;font-size:.8rem;letter-spacing:.1em;cursor:pointer;transition:all .2s;box-shadow:0 0 15px rgba(0,102,204,.4)}
+.btn-primary:hover{background:linear-gradient(135deg,#0088ff,#0066cc);box-shadow:0 0 25px rgba(0,136,255,.5);transform:translateY(-2px)}
+.btn-success{background:linear-gradient(135deg,#006633,#004422);border-color:var(--success);box-shadow:0 0 15px rgba(0,255,136,.3)}
+.lueckentext{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:1.2rem;font-size:1rem;line-height:2.8;margin-bottom:1rem}
+.luecke{display:inline-block;border-bottom:2px solid var(--glow);min-width:120px;padding:0 .3rem;margin:0 .2rem;color:var(--glow);font-family:'Share Tech Mono',monospace;cursor:text;vertical-align:middle}
+.luecke-input{background:transparent;border:none;outline:none;color:var(--glow);font-family:'Share Tech Mono',monospace;font-size:.95rem;width:100%;text-align:center}
+.luecke.correct-fill{border-color:var(--success);color:var(--success)}
+.luecke.wrong-fill{border-color:var(--danger);color:var(--danger)}
+.code-section{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-top:1rem}
+.code-input{background:var(--bg);border:2px solid var(--border);border-radius:8px;padding:.75rem 1rem;color:var(--glow);font-family:'Orbitron',monospace;font-size:1.1rem;letter-spacing:.2em;width:180px;outline:none;transition:border-color .2s,box-shadow .2s}
+.code-input:focus{border-color:var(--glow);box-shadow:0 0 12px rgba(0,212,255,.3)}
+.code-input.error{border-color:var(--danger);animation:shake .4s ease}
+.digit-display{display:flex;gap:.5rem;margin:1rem 0;flex-wrap:wrap}
+.digit-box{width:52px;height:64px;background:var(--bg);border:2px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:1.6rem;color:var(--textdim);transition:all .3s;position:relative}
+.digit-box.filled{border-color:var(--glow);color:var(--glow);box-shadow:0 0 12px rgba(0,212,255,.3)}
+.digit-box .digit-label{position:absolute;bottom:2px;font-size:.45rem;color:var(--textdim);letter-spacing:.05em;font-family:'Exo 2',sans-serif}
+.mol-table{width:100%;border-collapse:collapse;margin-bottom:1rem;font-size:.9rem}
+.mol-table th{font-family:'Orbitron',monospace;font-size:.65rem;letter-spacing:.12em;color:var(--glow);border-bottom:1px solid var(--border);padding:.5rem .8rem;text-align:left;background:var(--panel2)}
+.mol-table td{padding:.5rem .8rem;border-bottom:1px solid rgba(30,58,95,.5);font-family:'Share Tech Mono',monospace;color:var(--text)}
+.mol-table tr:hover td{background:rgba(0,212,255,.04)}
+.hint-box{background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.3);border-radius:8px;padding:.8rem 1rem;font-size:.85rem;color:#ffaa77;margin-top:.8rem}
+.hint-box strong{color:var(--glow2)}
+.intro-art{text-align:center;padding:2rem 0 1.5rem}
+.lab-logo{font-family:'Orbitron',monospace;font-size:clamp(1.8rem,8vw,3.5rem);font-weight:900;background:linear-gradient(135deg,var(--glow),var(--glow3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;animation:glowPulse 3s ease-in-out infinite}
+@keyframes glowPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.3)}}
+.warning-badge{display:inline-block;background:rgba(255,34,68,.15);border:1px solid var(--danger);border-radius:20px;padding:.3rem 1rem;font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--danger);letter-spacing:.1em;margin:.8rem 0;animation:blink 1.5s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.success-screen{text-align:center;padding:3rem 1rem}
+.trophy{font-size:5rem;animation:bounce 1s ease infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.success-title{font-family:'Orbitron',monospace;font-size:clamp(1.5rem,5vw,2.5rem);background:linear-gradient(135deg,var(--gold),#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:1rem 0}
+.code-reveal{font-family:'Orbitron',monospace;font-size:2rem;color:var(--glow3);text-shadow:0 0 20px var(--glow3);letter-spacing:.3em;padding:1rem 2rem;background:var(--panel);border:2px solid var(--glow3);border-radius:12px;display:inline-block;margin:1rem 0}
+.mistakes-display{font-family:'Share Tech Mono',monospace;color:var(--textdim);font-size:.9rem;margin-top:.5rem}
+
+/* ── GRID DRAG & DROP ── */
+.drag-area{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem}
+.atom-piece{background:linear-gradient(135deg,#1a2a4a,#0f1e36);border:2px solid #2a4a7a;border-radius:8px;padding:.5rem .9rem;font-family:'Share Tech Mono',monospace;font-size:1rem;cursor:grab;user-select:none;transition:all .2s;touch-action:none}
+.atom-piece:hover{border-color:var(--glow);box-shadow:0 0 12px rgba(0,212,255,.3);transform:scale(1.05)}
+.atom-piece.dragging{opacity:.5;cursor:grabbing}
+.atom-C{border-color:#888;color:#ccc}
+.atom-H{border-color:#4af;color:#8cf}
+.atom-O{border-color:#f44;color:#f88}
+.atom-DB{border-color:var(--glow);color:var(--glow);background:linear-gradient(135deg,#0a2040,#051228);font-weight:bold;font-size:1.2rem}
+.atom-TB{border-color:#c080ff;color:#c080ff;background:linear-gradient(135deg,#180a40,#0d0520);font-weight:bold;font-size:1.2rem}
+.grid-cell{width:100%;height:100%;display:flex;align-items:center;justify-content:center;border-radius:6px;font-family:'Share Tech Mono',monospace}
+.grid-empty{background:transparent}
+.grid-bond-v{background:transparent;position:relative}
+.grid-bond-v::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;transform:translateX(-50%);background:var(--textdim)}
+.grid-bond-h{background:transparent;position:relative}
+.grid-bond-h::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;transform:translateY(-50%);background:var(--textdim)}
+.grid-slot{background:var(--panel2);border:2px dashed var(--border);border-radius:8px;min-width:48px;min-height:48px;cursor:default;transition:border-color .2s,background .2s;position:relative}
+.grid-slot::before{content:'⬡';position:absolute;font-size:1.1rem;color:rgba(30,58,95,.7)}
+.grid-slot.has-atom::before{display:none}
+.grid-slot.dragover{border-color:var(--glow);background:rgba(0,212,255,.1)}
+.grid-slot.filled-ok{border-color:var(--success);background:rgba(0,255,136,.1)}
+.grid-slot.filled-err{border-color:var(--danger);background:rgba(255,34,68,.1)}
+.grid-center{background:var(--panel2);border:2px dashed #4a6a9a;border-radius:8px;min-width:48px;min-height:48px;cursor:default;transition:border-color .2s,background .2s;position:relative}
+.grid-center::before{content:'⬡';position:absolute;font-size:1.1rem;color:rgba(74,106,154,.6)}
+.grid-center.has-atom::before{display:none}
+.grid-center.dragover{border-color:var(--glow);background:rgba(0,212,255,.1)}
+.grid-center.filled-ok{border-color:var(--success);background:rgba(0,255,136,.1)}
+.grid-center.filled-err{border-color:var(--danger);background:rgba(255,34,68,.1)}
+.grid-slot-db{background:var(--panel2);border:2px dashed rgba(0,212,255,.4);border-radius:8px;min-width:40px;min-height:48px;cursor:default;transition:border-color .2s,background .2s;position:relative;display:flex;align-items:center;justify-content:center;color:rgba(0,212,255,.35);font-size:1.3rem}
+.grid-slot-db.has-atom::before{display:none}
+.grid-slot-db.dragover{border-color:var(--glow);background:rgba(0,212,255,.1)}
+.grid-slot-db.filled-ok{border-color:var(--success);background:rgba(0,255,136,.1)}
+.grid-slot-db.filled-err{border-color:var(--danger);background:rgba(255,34,68,.1)}
+.grid-slot-tb{background:var(--panel2);border:2px dashed rgba(192,128,255,.4);border-radius:8px;min-width:40px;min-height:48px;cursor:default;transition:border-color .2s,background .2s;position:relative;display:flex;align-items:center;justify-content:center;color:rgba(192,128,255,.35);font-size:1.3rem}
+.grid-slot-tb.dragover{border-color:#c080ff;background:rgba(192,128,255,.1)}
+.grid-slot-tb.filled-ok{border-color:var(--success);background:rgba(0,255,136,.1)}
+.grid-slot-tb.filled-err{border-color:var(--danger);background:rgba(255,34,68,.1)}
+.drop-label{font-family:'Orbitron',monospace;font-size:.65rem;color:var(--textdim);letter-spacing:.1em;margin-bottom:.5rem}
+.mol-section{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.mol-section:last-of-type{border-bottom:none}
+.mol-name-badge{display:inline-flex;align-items:center;gap:.5rem;font-family:'Orbitron',monospace;font-size:.9rem;color:var(--gold);background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.3);border-radius:6px;padding:.35rem .9rem;margin-bottom:.8rem;letter-spacing:.1em}
+@media(max-width:500px){.room-card{padding:1.2rem}.code-input{width:140px}.digit-box{width:40px;height:52px;font-size:1.2rem}.grid-slot,.grid-center{min-width:40px;min-height:40px}}
+</style>
+</head>
+<body>
+
+<div class="lab-header" id="mainHeader" style="display:none">
+  <div class="lab-title">⚗ LABOR // PROF. KOHLENSTOFF</div>
+  <div class="progress-bar-wrap">
+    <span class="progress-label">FORTSCHRITT</span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+  <div class="room-indicator" id="roomIndicator">RAUM 1/5</div>
+</div>
+
+<!-- ═══ INTRO ═══ -->
+<div id="screen-intro" class="screen active">
+<div class="container">
+  <div class="intro-art">
+    <div class="lab-logo">⚗ ESCAPE<br>LAB</div>
+    <div class="warning-badge">⚠ NOTFALL – LABOR GESPERRT</div>
+  </div>
+  <div class="room-card">
+    <div class="room-title">Willkommen im Labor des Professor Kohlenstoff</div>
+    <div class="story-text">
+      <span class="speaker">📻 NOTFALLNACHRICHT // 07:42 UHR</span>
+      Professor Kohlenstoff hat sich heute Nacht in seinem Labor eingeschlossen – und vergessen, wie der Zahlencode für die Sicherheitstür lautet! Er braucht dringend eure Hilfe.<br><br>
+      Löst alle 5 Rätsel rund um organische Chemie. Jedes gelöste Rätsel verrät euch eine Ziffer des Codes. Mit dem vollständigen Code könnt ihr die Labortür öffnen!<br><br>
+      <strong style="color:var(--glow2)">⚠ Jede Gruppe bekommt einen eigenen, zufälligen Code – Abschreiben hilft nicht! ☕</strong>
+    </div>
+    <div class="task-label">// THEMEN IN DIESEM ESCAPE GAME</div>
+    <table class="mol-table">
+      <tr><th>Raum</th><th>Thema</th><th>Rätseltyp</th></tr>
+      <tr><td>1</td><td>Alkane benennen</td><td>Multiple Choice (5 Fragen)</td></tr>
+      <tr><td>2</td><td>Strukturformeln bauen</td><td>Drag & Drop ins Gitter (6 Moleküle)</td></tr>
+      <tr><td>3</td><td>Alkene & Alkine</td><td>Lückentext (12 Lücken)</td></tr>
+      <tr><td>4</td><td>Ethanol-Fakten</td><td>Richtige Aussagen finden</td></tr>
+      <tr><td>5</td><td>Finalcode eingeben</td><td>Alle Ziffern kombinieren</td></tr>
+    </table>
+    <div class="hint-box"><strong>Tipp:</strong> Notiert euch nach jedem Raum die Ziffer! Ihr braucht alle 4 am Ende.</div>
+    <br>
+    <button class="btn-primary" onclick="startGame()" style="width:100%;padding:1rem;font-size:1rem;">🔓 MISSION STARTEN</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══ RAUM 1 – ALKANE (5 Fragen) ═══ -->
+<div id="screen-r1" class="screen">
+<div class="container">
+  <div class="room-card">
+    <div class="room-number">// RAUM 01 VON 05</div>
+    <div class="room-title">🔑 Die Namenstafel der Alkane</div>
+    <div class="story-text">
+      <span class="speaker">📻 PROF. KOHLENSTOFF (per Gegensprechanlage)</span>
+      „Die erste Ziffer meines Codes steckt hinter den Namen der Alkane! Beantwortet alle fünf Fragen richtig – erst dann erscheint die Ziffer."
+    </div>
+
+    <div class="task-label">// FRAGE 1 VON 5: Wie heißt das Alkan mit 3 Kohlenstoffatomen?</div>
+    <div class="choices" id="r1q1">
+      <button class="choice-btn" onclick="checkChoice(this,'r1q1','wrong')"><span class="choice-icon">A</span> Ethan</button>
+      <button class="choice-btn" onclick="checkChoice(this,'r1q1','correct')"><span class="choice-icon">B</span> Propan</button>
+      <button class="choice-btn" onclick="checkChoice(this,'r1q1','wrong')"><span class="choice-icon">C</span> Butan</button>
+      <button class="choice-btn" onclick="checkChoice(this,'r1q1','wrong')"><span class="choice-icon">D</span> Pentan</button>
+    </div>
+
+    <div id="r1q2-wrap" style="display:none">
+      <div class="task-label">// FRAGE 2 VON 5: Welche allgemeine Formel gilt für Alkane?</div>
+      <div class="choices" id="r1q2">
+        <button class="choice-btn" onclick="checkChoice(this,'r1q2','wrong')"><span class="choice-icon">A</span> CₙH₂ₙ</button>
+        <button class="choice-btn" onclick="checkChoice(this,'r1q2','wrong')"><span class="choice-icon">B</span> CₙHₙ</button>
+        <button class="choice-btn" onclick="checkChoice(this,'r1q2','correct')"><span class="choice-icon">C</span> CₙH₂ₙ₊₂</button>
+        <button class="choice-btn" onclick="checkChoice(this,'r1q2','wrong')"><span class="choice-icon">D</span> CₙH₂ₙ₋₂</button>
+      </div>
+    </div>
+
+    <div id="r1q3-wrap" style="display:none">
+      <div class="task-label">// FRAGE 3 VON 5: Wie heißt das Alkan mit 5 Kohlenstoffatomen?</div>
+      <div class="choices" id="r1q3">
+        <button class="choice-btn" onclick="checkChoice(this,'r1q3','wrong')"><span class="choice-icon">A</span> Hexan</button>
+        <button class="choice-btn" onclick="checkChoice(this,'r1q3','correct')"><span class="choice-icon">B</span> Pentan</button>
+        <button class="choice-btn" onclick="checkChoice(this,'r1q3','wrong')"><span class="choice-icon">C</span> Butan</button>
+        <button class="choice-btn" onclick="checkChoice(this,'r1q3','wrong')"><span class="choice-icon">D</span> Oktan</button>
+      </div>
+    </div>
+
+    <div id="r1q4-wrap" style="display:none">
+      <div class="task-label">// FRAGE 4 VON 5: Wie viele H-Atome hat Ethan (C₂H₆)?</div>
+      <div class="choices" id="r1q4">
+        <button class="choice-btn" onclick="checkChoice(this,'r1q4','wrong')"><span class="choice-icon">A</span> 2</button>
+        <button class="choice-btn" onclick="checkChoice(this,'r1q4','wrong')"><span class="choice-icon">B</span> 4</button>
+        <button class="choice-btn" onclick="checkChoice(this,'r1q4','correct')"><span class="choice-icon">C</span> 6</button>
+        <button class="choice-btn" onclick="checkChoice(this,'r1q4','wrong')"><span class="choice-icon">D</span> 8</button>
+      </div>
+    </div>
+
+    <div id="r1q5-wrap" style="display:none">
+      <div class="task-label">// FRAGE 5 VON 5: Welcher Begriff beschreibt Alkane, da sie nur Einfachbindungen haben?</div>
+      <div class="choices" id="r1q5">
+        <button class="choice-btn" onclick="checkChoice(this,'r1q5','wrong')"><span class="choice-icon">A</span> ungesättigt</button>
+        <button class="choice-btn" onclick="checkChoice(this,'r1q5','correct')"><span class="choice-icon">B</span> gesättigt</button>
+        <button class="choice-btn" onclick="checkChoice(this,'r1q5','wrong')"><span class="choice-icon">C</span> aromatisch</button>
+        <button class="choice-btn" onclick="checkChoice(this,'r1q5','wrong')"><span class="choice-icon">D</span> polar</button>
+      </div>
+    </div>
+
+    <div id="r1-reward" style="display:none">
+      <div class="feedback show ok">
+        ✅ Alle Fragen richtig! Professor Kohlenstoff tippt begeistert gegen die Glasscheibe.<br>
+        <strong style="font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--glow3)" id="r1-digit-display"></strong>
+      </div>
+      <button class="btn-primary btn-success" style="margin-top:1rem;width:100%" onclick="goRoom(2)">→ RAUM 2 BETRETEN</button>
+    </div>
+  </div>
+  <div class="hint-box">💡 <strong>Merkhilfe:</strong> Meth(1) – Eth(2) – Prop(3) – But(4) – Pent(5) – Hex(6) – Hept(7) – Oct(8)<br>
+  <span style="color:var(--danger)">⚠ Nach 3 Fehlern gesamt schließt die Sicherheitstür dauerhaft!</span></div>
+</div>
+</div>
+
+<!-- ═══ RAUM 2 – STRUKTURFORMELN (Methan, Ethan, Ethen, Ethin) ═══ -->
+<div id="screen-r2" class="screen">
+<div class="container">
+  <div class="room-card">
+    <div class="room-number">// RAUM 02 VON 05</div>
+    <div class="room-title">🧩 Das Molekülpuzzle</div>
+    <div class="story-text">
+      <span class="speaker">📻 PROF. KOHLENSTOFF</span>
+      „Die Molekülmodelle im Labor sind auseinandergefallen! Zieht die richtigen Atome in die Gitterfelder (⬡). Für Alkene braucht ihr einen Doppelbindungsbaustein <span style="color:var(--glow)">(=)</span>, für Alkine einen Dreifachbindungsbaustein <span style="color:#c080ff">(≡)</span>."
+    </div>
+
+    <!-- METHAN -->
+    <div class="mol-section" id="mol-methan-section">
+      <div class="mol-name-badge">🔬 Methan <span style="font-size:.75rem;color:var(--textdim);font-family:'Share Tech Mono',monospace">CH₄ | Alkan</span></div>
+      <div class="task-label">// AUFGABE 1 VON 4: Baut die Strukturformel von Methan</div>
+      <div class="drag-area" id="pieces-methan">
+        <div class="atom-piece atom-C" draggable="true" data-atom="C" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">C</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-O" draggable="true" data-atom="O" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">O</div>
+      </div>
+      <div class="drop-label">STRUKTURFORMEL METHAN:</div>
+      <div id="grid-methan" style="display:grid;grid-template-columns:56px 24px 56px 24px 56px;grid-template-rows:56px 20px 56px 20px 56px;gap:3px;margin-bottom:.8rem;width:fit-content;align-items:center;justify-items:center">
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="mA-top" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-methan','mA-top')"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-bond-v"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="mA-left" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-methan','mA-left')"></div>
+        <div class="grid-cell grid-bond-h"></div>
+        <div class="grid-cell grid-center" data-slot="mA-center" data-expects="C" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-methan','mA-center')"></div>
+        <div class="grid-cell grid-bond-h"></div>
+        <div class="grid-cell grid-slot" data-slot="mA-right" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-methan','mA-right')"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-bond-v"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="mA-bottom" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-methan','mA-bottom')"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+      </div>
+      <button class="btn-primary" onclick="checkMolecule('methan')" style="margin-bottom:.5rem">Methan prüfen ✓</button>
+      <div class="feedback" id="fb-methan"></div>
+    </div>
+
+    <!-- ETHAN -->
+    <div class="mol-section" id="mol-ethan-section" style="display:none">
+      <div class="mol-name-badge">🔬 Ethan <span style="font-size:.75rem;color:var(--textdim);font-family:'Share Tech Mono',monospace">C₂H₆ | Alkan | Einfachbindung C–C</span></div>
+      <div class="task-label">// AUFGABE 2 VON 4: Baut die Strukturformel von Ethan</div>
+      <div class="drag-area" id="pieces-ethan">
+        <div class="atom-piece atom-C" draggable="true" data-atom="C" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">C</div>
+        <div class="atom-piece atom-C" draggable="true" data-atom="C" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">C</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-O" draggable="true" data-atom="O" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">O</div>
+      </div>
+      <div class="drop-label">STRUKTURFORMEL ETHAN:</div>
+      <div id="grid-ethan" style="display:grid;grid-template-columns:56px 24px 56px 24px 56px 24px 56px;grid-template-rows:56px 20px 56px 20px 56px;gap:3px;margin-bottom:.8rem;width:fit-content;align-items:center;justify-items:center">
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="eB-tl" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethan','eB-tl')"></div>
+        <div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="eB-tr" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethan','eB-tr')"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-bond-v"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-bond-v"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="eB-ml" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethan','eB-ml')"></div>
+        <div class="grid-cell grid-bond-h"></div>
+        <div class="grid-cell grid-center" data-slot="eB-c1" data-expects="C" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethan','eB-c1')"></div>
+        <div class="grid-cell grid-bond-h"></div>
+        <div class="grid-cell grid-center" data-slot="eB-c2" data-expects="C" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethan','eB-c2')"></div>
+        <div class="grid-cell grid-bond-h"></div>
+        <div class="grid-cell grid-slot" data-slot="eB-mr" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethan','eB-mr')"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-bond-v"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-bond-v"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="eB-bl" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethan','eB-bl')"></div>
+        <div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="eB-br" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethan','eB-br')"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+      </div>
+      <button class="btn-primary" onclick="checkMolecule('ethan')" style="margin-bottom:.5rem">Ethan prüfen ✓</button>
+      <div class="feedback" id="fb-ethan"></div>
+    </div>
+
+    <!-- ETHEN -->
+    <div class="mol-section" id="mol-ethen-section" style="display:none">
+      <div class="mol-name-badge">🔬 Ethen <span style="font-size:.75rem;color:var(--glow);font-family:'Share Tech Mono',monospace">C₂H₄ | Alken | Doppelbindung C=C</span></div>
+      <div class="task-label">// AUFGABE 3 VON 6: Baut die Strukturformel von Ethen</div>
+      <p style="color:var(--textdim);font-size:.85rem;margin-bottom:.8rem;font-family:'Share Tech Mono',monospace">▸ Zwischen den zwei C-Atomen muss der <strong style="color:var(--glow)">Doppelbindungsbaustein (=)</strong> eingesetzt werden! Jedes C hat genau 2 H (oben + unten).</p>
+      <div class="drag-area" id="pieces-ethen">
+        <div class="atom-piece atom-C" draggable="true" data-atom="C" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">C</div>
+        <div class="atom-piece atom-C" draggable="true" data-atom="C" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">C</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-DB" draggable="true" data-atom="DB" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">=</div>
+        <div class="atom-piece atom-O" draggable="true" data-atom="O" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">O</div>
+        <div class="atom-piece atom-TB" draggable="true" data-atom="TB" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">≡</div>
+      </div>
+      <div class="drop-label">STRUKTURFORMEL ETHEN (H₂C=CH₂):</div>
+      <!--
+        Ethen grid (5 cols × 5 rows), NO side H:
+             H     H
+             |     |
+             C1 = C2
+             |     |
+             H     H
+        Cols: 56 | 24bond | 56C1 | 40DB | 56C2 | 24bond | 56
+        But middle row has NO outer H — just empty on sides
+      -->
+      <div id="grid-ethen" style="display:grid;grid-template-columns:56px 40px 56px 56px;grid-template-rows:56px 20px 56px 20px 56px;gap:3px;margin-bottom:.8rem;width:fit-content;align-items:center;justify-items:center">
+        <!-- Row 1: H-top-c1, empty, H-top-c2, empty -->
+        <div class="grid-cell grid-slot" data-slot="en-tl" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethen','en-tl')"></div>
+        <div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="en-tr" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethen','en-tr')"></div>
+        <div class="grid-cell grid-empty"></div>
+        <!-- Row 2: bond-v, empty, bond-v, empty -->
+        <div class="grid-cell grid-bond-v"></div>
+        <div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-bond-v"></div>
+        <div class="grid-cell grid-empty"></div>
+        <!-- Row 3: C1, DB-slot, C2, empty -->
+        <div class="grid-cell grid-center" data-slot="en-c1" data-expects="C" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethen','en-c1')"></div>
+        <div class="grid-slot-db" data-slot="en-db" data-expects="DB" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethen','en-db')">=</div>
+        <div class="grid-cell grid-center" data-slot="en-c2" data-expects="C" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethen','en-c2')"></div>
+        <div class="grid-cell grid-empty"></div>
+        <!-- Row 4: bond-v, empty, bond-v, empty -->
+        <div class="grid-cell grid-bond-v"></div>
+        <div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-bond-v"></div>
+        <div class="grid-cell grid-empty"></div>
+        <!-- Row 5: H-bottom-c1, empty, H-bottom-c2, empty -->
+        <div class="grid-cell grid-slot" data-slot="en-bl" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethen','en-bl')"></div>
+        <div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="en-br" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethen','en-br')"></div>
+        <div class="grid-cell grid-empty"></div>
+      </div>
+      <button class="btn-primary" onclick="checkMolecule('ethen')" style="margin-bottom:.5rem">Ethen prüfen ✓</button>
+      <div class="feedback" id="fb-ethen"></div>
+    </div>
+
+    <!-- ETHIN -->
+    <div class="mol-section" id="mol-ethin-section" style="display:none">
+      <div class="mol-name-badge">🔬 Ethin <span style="font-size:.75rem;color:#c080ff;font-family:'Share Tech Mono',monospace">C₂H₂ | Alkin | Dreifachbindung C≡C</span></div>
+      <div class="task-label">// AUFGABE 4 VON 6: Baut die Strukturformel von Ethin</div>
+      <p style="color:var(--textdim);font-size:.85rem;margin-bottom:.8rem;font-family:'Share Tech Mono',monospace">▸ Zwischen den zwei C-Atomen muss der <strong style="color:#c080ff">Dreifachbindungsbaustein (≡)</strong> eingesetzt werden! Ethin ist linear – nur eine Reihe.</p>
+      <div class="drag-area" id="pieces-ethin">
+        <div class="atom-piece atom-C" draggable="true" data-atom="C" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">C</div>
+        <div class="atom-piece atom-C" draggable="true" data-atom="C" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">C</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-TB" draggable="true" data-atom="TB" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">≡</div>
+        <div class="atom-piece atom-DB" draggable="true" data-atom="DB" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">=</div>
+        <div class="atom-piece atom-O" draggable="true" data-atom="O" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">O</div>
+      </div>
+      <div class="drop-label">STRUKTURFORMEL ETHIN (H–C≡C–H):</div>
+      <div id="grid-ethin" style="display:grid;grid-template-columns:56px 24px 56px 44px 56px 24px 56px;grid-template-rows:60px;gap:3px;margin-bottom:.8rem;width:fit-content;align-items:center;justify-items:center">
+        <div class="grid-cell grid-slot" data-slot="ei-hl" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethin','ei-hl')"></div>
+        <div class="grid-cell grid-bond-h"></div>
+        <div class="grid-cell grid-center" data-slot="ei-c1" data-expects="C" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethin','ei-c1')"></div>
+        <div class="grid-slot-tb" data-slot="ei-tb" data-expects="TB" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethin','ei-tb')">≡</div>
+        <div class="grid-cell grid-center" data-slot="ei-c2" data-expects="C" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethin','ei-c2')"></div>
+        <div class="grid-cell grid-bond-h"></div>
+        <div class="grid-cell grid-slot" data-slot="ei-hr" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethin','ei-hr')"></div>
+      </div>
+      <button class="btn-primary" onclick="checkMolecule('ethin')" style="margin-bottom:.5rem">Ethin prüfen ✓</button>
+      <div class="feedback" id="fb-ethin"></div>
+    </div>
+
+    <!-- METHANOL -->
+    <div class="mol-section" id="mol-methanol-section" style="display:none">
+      <div class="mol-name-badge" style="color:#ff9955;border-color:rgba(255,153,85,.4);background:rgba(255,153,85,.08)">🔬 Methanol <span style="font-size:.75rem;color:var(--textdim);font-family:'Share Tech Mono',monospace">CH₃OH | Alkohol | einfachster Alkohol</span></div>
+      <div class="task-label">// AUFGABE 5 VON 6: Baut die Strukturformel von Methanol</div>
+      <p style="color:var(--textdim);font-size:.85rem;margin-bottom:.8rem;font-family:'Share Tech Mono',monospace">▸ Methanol = Methan + OH-Gruppe. Das C hat nur 3 H (eines ersetzt durch OH). Zieht C, 3×H und 1×O ins Gitter!</p>
+      <div class="drag-area" id="pieces-methanol">
+        <div class="atom-piece atom-C" draggable="true" data-atom="C" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">C</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-O" draggable="true" data-atom="O" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">O</div>
+        <div class="atom-piece atom-O" draggable="true" data-atom="O" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">O</div>
+        <div class="atom-piece atom-DB" draggable="true" data-atom="DB" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">=</div>
+      </div>
+      <div class="drop-label">STRUKTURFORMEL METHANOL (H₃C–OH):</div>
+      <!--
+        Methanol: H
+                  |
+               H–C–O–H
+                  |
+                  H
+        Grid 7cols×5rows: _ _ Htop _ _ _ _
+                          _ _ |   _ _ _ _
+                          Hl–C–O–Hr _ _ _
+                          _ _ |   _ _ _ _
+                          _ _ Hbot _ _ _ _
+        Simplify: 5cols×5rows: _ Htop _ _
+                               _ |    _ _
+                               Hl–C–O–Hr  (O in slot, Hr after O)
+                               _ |    _ _
+                               _ Hbot _ _
+      -->
+      <div id="grid-methanol" style="display:grid;grid-template-columns:56px 24px 56px 24px 56px 24px 56px;grid-template-rows:56px 20px 56px 20px 56px;gap:3px;margin-bottom:.8rem;width:fit-content;align-items:center;justify-items:center">
+        <!-- Row 1 -->
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="mol-htop" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-methanol','mol-htop')"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <!-- Row 2 -->
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-bond-v"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <!-- Row 3: H-left — C — O — H-right -->
+        <div class="grid-cell grid-slot" data-slot="mol-hl" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-methanol','mol-hl')"></div>
+        <div class="grid-cell grid-bond-h"></div>
+        <div class="grid-cell grid-center" data-slot="mol-c" data-expects="C" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-methanol','mol-c')"></div>
+        <div class="grid-cell grid-bond-h"></div>
+        <div class="grid-cell grid-slot" data-slot="mol-o" data-expects="O" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-methanol','mol-o')" style="border-color:rgba(255,68,68,.5)"></div>
+        <div class="grid-cell grid-bond-h"></div>
+        <div class="grid-cell grid-slot" data-slot="mol-hr" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-methanol','mol-hr')"></div>
+        <!-- Row 4 -->
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-bond-v"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <!-- Row 5 -->
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="mol-hbot" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-methanol','mol-hbot')"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+      </div>
+      <button class="btn-primary" onclick="checkMolecule('methanol')" style="margin-bottom:.5rem">Methanol prüfen ✓</button>
+      <div class="feedback" id="fb-methanol"></div>
+    </div>
+
+    <!-- ETHANOL -->
+    <div class="mol-section" id="mol-ethanol-section" style="display:none">
+      <div class="mol-name-badge" style="color:#ff9955;border-color:rgba(255,153,85,.4);background:rgba(255,153,85,.08)">🔬 Ethanol <span style="font-size:.75rem;color:var(--textdim);font-family:'Share Tech Mono',monospace">C₂H₅OH | Alkohol | Trinkalkohol</span></div>
+      <div class="task-label">// AUFGABE 6 VON 6: Baut die Strukturformel von Ethanol</div>
+      <p style="color:var(--textdim);font-size:.85rem;margin-bottom:.8rem;font-family:'Share Tech Mono',monospace">▸ Ethanol = Ethan + OH-Gruppe. Das rechte C hat nur 2 H statt 3 (eines ist durch OH ersetzt). Zieht 2×C, 5×H und 1×O ins Gitter!</p>
+      <div class="drag-area" id="pieces-ethanol">
+        <div class="atom-piece atom-C" draggable="true" data-atom="C" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">C</div>
+        <div class="atom-piece atom-C" draggable="true" data-atom="C" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">C</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-H" draggable="true" data-atom="H" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">H</div>
+        <div class="atom-piece atom-O" draggable="true" data-atom="O" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">O</div>
+        <div class="atom-piece atom-O" draggable="true" data-atom="O" ondragstart="dragStart(event)" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEndGrid(event)">O</div>
+      </div>
+      <div class="drop-label">STRUKTURFORMEL ETHANOL (H₃C–CH₂–OH):</div>
+      <!--
+        Ethanol:  H  H
+                  |  |
+               H–C1–C2–O–H
+                  |  |
+                  H  H
+        Grid: 9cols × 5rows (C1 left has 3H, C2 right has 2H + O–H)
+        Simplify cols: Hl | bond | C1 | bond | C2 | bond | O | bond | Hr
+        Rows: top-H1, top-H2
+              bond-v, bond-v
+              Hl – C1 – C2 – O – Hr
+              bond-v, bond-v
+              bot-H1, bot-H2
+      -->
+      <div id="grid-ethanol" style="display:grid;grid-template-columns:56px 24px 56px 24px 56px 24px 56px 24px 56px;grid-template-rows:56px 20px 56px 20px 56px;gap:3px;margin-bottom:.8rem;width:fit-content;align-items:center;justify-items:center">
+        <!-- Row 1 -->
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="ea-t1" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethanol','ea-t1')"></div>
+        <div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="ea-t2" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethanol','ea-t2')"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <!-- Row 2 -->
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-bond-v"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-bond-v"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <!-- Row 3: H–C1–C2–O–H -->
+        <div class="grid-cell grid-slot" data-slot="ea-hl" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethanol','ea-hl')"></div>
+        <div class="grid-cell grid-bond-h"></div>
+        <div class="grid-cell grid-center" data-slot="ea-c1" data-expects="C" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethanol','ea-c1')"></div>
+        <div class="grid-cell grid-bond-h"></div>
+        <div class="grid-cell grid-center" data-slot="ea-c2" data-expects="C" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethanol','ea-c2')"></div>
+        <div class="grid-cell grid-bond-h"></div>
+        <div class="grid-cell grid-slot" data-slot="ea-o" data-expects="O" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethanol','ea-o')" style="border-color:rgba(255,68,68,.5)"></div>
+        <div class="grid-cell grid-bond-h"></div>
+        <div class="grid-cell grid-slot" data-slot="ea-hr" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethanol','ea-hr')"></div>
+        <!-- Row 4 -->
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-bond-v"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-bond-v"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <!-- Row 5 -->
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="ea-b1" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethanol','ea-b1')"></div>
+        <div class="grid-cell grid-empty"></div>
+        <div class="grid-cell grid-slot" data-slot="ea-b2" data-expects="H" ondragover="gridDragOver(event)" ondragleave="gridDragLeave(event)" ondrop="gridDrop(event,'grid-ethanol','ea-b2')"></div>
+        <div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div><div class="grid-cell grid-empty"></div>
+      </div>
+      <button class="btn-primary" onclick="checkMolecule('ethanol')" style="margin-bottom:.5rem">Ethanol prüfen ✓</button>
+      <div class="feedback" id="fb-ethanol-mol"></div>
+    </div>
+
+    <div id="r2-reward" style="display:none;margin-top:1rem">
+      <div class="feedback show ok">
+        ✅ Alle 6 Moleküle korrekt aufgebaut! Der Professor ruft: „Ihr seid echte Chemiker!"<br>
+        <strong style="font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--glow3)" id="r2-digit-display"></strong>
+      </div>
+      <button class="btn-primary btn-success" style="margin-top:1rem;width:100%" onclick="goRoom(3)">→ RAUM 3 BETRETEN</button>
+    </div>
+  </div>
+  <div class="hint-box">💡 <strong>Tipp:</strong> Klickt auf ein Atom im Gitter, um es zurückzugeben. Falsche Atome rot = noch nicht richtig! <span style="color:var(--glow)">= Doppelbindung</span> | <span style="color:#c080ff">≡ Dreifachbindung</span></div>
+</div>
+</div>
+
+<!-- ═══ RAUM 3 – LÜCKENTEXT (12 Lücken) ═══ -->
+<div id="screen-r3" class="screen">
+<div class="container">
+  <div class="room-card">
+    <div class="room-number">// RAUM 03 VON 05</div>
+    <div class="room-title">✏️ Die verschlüsselten Notizen</div>
+    <div class="story-text">
+      <span class="speaker">📻 PROF. KOHLENSTOFF</span>
+      „Meine Notizzettel wurden von Tintentintenflecken zerstört! Füllt alle fehlenden Wörter aus – dann könnt ihr die dritte Ziffer entschlüsseln."
+    </div>
+    <div class="task-label">// LÜCKENTEXT: KOHLENWASSERSTOFFE</div>
+    <div class="lueckentext">
+      Alkane, Alkene und Alkine sind alles <span class="luecke" id="l1"><input class="luecke-input" id="li1" type="text" placeholder="?" maxlength="20"></span>
+      Kohlenwasserstoffe. Sie bestehen nur aus <span class="luecke" id="l2"><input class="luecke-input" id="li2" type="text" placeholder="?" maxlength="15"></span>
+      und <span class="luecke" id="l3"><input class="luecke-input" id="li3" type="text" placeholder="?" maxlength="15"></span>.
+      <br><br>
+      Alkane haben nur <span class="luecke" id="l4"><input class="luecke-input" id="li4" type="text" placeholder="?" maxlength="20"></span>
+      zwischen den C-Atomen. Man nennt sie deshalb <span class="luecke" id="l5"><input class="luecke-input" id="li5" type="text" placeholder="?" maxlength="20"></span>.
+      <br><br>
+      Alkene besitzen mindestens eine <span class="luecke" id="l6"><input class="luecke-input" id="li6" type="text" placeholder="?" maxlength="25"></span>
+      (C=C). Die allgemeine Formel lautet <span class="luecke" id="l7"><input class="luecke-input" id="li7" type="text" placeholder="?" maxlength="15"></span>.
+      <br><br>
+      Alkine haben sogar eine <span class="luecke" id="l8"><input class="luecke-input" id="li8" type="text" placeholder="?" maxlength="25"></span>
+      (C≡C). Ihre allgemeine Formel ist <span class="luecke" id="l9"><input class="luecke-input" id="li9" type="text" placeholder="?" maxlength="15"></span>.
+      <br><br>
+      Das einfachste Alkan ist <span class="luecke" id="l10"><input class="luecke-input" id="li10" type="text" placeholder="?" maxlength="15"></span>
+      (CH₄). Das einfachste Alken heißt <span class="luecke" id="l11"><input class="luecke-input" id="li11" type="text" placeholder="?" maxlength="15"></span>
+      und das einfachste Alkin heißt <span class="luecke" id="l12"><input class="luecke-input" id="li12" type="text" placeholder="?" maxlength="15"></span>.
+    </div>
+    <div class="hint-box" style="margin-bottom:1rem">
+      💡 <strong>Wortbank:</strong> Einfachbindungen · Dreifachbindung · Doppelbindung · gesättigt · CₙH₂ₙ · CₙH₂ₙ₋₂ · Kohlenstoff · organische · Wasserstoff · Methan · Ethen · Ethin
+    </div>
+    <button class="btn-primary" onclick="checkLueckentext()">Lückentext prüfen ✓</button>
+    <div class="feedback" id="fb-luecke"></div>
+    <div id="r3-reward" style="display:none;margin-top:1rem">
+      <div class="feedback show ok">
+        ✅ Ausgezeichnet! Die Tintenwolke hebt sich.<br>
+        <strong style="font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--glow3)" id="r3-digit-display"></strong>
+      </div>
+      <button class="btn-primary btn-success" style="margin-top:1rem;width:100%" onclick="goRoom(4)">→ RAUM 4 BETRETEN</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ RAUM 4 – ETHANOL ═══ -->
+<div id="screen-r4" class="screen">
+<div class="container">
+  <div class="room-card">
+    <div class="room-number">// RAUM 04 VON 05</div>
+    <div class="room-title">🍷 Das Ethanol-Archiv</div>
+    <div class="story-text">
+      <span class="speaker">📻 PROF. KOHLENSTOFF</span>
+      „In diesem Raum hängen viele Aussagen über Ethanol an der Wand. Einige davon sind falsch! Klickt nur auf die RICHTIGEN Aussagen – alle falschen müsst ihr meiden."
+    </div>
+    <div class="task-label">// KLICKT NUR AUF DIE RICHTIGEN AUSSAGEN ÜBER ETHANOL</div>
+    <div class="choices" id="r4-choices" style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem"></div>
+    <div class="feedback" id="fb-ethanol" style="margin-top:.8rem"></div>
+    <div id="r4-reward" style="display:none;margin-top:1rem">
+      <div class="feedback show ok">
+        ✅ Alle richtigen Aussagen gefunden! Der Professor springt vor Freude.<br>
+        <strong style="font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--glow3)" id="r4-digit-display"></strong>
+      </div>
+      <button class="btn-primary btn-success" style="margin-top:1rem;width:100%" onclick="goRoom(5)">→ FINALRAUM BETRETEN</button>
+    </div>
+  </div>
+  <div class="hint-box">💡 Falsch angeklickte Aussagen ersetzen sich durch neue – aber nach <strong style="color:var(--danger)">3 Fehlern</strong> schlägt der Ethanol-Sensor Alarm! 🚨</div>
+</div>
+</div>
+
+<!-- ═══ RAUM 5 – FINALCODE ═══ -->
+<div id="screen-r5" class="screen">
+<div class="container">
+  <div class="room-card">
+    <div class="room-number">// RAUM 05 – FINALE</div>
+    <div class="room-title">🔐 Die Labortür</div>
+    <div class="story-text">
+      <span class="speaker">📻 PROF. KOHLENSTOFF (erleichtert)</span>
+      „Ihr habt es bis zur Tür geschafft! Gebt jetzt den vierstelligen Code ein, den ihr euch aus den vier Räumen notiert habt. Die Reihenfolge: Raum 1 → Raum 2 → Raum 3 → Raum 4."
+    </div>
+    <div class="task-label">// CODE EINGEBEN</div>
+    <div class="code-section">
+      <input class="code-input" type="password" id="finalCode" maxlength="4" placeholder="····">
+      <button class="btn-primary" onclick="checkFinalCode()">🔓 TÜR ÖFFNEN</button>
+    </div>
+    <div class="feedback" id="fb-final"></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ LOCKOUT ═══ -->
+<div id="screen-lockout" class="screen">
+<div class="container">
+  <div class="room-card" style="text-align:center;border-color:var(--danger);box-shadow:0 0 40px rgba(255,34,68,.3)">
+    <div style="font-size:4rem;margin-bottom:1rem" id="lockout-icon">🔒</div>
+    <div class="room-title" style="color:var(--danger);text-shadow:0 0 15px rgba(255,34,68,.5)" id="lockout-title">SICHERHEITSSYSTEM AKTIVIERT</div>
+    <div class="story-text" id="lockout-message">
+      <span class="speaker" style="color:var(--danger)">⚠ ALARM // SICHERHEITSSYSTEM</span>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;color:var(--textdim);font-size:.85rem;margin-bottom:1.5rem" id="lockout-sub"></div>
+    <button class="btn-primary" onclick="restartGame()" style="background:linear-gradient(135deg,#660000,#440000);border-color:var(--danger);box-shadow:0 0 15px rgba(255,34,68,.4)">🔄 Von vorne versuchen</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══ SUCCESS ═══ -->
+<div id="screen-success" class="screen">
+<div class="container">
+  <div class="success-screen">
+    <div class="trophy">🏆</div>
+    <div class="success-title">LABOR BEFREIT!</div>
+    <p style="color:var(--textdim);margin-bottom:1rem">Professor Kohlenstoff tanzt einen Freudentanz im Labor.</p>
+    <div class="code-reveal" id="success-code">? ? ? ?</div>
+    <div class="mistakes-display" id="final-mistakes"></div>
+    <br>
+    <div class="room-card" style="text-align:left;margin-top:1.5rem">
+      <div class="task-label">// ZUSAMMENFASSUNG – WAS IHR GELERNT HABT</div>
+      <table class="mol-table">
+        <tr><th>Stoffklasse</th><th>Bindung</th><th>Formel</th><th>Beispiel</th></tr>
+        <tr><td>Alkane</td><td>nur Einfach –</td><td>CₙH₂ₙ₊₂</td><td>Methan CH₄</td></tr>
+        <tr><td>Alkene</td><td>mind. eine Doppel =</td><td>CₙH₂ₙ</td><td>Ethen C₂H₄</td></tr>
+        <tr><td>Alkine</td><td>mind. eine Dreifach ≡</td><td>CₙH₂ₙ₋₂</td><td>Ethin C₂H₂</td></tr>
+        <tr><td>Ethanol</td><td>Einfach + OH</td><td>C₂H₅OH</td><td>Trinkalkohol</td></tr>
+      </table>
+    </div>
+    <br>
+    <button class="btn-primary" onclick="restartGame()" style="width:100%;padding:1rem">🔄 Nochmal spielen (neuer Code!)</button>
+  </div>
+</div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// HILFSFUNKTION
+// ════════════════════════════════════════
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+// ════════════════════════════════════════
+// ZUFÄLLIGER CODE – bei jedem Spielstart neu
+// ════════════════════════════════════════
+function generateDigits() {
+  const d = {};
+  for (let i = 1; i <= 4; i++) d[i] = String(Math.floor(Math.random() * 10));
+  return d;
+}
+const digits = generateDigits();
+const correctCode = digits[1] + digits[2] + digits[3] + digits[4];
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+const state = {
+  room: 0, mistakes: 0,
+  r1mistakes: 0, r4mistakes: 0,
+  r4correct: new Set(),
+  draggedEl: null, draggedAtom: null, touchClone: null
+};
+
+// ════════════════════════════════════════
+// LOCKOUT
+// ════════════════════════════════════════
+const lockoutData = {
+  r1: { icon:'🚪', title:'SICHERHEITSTÜR DAUERHAFT GESCHLOSSEN',
+    msg:'„Zu viele Fehler beim Erkennen der Alkane – das Labor-KI hat die Sicherheitstür dauerhaft verriegelt. Nur Professor Kohlenstoff persönlich kann sie öffnen... aber der ist ja drin."',
+    sub:'▸ Tipp: Meth(1) – Eth(2) – Prop(3) – But(4) – Pent(5)' },
+  r4: { icon:'🚨', title:'ALARM! ETHANOL-SENSOR AUSGELÖST',
+    msg:'„Zu viele falsche Aussagen aktiviert! Der Ethanol-Sensor hat Alarm geschlagen. Feuerwehr, Polizei und ein sehr verärgerter Professor Kohlenstoff sind auf dem Weg."',
+    sub:'▸ Beim nächsten Versuch: Nur auf RICHTIGE Aussagen klicken!' }
+};
+
+function showLockout(room) {
+  const d = lockoutData[room];
+  document.getElementById('lockout-icon').textContent = d.icon;
+  document.getElementById('lockout-title').textContent = d.title;
+  document.getElementById('lockout-message').innerHTML = `<span class="speaker" style="color:var(--danger)">⚠ ALARM // SICHERHEITSSYSTEM</span>${d.msg}`;
+  document.getElementById('lockout-sub').textContent = d.sub;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-lockout').classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+function startGame() {
+  randomiseRoom1();
+  buildEthanolRoom();
+  goRoom(1);
+  document.getElementById('mainHeader').style.display = 'flex';
+}
+function goRoom(n) {
+  state.room = n;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-r'+n).classList.add('active');
+  document.getElementById('progressFill').style.width = ((n-1)/5*100)+'%';
+  document.getElementById('roomIndicator').textContent = 'RAUM '+n+'/5';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// Randomise Room 1: pick 5 questions from a larger pool and shuffle answers
+const r1QuestionPool = [
+  { text:'Wie heißt das Alkan mit 3 Kohlenstoffatomen?',  correct:'Propan',              wrongs:['Ethan','Butan','Pentan','Hexan'] },
+  { text:'Welche allgemeine Formel gilt für Alkane?',      correct:'CₙH₂ₙ₊₂',           wrongs:['CₙH₂ₙ','CₙHₙ','CₙH₂ₙ₋₂'] },
+  { text:'Wie heißt das Alkan mit 5 Kohlenstoffatomen?',  correct:'Pentan',              wrongs:['Hexan','Butan','Oktan','Heptan'] },
+  { text:'Wie viele H-Atome hat Ethan (C₂H₆)?',          correct:'6',                   wrongs:['2','4','8','3'] },
+  { text:'Wie nennt man Alkane, weil sie nur Einfachbindungen haben?', correct:'gesättigt', wrongs:['ungesättigt','aromatisch','polar'] },
+  { text:'Wie heißt das Alkan mit 6 Kohlenstoffatomen?',  correct:'Hexan',              wrongs:['Pentan','Heptan','Oktan','Nonan'] },
+  { text:'Wie heißt das Alkan mit 8 Kohlenstoffatomen?',  correct:'Oktan',              wrongs:['Heptan','Nonan','Decan','Hexan'] },
+  { text:'Wie viele C-Atome hat Propan?',                 correct:'3',                   wrongs:['2','4','5','1'] },
+  { text:'Welche Formel hat Methan?',                     correct:'CH₄',                 wrongs:['C₂H₆','C₃H₈','C₂H₄','CH₂'] },
+  { text:'Wie heißt das Alkan mit 4 Kohlenstoffatomen?',  correct:'Butan',              wrongs:['Propan','Pentan','Ethan','Hexan'] },
+  { text:'Wie viele H-Atome hat Propan (C₃H₈)?',         correct:'8',                   wrongs:['6','10','4','3'] },
+  { text:'Welche allgemeine Formel gilt für Alkine?',     correct:'CₙH₂ₙ₋₂',           wrongs:['CₙH₂ₙ₊₂','CₙH₂ₙ','CₙHₙ'] },
+];
+
+// Per-question state (filled by randomiseRoom1)
+const r1Correct  = {};
+const r1ExtraWrong = {};
+const r1ExtraIdx = { r1q1:0, r1q2:0, r1q3:0, r1q4:0, r1q5:0 };
+const r1Seq      = ['r1q1','r1q2','r1q3','r1q4','r1q5'];
+
+function randomiseRoom1() {
+  const picked = shuffle(r1QuestionPool).slice(0, 5);
+  const letters = ['A','B','C','D'];
+
+  picked.forEach((q, idx) => {
+    const groupId = r1Seq[idx];
+    r1Correct[groupId]    = q.correct;
+    r1ExtraWrong[groupId] = [shuffle([...q.wrongs])];  // replacement pool
+    r1ExtraIdx[groupId]   = 0;
+
+    // Update question label
+    const wrapEl = idx === 0
+      ? document.getElementById(groupId).previousElementSibling
+      : document.querySelector(`#${groupId}-wrap .task-label`);
+    if (wrapEl) wrapEl.textContent = `// FRAGE ${idx+1} VON 5: ${q.text}`;
+
+    // Build shuffled options
+    const options = shuffle([q.correct, ...shuffle([...q.wrongs]).slice(0,3)]);
+    const choicesEl = document.getElementById(groupId);
+    choicesEl.innerHTML = options.map((opt, i) => {
+      const res = opt === q.correct ? 'correct' : 'wrong';
+      return `<button class="choice-btn" onclick="checkChoice(this,'${groupId}','${res}')">
+        <span class="choice-icon">${letters[i]}</span> ${opt}
+      </button>`;
+    }).join('');
+  });
+}
+
+function checkChoice(btn, groupId, result) {
+  const group = document.getElementById(groupId);
+  if (group.dataset.done) return;
+  if (result === 'correct') {
+    group.dataset.done = '1';
+    group.querySelectorAll('.choice-btn').forEach(b => b.disabled=true);
+    btn.classList.add('correct');
+    setTimeout(() => unlockNextQ(groupId), 600);
+  } else {
+    state.mistakes++; state.r1mistakes++;
+    btn.classList.add('wrong'); btn.disabled=true;
+    if (state.r1mistakes >= 3) { setTimeout(() => showLockout('r1'), 700); return; }
+    setTimeout(() => replaceWrongOptions(groupId), 800);
+  }
+}
+
+function replaceWrongOptions(groupId) {
+  const pool    = r1ExtraWrong[groupId];
+  const idx     = r1ExtraIdx[groupId] % pool.length;
+  r1ExtraIdx[groupId]++;
+  const correct = r1Correct[groupId];
+  const options = shuffle([correct, ...shuffle(pool[idx]).slice(0,3)]);
+  const letters = ['A','B','C','D'];
+  document.getElementById(groupId).querySelectorAll('.choice-btn').forEach((b, i) => {
+    const isC = options[i] === correct;
+    b.classList.remove('wrong'); b.disabled=false;
+    b.innerHTML = `<span class="choice-icon">${letters[i]}</span> ${options[i]}`;
+    b.onclick = () => checkChoice(b, groupId, isC ? 'correct' : 'wrong');
+  });
+}
+
+function unlockNextQ(groupId) {
+  const idx = r1Seq.indexOf(groupId);
+  if (idx < r1Seq.length-1) {
+    const el = document.getElementById(r1Seq[idx+1]+'-wrap');
+    el.style.display='block';
+    setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),100);
+  } else {
+    document.getElementById('r1-reward').style.display='block';
+    document.getElementById('r1-digit-display').textContent='Ziffer 1 lautet: '+digits[1];
+  }
+}
+
+// ════════════════════════════════════════
+// RAUM 2 – GRID DRAG & DROP
+// ════════════════════════════════════════
+const gridSlots = {
+  'mA-top':'H','mA-left':'H','mA-center':'C','mA-right':'H','mA-bottom':'H',
+  'eB-tl':'H','eB-tr':'H','eB-ml':'H','eB-c1':'C','eB-c2':'C','eB-mr':'H','eB-bl':'H','eB-br':'H',
+  'en-tl':'H','en-tr':'H','en-c1':'C','en-db':'DB','en-c2':'C','en-bl':'H','en-br':'H',
+  'ei-hl':'H','ei-c1':'C','ei-tb':'TB','ei-c2':'C','ei-hr':'H',
+  'mol-htop':'H','mol-hl':'H','mol-c':'C','mol-o':'O','mol-hr':'H','mol-hbot':'H',
+  'ea-t1':'H','ea-t2':'H','ea-hl':'H','ea-c1':'C','ea-c2':'C','ea-o':'O','ea-hr':'H','ea-b1':'H','ea-b2':'H'
+};
+const molSlots = {
+  methan:  ['mA-top','mA-left','mA-center','mA-right','mA-bottom'],
+  ethan:   ['eB-tl','eB-tr','eB-ml','eB-c1','eB-c2','eB-mr','eB-bl','eB-br'],
+  ethen:   ['en-tl','en-tr','en-c1','en-db','en-c2','en-bl','en-br'],
+  ethin:   ['ei-hl','ei-c1','ei-tb','ei-c2','ei-hr'],
+  methanol:['mol-htop','mol-hl','mol-c','mol-o','mol-hr','mol-hbot'],
+  ethanol: ['ea-t1','ea-t2','ea-hl','ea-c1','ea-c2','ea-o','ea-hr','ea-b1','ea-b2']
+};
+const gridToSupply = {
+  'grid-methan':'pieces-methan','grid-ethan':'pieces-ethan',
+  'grid-ethen':'pieces-ethen','grid-ethin':'pieces-ethin',
+  'grid-methanol':'pieces-methanol','grid-ethanol':'pieces-ethanol'
+};
+const slotContents = {};
+const molOrder = ['methan','ethan','ethen','ethin','methanol','ethanol'];
+
+function dragStart(e) {
+  state.draggedEl = e.target; state.draggedAtom = e.target.dataset.atom;
+  e.target.classList.add('dragging');
+  if (e.dataTransfer) e.dataTransfer.effectAllowed='move';
+}
+function gridDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
+function gridDragLeave(e) { e.currentTarget.classList.remove('dragover'); }
+
+function atomLabel(atom) { return atom==='DB'?'=':atom==='TB'?'≡':atom; }
+
+function gridDrop(e, gridId, slotId) {
+  e.preventDefault();
+  const cell = e.currentTarget;
+  cell.classList.remove('dragover');
+  if (!state.draggedEl) return;
+  const atom = state.draggedAtom;
+  if (slotContents[slotId]) returnAtomToSupply(slotId, gridId);
+  slotContents[slotId] = atom;
+  cell.innerHTML=''; cell.classList.add('has-atom');
+  const badge = document.createElement('div');
+  badge.className=`atom-piece atom-${atom}`;
+  badge.textContent=atomLabel(atom);
+  badge.style.cssText='cursor:pointer;margin:0;font-size:1rem;padding:.3rem .5rem;';
+  badge.title='Klicken zum Entfernen';
+  badge.onclick=()=>returnAtomToSupply(slotId,gridId);
+  cell.appendChild(badge);
+  if (state.draggedEl) state.draggedEl.classList.remove('dragging');
+  state.draggedEl=null;
+}
+
+function returnAtomToSupply(slotId, gridId) {
+  const atom = slotContents[slotId];
+  if (!atom) return;
+  delete slotContents[slotId];
+  if (!gridId) {
+    const p=slotId.split('-')[0];
+    gridId={mA:'grid-methan',eB:'grid-ethan',en:'grid-ethen',ei:'grid-ethin',mol:'grid-methanol',ea:'grid-ethanol'}[p]||'';
+  }
+  const grid = document.getElementById(gridId);
+  const cell = grid ? grid.querySelector(`[data-slot="${slotId}"]`) : null;
+  if (cell) { cell.innerHTML=''; cell.classList.remove('has-atom','filled-ok','filled-err'); }
+  const supply = document.getElementById(gridToSupply[gridId]);
+  if (!supply) return;
+  const piece = document.createElement('div');
+  piece.className=`atom-piece atom-${atom}`;
+  piece.draggable=true; piece.dataset.atom=atom;
+  piece.textContent=atomLabel(atom);
+  piece.ondragstart=dragStart; piece.ontouchstart=touchStart;
+  piece.ontouchmove=touchMove; piece.ontouchend=touchEndGrid;
+  supply.appendChild(piece);
+}
+
+function touchStart(e) {
+  const t=e.touches[0];
+  state.draggedEl=e.currentTarget; state.draggedAtom=e.currentTarget.dataset.atom;
+  const clone=e.currentTarget.cloneNode(true);
+  clone.style.cssText=`position:fixed;opacity:.8;pointer-events:none;z-index:9999;left:${t.clientX-24}px;top:${t.clientY-24}px;`;
+  document.body.appendChild(clone); state.touchClone=clone;
+}
+function touchMove(e) {
+  e.preventDefault();
+  const t=e.touches[0];
+  if(state.touchClone){state.touchClone.style.left=(t.clientX-24)+'px';state.touchClone.style.top=(t.clientY-24)+'px';}
+}
+function touchEndGrid(e) {
+  if(state.touchClone){state.touchClone.remove();state.touchClone=null;}
+  const t=e.changedTouches[0];
+  const els=document.elementsFromPoint(t.clientX,t.clientY);
+  for(const el of els){
+    if(el.dataset&&el.dataset.slot){
+      const gridEl=el.closest('[id^="grid-"]');
+      if(gridEl){gridDrop({preventDefault:()=>{},currentTarget:el},gridEl.id,el.dataset.slot);break;}
+    }
+  }
+  state.draggedEl=null;
+}
+
+function checkMolecule(mol) {
+  const slots=molSlots[mol]; const gridId='grid-'+mol;
+  const fbId = mol==='ethanol' ? 'fb-ethanol-mol' : 'fb-'+mol;
+  const fb=document.getElementById(fbId);
+  let allCorrect=true;
+  for(const sid of slots){
+    const expected=gridSlots[sid]; const actual=slotContents[sid];
+    const cell=document.querySelector(`#${gridId} [data-slot="${sid}"]`);
+    if(actual===expected){if(cell){cell.classList.add('filled-ok');cell.classList.remove('filled-err');}}
+    else{if(cell){cell.classList.add('filled-err');cell.classList.remove('filled-ok');}allCorrect=false;}
+  }
+  if(allCorrect){
+    fb.textContent=`✅ ${mol.charAt(0).toUpperCase()+mol.slice(1)} korrekt aufgebaut!`;
+    fb.className='feedback show ok';
+    const nextIdx=molOrder.indexOf(mol)+1;
+    if(nextIdx<molOrder.length){
+      setTimeout(()=>{
+        const sec=document.getElementById('mol-'+molOrder[nextIdx]+'-section');
+        sec.style.display='block';
+        sec.scrollIntoView({behavior:'smooth',block:'start'});
+      },500);
+    } else {
+      document.getElementById('r2-reward').style.display='block';
+      document.getElementById('r2-digit-display').textContent='Ziffer 2 lautet: '+digits[2];
+    }
+  } else {
+    fb.textContent='❌ Noch nicht ganz richtig. Rot markierte Felder prüfen!';
+    fb.className='feedback show err';
+    state.mistakes++;
+  }
+}
+
+// ════════════════════════════════════════
+// RAUM 3 – LÜCKENTEXT
+// ════════════════════════════════════════
+const lueckenAnswers = {
+  li1:['organische'],
+  li2:['kohlenstoff'],
+  li3:['wasserstoff'],
+  li4:['einfachbindungen','einfach bindungen'],
+  li5:['gesättigt','gesaettigt'],
+  li6:['doppelbindung'],
+  li7:['cnh2n','CnH2n','CₙH₂ₙ'],
+  li8:['dreifachbindung'],
+  li9:['cnh2n-2','CnH2n-2','CₙH₂ₙ₋₂'],
+  li10:['methan'],
+  li11:['ethen'],
+  li12:['ethin']
+};
+function checkLueckentext() {
+  let allOk=true;
+  for(let i=1;i<=12;i++){
+    const val=document.getElementById('li'+i).value.trim().toLowerCase().replace(/\s+/g,'');
+    const answers=lueckenAnswers['li'+i].map(a=>a.toLowerCase().replace(/\s+/g,''));
+    const luecke=document.getElementById('l'+i);
+    if(answers.includes(val)){luecke.classList.remove('wrong-fill');luecke.classList.add('correct-fill');}
+    else{luecke.classList.remove('correct-fill');luecke.classList.add('wrong-fill');allOk=false;}
+  }
+  const fb=document.getElementById('fb-luecke');
+  if(allOk){
+    fb.textContent='✅ Alle 12 Lücken korrekt!'; fb.className='feedback show ok';
+    document.getElementById('r3-reward').style.display='block';
+    document.getElementById('r3-digit-display').textContent='Ziffer 3 lautet: '+digits[3];
+  } else {
+    fb.textContent='❌ Noch nicht alle Felder stimmen. Rot markierte Felder nochmal prüfen!';
+    fb.className='feedback show err'; state.mistakes++;
+  }
+}
+
+// ════════════════════════════════════════
+// RAUM 4 – ETHANOL
+// ════════════════════════════════════════
+const ethanolStatements=[
+  {text:'Ethanol hat die Formel C₂H₅OH',correct:true},
+  {text:'Ethanol ist ein Alkan',correct:false},
+  {text:'Ethanol enthält eine OH-Gruppe',correct:true},
+  {text:'Ethanol ist in Wasser unlöslich',correct:false},
+  {text:'Ethanol entsteht bei der Gärung von Zucker',correct:true},
+  {text:'Ethanol siedet bei 78 °C',correct:true},
+  {text:'Ethanol hat die Formel CH₄',correct:false},
+  {text:'Ethanol ist ein Alkohol',correct:true},
+  {text:'Ethanol besteht nur aus C und H',correct:false},
+  {text:'Ethanol kann als Lösungsmittel verwendet werden',correct:true},
+];
+const r4WrongPool=[
+  'Ethanol hat die Summenformel C₃H₈','Ethanol gehört zu den Alkinen','Ethanol ist ein Ether',
+  'Ethanol hat einen Siedepunkt von 100 °C','Ethanol ist nicht entzündlich','Ethanol enthält keine Kohlenstoffatome',
+  'Ethanol ist ein fester Stoff bei Raumtemperatur','Ethanol ist ein Alken','Ethanol ist identisch mit Methan',
+  'Ethanol löst sich nicht in Wasser',
+];
+let r4WrongPoolIdx=0;
+let r4ActiveStatements=[...ethanolStatements];
+const r4needed=ethanolStatements.filter(s=>s.correct).length;
+
+function buildEthanolRoom(){
+  r4ActiveStatements = shuffle([...ethanolStatements]);
+  renderEthanolStatements();
+}
+function renderEthanolStatements(){
+  const c=document.getElementById('r4-choices'); c.innerHTML='';
+  r4ActiveStatements.forEach((s,i)=>{
+    const btn=document.createElement('button'); btn.className='choice-btn'; btn.innerHTML=s.text;
+    if(s._done){btn.classList.add(s.correct?'correct':'wrong');btn.disabled=true;}
+    else{btn.onclick=()=>handleEthanolClick(btn,i);}
+    c.appendChild(btn);
+  });
+}
+function handleEthanolClick(btn,idx){
+  if(btn.disabled)return;
+  const s=r4ActiveStatements[idx]; const fb=document.getElementById('fb-ethanol');
+  if(s.correct){
+    btn.classList.add('correct');btn.disabled=true;s._done=true;
+    state.r4correct.add(idx);
+    if(state.r4correct.size===r4needed){
+      fb.textContent='✅ Alle richtigen Aussagen gefunden!';fb.className='feedback show ok';
+      document.getElementById('r4-reward').style.display='block';
+      document.getElementById('r4-digit-display').textContent='Ziffer 4 lautet: '+digits[4];
+    } else {
+      fb.textContent=`✅ Richtig! Noch ${r4needed-state.r4correct.size} richtige Aussagen übrig.`;
+      fb.className='feedback show ok';
+    }
+  } else {
+    state.mistakes++;state.r4mistakes++;
+    btn.classList.add('wrong');btn.disabled=true;s._done=true;
+    if(state.r4mistakes>=3){fb.textContent='❌ Zu viele Fehler!';fb.className='feedback show err';setTimeout(()=>showLockout('r4'),700);return;}
+    const newText=r4WrongPool[r4WrongPoolIdx%r4WrongPool.length];r4WrongPoolIdx++;
+    r4ActiveStatements.push({text:newText,correct:false});
+    fb.textContent=`❌ Das stimmt nicht! Eine neue Aussage erscheint... (Fehler: ${state.r4mistakes}/3)`;
+    fb.className='feedback show err';
+    setTimeout(()=>renderEthanolStatements(),600);
+  }
+}
+
+// ════════════════════════════════════════
+// RAUM 5 – FINALCODE
+// ════════════════════════════════════════
+function checkFinalCode(){
+  const inp=document.getElementById('finalCode').value.trim();
+  const fb=document.getElementById('fb-final');
+  if(inp===correctCode){
+    fb.textContent='✅ CODE KORREKT! Tür öffnet sich...';fb.className='feedback show ok';
+    setTimeout(()=>{
+      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+      document.getElementById('screen-success').classList.add('active');
+      document.getElementById('success-code').textContent=digits[1]+' '+digits[2]+' '+digits[3]+' '+digits[4];
+      document.getElementById('final-mistakes').textContent=`Fehler insgesamt: ${state.mistakes} | Alle 4 Räume gelöst ✓`;
+      document.getElementById('mainHeader').style.display='none';
+    },1200);
+  } else {
+    document.getElementById('finalCode').classList.add('error');
+    setTimeout(()=>document.getElementById('finalCode').classList.remove('error'),600);
+    fb.textContent='❌ Falscher Code. Schaut nochmal in eure Notizen!';
+    fb.className='feedback show err'; state.mistakes++;
+  }
+}
+function restartGame(){location.reload();}
+</script>
+</body>
+</html>

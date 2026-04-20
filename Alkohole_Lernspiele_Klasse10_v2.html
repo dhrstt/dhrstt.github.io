@@ -1,0 +1,2004 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alkohole – Lernspiele | Chemie Klasse 10</title>
+<style>
+/* ===== RESET ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#07090d;color:#cdd9e5;font-family:system-ui,-apple-system,sans-serif;min-height:100vh;overflow-x:hidden}
+button{cursor:pointer;font-family:inherit;border:none}
+button:focus-visible{outline:2px solid #00e5ff;outline-offset:2px}
+input,select{font-family:inherit;box-sizing:border-box}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.07) 3px,rgba(0,0,0,.07) 4px);pointer-events:none;z-index:9998}
+
+/* ===== GLOBAL HEADER ===== */
+#gh{position:sticky;top:0;z-index:200;background:rgba(7,9,13,.97);border-bottom:1px solid #1a2535;backdrop-filter:blur(16px);padding:9px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.gh-logo{font-family:Georgia,serif;color:#00e5ff;font-size:.95rem;letter-spacing:.05em;white-space:nowrap;flex-shrink:0}
+.gh-logo span{color:#546e7a;font-size:.8em}
+.gh-box{display:flex;align-items:center;gap:7px;background:#0d1219;border:1px solid #1a2535;border-radius:99px;padding:4px 13px;flex-shrink:0}
+.gh-lbl{font-size:.62rem;color:#546e7a;text-transform:uppercase;letter-spacing:.1em}
+#gscore{font-family:'Courier New',monospace;font-size:1.2rem;color:#ffd600;min-width:3ch;text-align:right}
+#gscore.bump{animation:scoreBump .4s ease}
+#gmaxpts{font-size:.72rem;color:#546e7a;align-self:flex-end;padding-bottom:1px}
+.gh-nav{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+.nb{background:#0d1219;border:1px solid #1a2535;border-radius:99px;color:#546e7a;font-size:.66rem;padding:5px 10px;transition:all .2s;white-space:nowrap;min-height:30px;-webkit-tap-highlight-color:transparent}
+.nb:hover{color:#cdd9e5;border-color:#546e7a}
+.nb.on{font-weight:700}
+.nb[data-g="1"].on{color:#00e5ff;border-color:#00e5ff}
+.nb[data-g="2"].on{color:#69ff47;border-color:#69ff47}
+.nb[data-g="3"].on{color:#ff6d00;border-color:#ff6d00}
+.nb[data-g="4"].on{color:#ea80fc;border-color:#ea80fc}
+.nb[data-g="5"].on{color:#40c4ff;border-color:#40c4ff}
+.nb[data-g="6"].on{color:#ffab40;border-color:#ffab40}
+.nb[data-g="7"].on{color:#b9f6ca;border-color:#b9f6ca}
+.nb[data-g="end"].on{color:#ffd600;border-color:#ffd600}
+
+/* ===== SECTIONS ===== */
+.gsec{display:none;min-height:calc(100vh - 52px);padding:22px 14px 60px;max-width:860px;margin:0 auto;animation:fadeUp .35s ease}
+.gsec.on{display:block}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scoreBump{0%,100%{transform:scale(1)}50%{transform:scale(1.55);color:#fff}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+@keyframes pop{0%{transform:scale(.75);opacity:0}70%{transform:scale(1.07)}100%{transform:scale(1);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@keyframes rollIn{from{transform:scaleY(0);opacity:0;transform-origin:top center}to{transform:scaleY(1);opacity:1}}
+@keyframes spinGlow{0%{transform:rotate(0deg);filter:drop-shadow(0 0 4px #ffd600)}100%{transform:rotate(360deg);filter:drop-shadow(0 0 12px #ffd600)}}
+
+/* ===== SHARED UI ===== */
+.g-header{display:flex;align-items:flex-start;gap:13px;margin-bottom:22px}
+.g-icon{font-size:2.5rem;flex-shrink:0;line-height:1}
+.g-title{font-family:Georgia,serif;font-size:clamp(1.2rem,3vw,1.65rem);line-height:1.2}
+.g-sub{font-size:.72rem;margin-top:3px;opacity:.5;letter-spacing:.08em;text-transform:uppercase}
+.g-pts-box{margin-left:auto;flex-shrink:0;background:#0d1219;border:1px solid #1a2535;border-radius:8px;padding:7px 13px;text-align:center;min-width:68px}
+.g-pts-num{font-family:'Courier New',monospace;font-size:1.25rem;display:block}
+.g-pts-lbl{font-size:.6rem;color:#546e7a;text-transform:uppercase}
+
+.card{background:#0d1219;border:1px solid #1a2535;border-radius:12px;padding:18px 16px;margin-bottom:11px}
+
+.pbar-wrap{margin-bottom:16px}
+.pbar-info{display:flex;justify-content:space-between;font-size:.7rem;color:#546e7a;margin-bottom:4px}
+.pbar-bg{background:#0d1219;border-radius:99px;height:4px;border:1px solid #1a2535}
+.pbar-fill{height:100%;border-radius:99px;transition:width .5s ease}
+
+.fb{padding:10px 14px;border-radius:8px;font-size:.85rem;line-height:1.55;margin-top:9px;display:none;animation:pop .3s ease}
+.fb.show{display:block}
+.fb.ok{background:rgba(0,230,118,.09);border:1px solid rgba(0,230,118,.22);color:#00e676}
+.fb.err{background:rgba(255,82,82,.09);border:1px solid rgba(255,82,82,.22);color:#ff5252;animation:shake .4s ease}
+.fb.warn{background:rgba(255,171,64,.09);border:1px solid rgba(255,171,64,.22);color:#ffab40}
+.fb.info{background:rgba(64,196,255,.09);border:1px solid rgba(64,196,255,.22);color:#40c4ff}
+
+.abtn{padding:11px 20px;border-radius:8px;font-size:.87rem;font-weight:600;letter-spacing:.04em;transition:all .2s;min-height:44px;-webkit-tap-highlight-color:transparent;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.abtn:hover:not(:disabled){filter:brightness(1.15);transform:translateY(-1px)}
+.abtn:active{transform:translateY(0)}
+
+/* drag ghost */
+.drag-ghost{position:fixed;z-index:9997;opacity:.88;pointer-events:none;background:#1a2535;border:1px solid #546e7a;border-radius:6px;padding:5px 11px;font-size:.78rem;color:#cdd9e5;white-space:nowrap;max-width:200px;overflow:hidden}
+
+/* locked badge */
+.locked-badge{display:inline-block;background:rgba(255,171,64,.15);border:1px solid rgba(255,171,64,.3);color:#ffab40;border-radius:6px;font-size:.72rem;padding:3px 9px;margin-left:8px}
+
+/* ===== GAME 1 – QUIZ (cyan) ===== */
+#g1 .g-title{color:#00e5ff}
+#g1 .pbar-fill{background:linear-gradient(90deg,#00e5ff,#40c4ff)}
+.q-meta{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap}
+.q-chip{background:#0d1219;border:1px solid #1a2535;border-radius:8px;padding:6px 11px;text-align:center;font-size:.7rem;color:#546e7a;flex:1;min-width:62px}
+.q-chip strong{display:block;font-size:1.15rem;color:#cdd9e5;font-family:'Courier New',monospace}
+.q-chip.streak strong{color:#ffd600}
+.timer-bar{height:4px;border-radius:99px;background:#1a2535;overflow:hidden;margin-bottom:14px}
+.timer-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#00e5ff,#ff6d00);transition:width .15s linear}
+.q-num-lbl{font-size:.7rem;color:#00e5ff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:9px}
+.q-text{font-family:Georgia,serif;font-size:clamp(.93rem,2.2vw,1.1rem);line-height:1.65;margin-bottom:16px;color:#e0ecf4}
+.q-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:480px){.q-opts{grid-template-columns:1fr}}
+.qo{background:#0d1219;border:2px solid #1a2535;border-radius:10px;color:#cdd9e5;font-size:.84rem;padding:12px 14px;text-align:left;display:flex;align-items:center;gap:8px;transition:all .2s;line-height:1.4;min-height:48px;-webkit-tap-highlight-color:transparent}
+.qo:hover:not(:disabled){border-color:#00e5ff;background:rgba(0,229,255,.06)}
+.qo .ql{width:21px;height:21px;border-radius:50%;background:#1a2535;display:flex;align-items:center;justify-content:center;font-size:.68rem;flex-shrink:0;font-weight:700}
+.qo.correct{border-color:#00e676;background:rgba(0,230,118,.09);color:#00e676}
+.qo.correct .ql{background:#00e676;color:#000}
+.qo.wrong{border-color:#ff5252;background:rgba(255,82,82,.07);color:#ff5252;animation:shake .4s ease}
+.qo.wrong .ql{background:#ff5252;color:#fff}
+.qo:disabled{cursor:default}
+
+/* ===== GAME 2 – MEMORY (green) ===== */
+#g2 .g-title{color:#69ff47}
+.mem-diff{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.mdb{background:#0d1219;border:1px solid #1a2535;border-radius:99px;color:#546e7a;font-size:.73rem;padding:5px 13px;transition:all .2s;-webkit-tap-highlight-color:transparent;min-height:32px}
+.mdb:hover,.mdb.on{border-color:#69ff47;color:#69ff47}
+.mem-stats{display:flex;gap:7px;margin-bottom:14px}
+.mstat{background:#0d1219;border:1px solid #1a2535;border-radius:8px;padding:6px 11px;text-align:center;font-size:.68rem;color:#546e7a;flex:1}
+.mstat strong{display:block;font-family:'Courier New',monospace;font-size:1.15rem;color:#cdd9e5}
+#mem-grid{display:grid;gap:7px;width:100%}
+.mc{perspective:700px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mc-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .36s ease;border-radius:9px}
+.mc.flip .mc-inner,.mc.done .mc-inner{transform:rotateY(180deg)}
+.mc-face{position:absolute;inset:0;border-radius:9px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;align-items:center;justify-content:center;padding:7px;text-align:center;flex-direction:column;gap:3px}
+.mc-back{background:#0d1f14;border:1px solid #1a3525;font-size:1.4rem;color:#69ff47}
+.mc-back-lbl{font-size:.56rem;color:#546e7a;text-transform:uppercase;letter-spacing:.07em}
+.mc-front{background:#071410;border:2px solid #69ff47;transform:rotateY(180deg);font-size:clamp(.6rem,1.35vw,.78rem);line-height:1.35;color:#cdd9e5}
+.mc-front .mtype{font-size:.56rem;color:#69ff47;text-transform:uppercase;letter-spacing:.07em}
+.mc.done .mc-front{background:rgba(105,255,71,.1);animation:pop .3s ease}
+
+/* ===== GAME 3 – ZUORDNUNG (orange) ===== */
+#g3 .g-title{color:#ff6d00}
+.z-mode-bar{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.zmb{background:#0d1219;border:1px solid #1a2535;border-radius:99px;color:#546e7a;font-size:.73rem;padding:5px 13px;transition:all .2s;min-height:32px}
+.zmb.on{border-color:#ff6d00;color:#ff6d00}
+.z-alc-name{font-family:Georgia,serif;font-size:clamp(1.05rem,2.3vw,1.4rem);color:#ff6d00;margin-bottom:3px}
+.z-alc-sub{font-size:.76rem;color:#546e7a;margin-bottom:3px}
+.z-hint-box{font-size:.76rem;color:#ffab40;margin-top:5px;display:none;animation:pop .3s ease}
+.z-zones{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:7px;margin-bottom:11px}
+.zzone{background:#100d07;border:2px dashed #1a2535;border-radius:10px;padding:9px;min-height:78px;transition:all .2s}
+.zzone.drag-over{border-color:#ff6d00;background:rgba(255,109,0,.07)}
+.zzone-lbl{font-size:.63rem;text-transform:uppercase;letter-spacing:.09em;color:#ff6d00;margin-bottom:6px;border-bottom:1px solid #1a2535;padding-bottom:4px}
+.zchip{background:#0d1219;border:1px solid #1a2535;border-radius:6px;padding:6px 8px;font-size:.78rem;margin-bottom:4px;cursor:grab;transition:all .2s;user-select:none;-webkit-user-select:none;touch-action:none;line-height:1.3;display:flex;justify-content:space-between;align-items:center;gap:4px}
+.zchip:hover{border-color:#ff6d00}
+.zchip.dragging{opacity:.22}
+.zchip.ok-chip{border-color:#00e676;background:rgba(0,230,118,.09);color:#00e676}
+.zchip.err-chip{border-color:#ff5252;background:rgba(255,82,82,.07);color:#ff5252}
+.zchip .zx{opacity:.3;font-size:.68rem;flex-shrink:0}
+.z-bank{display:flex;flex-wrap:wrap;gap:6px;background:#0d1219;border:1px solid #1a2535;border-radius:10px;padding:11px;min-height:50px;margin-bottom:11px}
+.bchip{background:#100d07;border:1px solid #1a2535;border-radius:6px;padding:6px 11px;font-size:.8rem;cursor:grab;transition:all .2s;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent}
+.bchip:hover:not(.used){border-color:#ff6d00;color:#ff6d00}
+.bchip.used{opacity:.18;pointer-events:none}
+.z-act{display:flex;gap:7px;flex-wrap:wrap}
+.z-act .abtn{flex:1;min-width:90px}
+
+/* ===== GAME 4 – STRUKTURFORMEL-LABOR (magenta) ===== */
+#g4 .g-title{color:#ea80fc}
+.sf-mode-lbl{font-size:.7rem;color:#ea80fc;text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px}
+.sf-svg-box{display:flex;justify-content:center;align-items:center;background:#0a0814;border:1px solid #2a1a3d;border-radius:10px;padding:18px 8px;margin-bottom:16px;min-height:120px;overflow-x:auto}
+.sf-name-show{font-family:Georgia,serif;font-size:clamp(1.1rem,2.8vw,1.7rem);color:#ea80fc;text-align:center;padding:22px;min-height:90px;display:flex;align-items:center;justify-content:center}
+.sf-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:480px){.sf-opts{grid-template-columns:1fr}}
+.sfo{background:#0d1219;border:2px solid #1a2535;border-radius:10px;color:#cdd9e5;font-size:.82rem;padding:11px 13px;text-align:center;transition:all .2s;min-height:44px;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.sfo:hover:not(:disabled){border-color:#ea80fc;background:rgba(234,128,252,.06)}
+.sfo.correct{border-color:#00e676;background:rgba(0,230,118,.09);color:#00e676}
+.sfo.wrong{border-color:#ff5252;background:rgba(255,82,82,.07);color:#ff5252;animation:shake .4s}
+.sfo:disabled{cursor:default}
+.sfo-lbl{font-size:.7rem;color:#546e7a;font-family:'Courier New',monospace}
+
+/* ===== GAME 5 – NOMENKLATUR-BUILDER (teal) ===== */
+#g5 .g-title{color:#40c4ff}
+.nom-task{font-family:Georgia,serif;font-size:.97rem;color:#b0bec5;line-height:1.6;margin-bottom:12px}
+.nom-task strong{color:#40c4ff}
+.nom-display{font-family:Georgia,serif;font-size:clamp(1.4rem,4vw,2.2rem);text-align:center;min-height:65px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:0;margin-bottom:14px;letter-spacing:.02em;background:#060d14;border-radius:10px;padding:12px}
+.np.pre{color:#fff}
+.np.stem{color:#78909c}
+.np.suf{color:#40c4ff}
+.np.placeholder{color:#1a2535;font-size:1.8rem}
+.nom-rule{font-size:.78rem;color:#546e7a;background:#0d1219;border:1px solid #1a2535;border-radius:8px;padding:9px 13px;margin-bottom:12px;line-height:1.55}
+.nom-rule span{color:#40c4ff}
+.tipp-bar{background:#0d1219;border:1px solid #1a2535;border-radius:8px;padding:9px 13px;margin-bottom:12px;font-size:.8rem;display:none}
+.tipp-bar.show{display:block;animation:pop .3s ease}
+.tipp-cost{color:#ffab40;font-size:.72rem;font-weight:600}
+.pieces-row{margin-bottom:9px}
+.pieces-lbl{font-size:.63rem;text-transform:uppercase;letter-spacing:.1em;color:#546e7a;margin-bottom:5px}
+.pieces{display:flex;flex-wrap:wrap;gap:6px}
+.piece{border:1px solid #1a2535;border-radius:6px;padding:7px 13px;font-family:'Courier New',monospace;font-size:.86rem;color:#cdd9e5;background:#0d1219;transition:all .2s;-webkit-tap-highlight-color:transparent;min-height:36px}
+.piece.pre-p:hover:not(.used):not(:disabled){border-color:#fff;color:#fff}
+.piece.suf-p:hover:not(.used):not(:disabled){border-color:#40c4ff;color:#40c4ff}
+.piece.used{opacity:.18;pointer-events:none}
+.nom-sel-wrap{min-height:34px;margin-bottom:11px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.nom-sel-chip{background:#1a2535;border-radius:5px;padding:4px 9px;font-family:'Courier New',monospace;font-size:.82rem;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.nom-sel-chip:hover{opacity:.6}
+
+/* ===== GAME 6 – REIHEN-DETEKTOR (amber) ===== */
+#g6 .g-title{color:#ffab40}
+.rd-intro{font-size:.83rem;color:#546e7a;margin-bottom:12px;line-height:1.6}
+.rd-intro strong{color:#ffab40}
+.rd-tipp-btn{background:transparent;border:1px solid #ffab40;color:#ffab40;border-radius:6px;padding:5px 12px;font-size:.75rem;margin-bottom:10px;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.rd-tipp-btn:hover{background:rgba(255,171,64,.1)}
+.rd-tipp-btn:disabled{opacity:.35;cursor:default}
+.rd-table{width:100%;border-collapse:collapse;font-family:'Courier New',monospace;font-size:.82rem;margin-bottom:14px}
+.rd-table th{background:#0d1219;color:#ffab40;font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;padding:8px 10px;text-align:left;border-bottom:1px solid #1a2535}
+.rd-table td{padding:8px 10px;border-bottom:1px solid #1a2535;vertical-align:middle}
+.rd-table tr:last-child td{border-bottom:none}
+.rd-given{color:#cdd9e5}
+.rd-inp{background:#111a22;border:1px solid #1a2535;border-radius:6px;color:#cdd9e5;font-family:'Courier New',monospace;font-size:.82rem;padding:5px 8px;width:100%;transition:border-color .2s;min-width:78px}
+.rd-inp:focus{outline:none;border-color:#ffab40}
+.rd-inp.ok{border-color:#00e676;background:rgba(0,230,118,.07);color:#00e676}
+.rd-inp.err{border-color:#ff5252;background:rgba(255,82,82,.05);color:#ff5252}
+.rd-pattern{background:#060a05;border:1px solid rgba(255,171,64,.18);border-radius:8px;padding:11px;margin-top:11px;font-size:.8rem;line-height:1.7;display:none}
+.rd-pattern.show{display:block;animation:pop .4s ease}
+.rd-pattern strong{color:#ffab40}
+
+/* ===== GAME 7 – WERTIGKEIT-SORTIERER (mint) ===== */
+#g7 .g-title{color:#b9f6ca}
+.ws-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:11px}
+@media(max-width:560px){.ws-cols{grid-template-columns:1fr 1fr}}
+.wcol{background:#071410;border:2px dashed #1a2535;border-radius:10px;padding:9px 7px;min-height:145px;transition:all .2s}
+.wcol.drag-over{border-color:#b9f6ca;background:rgba(185,246,202,.06)}
+.wcol-h{text-align:center;font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:#b9f6ca;margin-bottom:7px;padding-bottom:6px;border-bottom:1px solid #1a2535}
+.wcol-h .oh{font-family:'Courier New',monospace;font-size:.92rem;display:block;color:#cdd9e5;margin-bottom:1px}
+.wcol-h .end{font-family:'Courier New',monospace;font-size:.76rem;color:#b9f6ca}
+.wcard{background:#0d1219;border:1px solid #1a2535;border-radius:7px;padding:6px 8px;margin-bottom:4px;font-size:.78rem;cursor:grab;transition:all .2s;user-select:none;-webkit-user-select:none;touch-action:none;line-height:1.3}
+.wcard:hover{border-color:#b9f6ca}
+.wcard.dragging{opacity:.22}
+.wcard.ok-card{border-color:#00e676;background:rgba(0,230,118,.07)}
+.wcard.err-card{border-color:#ff5252;background:rgba(255,82,82,.06);animation:shake .4s}
+.ws-bank{display:flex;flex-wrap:wrap;gap:6px;background:#0d1219;border:1px solid #1a2535;border-radius:10px;padding:11px;min-height:48px;margin-bottom:11px}
+
+/* ===== END SCREEN ===== */
+#gend{display:none;padding:28px 14px 60px;max-width:700px;margin:0 auto}
+#gend.on{display:block;animation:fadeUp .5s ease}
+.end-trophy{display:flex;justify-content:center;margin-bottom:14px}
+.confetti-piece{position:fixed;border-radius:2px;animation:confettiFall linear forwards;pointer-events:none;z-index:9990}
+.end-title-big{font-family:Georgia,serif;font-size:clamp(1.5rem,4vw,2.3rem);text-align:center;margin-bottom:4px}
+.end-sub-txt{color:#546e7a;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:18px;text-align:center}
+.end-score-row{display:flex;justify-content:center;align-items:baseline;gap:7px;margin-bottom:5px}
+.end-score-num{font-family:'Courier New',monospace;font-size:clamp(2.8rem,7vw,4.5rem);line-height:1;color:#ffd600}
+.end-score-max{font-size:1.4rem;color:#546e7a}
+.end-pct{font-size:.85rem;color:#546e7a;margin-bottom:22px;text-align:center}
+.end-msg-box{background:#0d1219;border:1px solid #1a2535;border-radius:12px;padding:16px 18px;margin-bottom:18px;font-style:italic;color:#b0bec5;line-height:1.7;font-family:Georgia,serif;font-size:.92rem}
+.end-breakdown-ttl{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:#546e7a;margin-bottom:11px}
+.end-cards{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:22px}
+@media(max-width:480px){.end-cards{grid-template-columns:1fr}}
+.end-card{background:#0d1219;border:1px solid #1a2535;border-radius:10px;padding:11px 13px}
+.end-card-name{font-size:.75rem;color:#546e7a;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
+.end-card-bar-bg{background:#1a2535;border-radius:99px;height:4px;margin-bottom:4px}
+.end-card-bar-fill{height:100%;border-radius:99px;transition:width 1s ease}
+.end-card-tip{font-size:.73rem;line-height:1.5}
+.end-restart{display:block;width:100%;background:#00e5ff;color:#000;border-radius:10px;padding:13px;font-size:.93rem;font-weight:700;letter-spacing:.04em;transition:all .2s}
+.end-restart:hover{background:#40c4ff;transform:translateY(-1px)}
+</style>
+</head>
+<body>
+
+<!-- GLOBAL HEADER -->
+<div id="gh">
+  <div class="gh-logo">⚗️ Alkohole <span>Chemie · Kl. 10</span></div>
+  <div class="gh-box">
+    <span class="gh-lbl">Punkte</span>
+    <span id="gscore">0</span>
+    <span id="gmaxpts">/ 0</span>
+  </div>
+  <nav class="gh-nav">
+    <button class="nb on" data-g="1" onclick="showGame('1')">🎯 Quiz</button>
+    <button class="nb" data-g="2" onclick="showGame('2')">🧩 Memory</button>
+    <button class="nb" data-g="3" onclick="showGame('3')">🔭 Zuordnung</button>
+    <button class="nb" data-g="4" onclick="showGame('4')">⚗️ Strukturen</button>
+    <button class="nb" data-g="5" onclick="showGame('5')">🔤 Nomenklatur</button>
+    <button class="nb" data-g="6" onclick="showGame('6')">🧬 Reihen</button>
+    <button class="nb" data-g="7" onclick="showGame('7')">🏷️ Wertigkeit</button>
+    <button class="nb" data-g="end" onclick="showGame('end')">🏆 Auswertung</button>
+  </nav>
+</div>
+
+<!-- GAME 1: QUIZ -->
+<section class="gsec on" id="g1">
+  <div class="g-header">
+    <div class="g-icon">🎯</div>
+    <div>
+      <div class="g-title">Wer wird Chemiemeister?</div>
+      <div class="g-sub">Quiz · 12 Fragen · Timer · einmalig gewertet</div>
+    </div>
+    <div class="g-pts-box"><span class="g-pts-num" id="q-pts" style="color:#00e5ff">0</span><span class="g-pts-lbl">Punkte</span></div>
+  </div>
+  <div class="pbar-wrap">
+    <div class="pbar-info"><span id="q-prog">Frage 1 von 12</span><span id="q-pct">0 %</span></div>
+    <div class="pbar-bg"><div class="pbar-fill" id="q-bar" style="width:0%"></div></div>
+  </div>
+  <div class="q-meta">
+    <div class="q-chip"><strong id="q-ok">0</strong>Richtig</div>
+    <div class="q-chip"><strong id="q-err">0</strong>Falsch</div>
+    <div class="q-chip streak"><strong id="q-streak">0</strong>Streak 🔥</div>
+    <div class="q-chip"><strong id="q-mult">×1</strong>Multi</div>
+  </div>
+  <div class="timer-bar"><div class="timer-fill" id="q-timer" style="width:100%"></div></div>
+  <div class="card" id="q-card">
+    <div class="q-num-lbl" id="q-num">FRAGE 01</div>
+    <div class="q-text" id="q-text"></div>
+    <div class="q-opts" id="q-opts"></div>
+    <div class="fb" id="q-fb"></div>
+    <button class="abtn" id="q-next" style="display:none;margin-top:13px;width:100%;background:#00e5ff;color:#000" onclick="qNext()">Weiter →</button>
+  </div>
+  <div id="q-end" style="display:none;text-align:center;padding:28px 0;animation:pop .5s ease">
+    <div style="font-size:2.8rem;margin-bottom:10px">🎯</div>
+    <div style="font-family:Georgia,serif;font-size:1.35rem;color:#00e5ff;margin-bottom:7px">Quiz abgeschlossen!</div>
+    <div style="font-family:'Courier New',monospace;font-size:2.4rem;color:#ffd600;margin-bottom:4px"><span id="q-fin-pts">0</span> Punkte</div>
+    <div style="color:#546e7a;font-size:.82rem;margin-bottom:8px" id="q-fin-msg"></div>
+    <div class="fb info show" style="text-align:left;margin-bottom:18px">ℹ️ Das Quiz ist jetzt gesperrt – die Punkte wurden bereits in den Gesamtstand eingerechnet. Du kannst das Quiz nochmal üben, aber es gibt keine weiteren globalen Punkte.</div>
+    <button class="abtn" style="background:transparent;border:1px solid #00e5ff;color:#00e5ff;margin-right:7px" onclick="qPractice()">↺ Üben (ohne Wertung)</button>
+    <button class="abtn" style="background:#00e5ff;color:#000" onclick="showGame('2')">Weiter →</button>
+  </div>
+</section>
+
+<!-- GAME 2: MEMORY -->
+<section class="gsec" id="g2">
+  <div class="g-header">
+    <div class="g-icon">🧩</div>
+    <div><div class="g-title">Molekül-Match</div><div class="g-sub">Memory · einmalig gewertet · Zeitbonus</div></div>
+    <div class="g-pts-box"><span class="g-pts-num" id="m-pts" style="color:#69ff47">0</span><span class="g-pts-lbl">Punkte</span></div>
+  </div>
+  <div class="mem-diff">
+    <button class="mdb on" onclick="mSetDiff(8,this)">8 Paare</button>
+    <button class="mdb" onclick="mSetDiff(12,this)">12 Paare</button>
+    <button class="mdb" onclick="mSetDiff(16,this)">16 Paare</button>
+  </div>
+  <div class="mem-stats">
+    <div class="mstat"><strong id="m-found">0</strong>Gefunden</div>
+    <div class="mstat"><strong id="m-tries">0</strong>Versuche</div>
+    <div class="mstat"><strong id="m-time">0:00</strong>Zeit</div>
+  </div>
+  <div id="mem-grid"></div>
+  <div id="m-win" style="display:none;text-align:center;padding:26px 0;animation:pop .4s ease">
+    <div style="font-size:2.8rem;margin-bottom:9px">🧩</div>
+    <div style="font-family:Georgia,serif;font-size:1.3rem;color:#69ff47;margin-bottom:7px">Alle Paare gefunden!</div>
+    <div style="font-family:'Courier New',monospace;font-size:2rem;color:#ffd600;margin-bottom:3px"><span id="m-fin-pts">0</span> Punkte</div>
+    <div style="color:#546e7a;font-size:.79rem;margin-bottom:16px" id="m-fin-info"></div>
+    <div class="fb info show" style="text-align:left;margin-bottom:14px">ℹ️ Memory ist nun gesperrt. Üben ist weiterhin möglich, bringt aber keine weiteren Gesamtpunkte.</div>
+    <button class="abtn" style="background:transparent;border:1px solid #69ff47;color:#69ff47;margin-right:7px" onclick="mPractice()">↺ Üben</button>
+    <button class="abtn" style="background:#69ff47;color:#000" onclick="showGame('3')">Weiter →</button>
+  </div>
+</section>
+
+<!-- GAME 3: ZUORDNUNG -->
+<section class="gsec" id="g3">
+  <div class="g-header">
+    <div class="g-icon">🔭</div>
+    <div><div class="g-title">Alkohol-Sortiermaschine</div><div class="g-sub">Drag & Drop · 3 Modi · 5 Runden je Modus</div></div>
+    <div class="g-pts-box"><span class="g-pts-num" id="z-pts" style="color:#ff6d00">0</span><span class="g-pts-lbl">Punkte</span></div>
+  </div>
+  <div class="z-mode-bar">
+    <button class="zmb on" onclick="zSetMode('eigenschaften',this)">Eigenschaften</button>
+    <button class="zmb" onclick="zSetMode('verwendung',this)">Verwendung</button>
+    <button class="zmb" onclick="zSetMode('formeln',this)">Formeln</button>
+  </div>
+  <div class="pbar-wrap">
+    <div class="pbar-info"><span id="z-prog">Runde 1 von 5</span><span id="z-ppct">0 Pkt</span></div>
+    <div class="pbar-bg"><div class="pbar-fill" id="z-bar" style="width:0%;background:linear-gradient(90deg,#ff6d00,#ffab40)"></div></div>
+  </div>
+  <div class="card">
+    <div style="font-size:.67rem;color:#ff6d00;text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px" id="z-task-lbl">Ordne zu:</div>
+    <div class="z-alc-name" id="z-alc-name"></div>
+    <div class="z-alc-sub" id="z-alc-sub"></div>
+    <div class="z-hint-box" id="z-hint">💡 Tipp wird nach 2 Fehlversuchen sichtbar</div>
+  </div>
+  <div class="z-zones" id="z-zones"></div>
+  <div class="z-bank" id="z-bank"></div>
+  <div class="fb" id="z-fb"></div>
+  <div class="z-act">
+    <button class="abtn" style="background:transparent;border:1px solid #1a2535;color:#546e7a" onclick="zReset()">↺ Reset</button>
+    <button class="abtn" style="background:#ff6d00;color:#000" onclick="zCheck()">✓ Prüfen</button>
+    <button class="abtn" id="z-next-btn" style="display:none;background:transparent;border:1px solid #ff6d00;color:#ff6d00" onclick="zNext()">Weiter →</button>
+  </div>
+  <div id="z-end" style="display:none;text-align:center;padding:26px 0">
+    <div style="font-size:2.5rem;margin-bottom:9px">🔭</div>
+    <div style="font-family:Georgia,serif;font-size:1.25rem;color:#ff6d00;margin-bottom:7px">Modus abgeschlossen!</div>
+    <div style="font-family:'Courier New',monospace;font-size:1.9rem;color:#ffd600;margin-bottom:15px"><span id="z-fin-pts">0</span> Punkte</div>
+    <button class="abtn" style="background:#ff6d00;color:#000;margin-right:7px" onclick="zRestart()">↺ Nochmal</button>
+    <button class="abtn" style="background:transparent;border:1px solid #ff6d00;color:#ff6d00" onclick="showGame('4')">Weiter →</button>
+  </div>
+</section>
+
+<!-- GAME 4: STRUKTURFORMEL-LABOR -->
+<section class="gsec" id="g4">
+  <div class="g-header">
+    <div class="g-icon">⚗️</div>
+    <div><div class="g-title">Strukturformel-Labor</div><div class="g-sub">Lewis-Formeln · 10 Runden · Name ↔ Formel</div></div>
+    <div class="g-pts-box"><span class="g-pts-num" id="sf-pts" style="color:#ea80fc">0</span><span class="g-pts-lbl">Punkte</span></div>
+  </div>
+  <div class="pbar-wrap">
+    <div class="pbar-info"><span id="sf-prog">Runde 1 von 10</span><span id="sf-pct">0 %</span></div>
+    <div class="pbar-bg"><div class="pbar-fill" id="sf-bar" style="width:0%;background:linear-gradient(90deg,#ea80fc,#ce93d8)"></div></div>
+  </div>
+  <div class="card" id="sf-card">
+    <div class="sf-mode-lbl" id="sf-mode-lbl"></div>
+    <div id="sf-display"></div>
+    <div class="sf-opts" id="sf-opts"></div>
+    <div class="fb" id="sf-fb"></div>
+    <button class="abtn" id="sf-next" style="display:none;margin-top:13px;width:100%;background:#ea80fc;color:#000" onclick="sfNext()">Weiter →</button>
+  </div>
+  <div id="sf-end" style="display:none;text-align:center;padding:26px 0">
+    <div style="font-size:2.5rem;margin-bottom:9px">⚗️</div>
+    <div style="font-family:Georgia,serif;font-size:1.25rem;color:#ea80fc;margin-bottom:7px">Labor abgeschlossen!</div>
+    <div style="font-family:'Courier New',monospace;font-size:1.9rem;color:#ffd600;margin-bottom:15px"><span id="sf-fin-pts">0</span> Punkte</div>
+    <button class="abtn" style="background:transparent;border:1px solid #ea80fc;color:#ea80fc" onclick="showGame('5')">Weiter →</button>
+  </div>
+</section>
+
+<!-- GAME 5: NOMENKLATUR-BUILDER -->
+<section class="gsec" id="g5">
+  <div class="g-header">
+    <div class="g-icon">🔤</div>
+    <div><div class="g-title">Nomenklatur-Builder</div><div class="g-sub">Namen zusammensetzen · 10 Aufgaben · mit Tipps</div></div>
+    <div class="g-pts-box"><span class="g-pts-num" id="nom-pts" style="color:#40c4ff">0</span><span class="g-pts-lbl">Punkte</span></div>
+  </div>
+  <div class="pbar-wrap">
+    <div class="pbar-info"><span id="nom-prog">Aufgabe 1 von 10</span><span id="nom-pct">0 %</span></div>
+    <div class="pbar-bg"><div class="pbar-fill" id="nom-bar" style="width:0%;background:linear-gradient(90deg,#40c4ff,#00e5ff)"></div></div>
+  </div>
+  <div class="card">
+    <div class="nom-task" id="nom-task"></div>
+    <div class="nom-display" id="nom-display"><span class="np placeholder">_ _ _ _ _ _</span></div>
+    <div class="nom-rule" id="nom-rule"></div>
+    <div class="tipp-bar" id="nom-tipp-bar"></div>
+    <div class="pieces-row">
+      <div class="pieces-lbl">Vorsilben (Anzahl C-Atome)</div>
+      <div class="pieces" id="nom-prefixes"></div>
+    </div>
+    <div class="pieces-row">
+      <div class="pieces-lbl">Endungen (Anzahl OH-Gruppen)</div>
+      <div class="pieces" id="nom-suffixes"></div>
+    </div>
+    <div style="font-size:.68rem;color:#546e7a;margin-bottom:5px">Deine Auswahl (klicken zum Entfernen):</div>
+    <div class="nom-sel-wrap" id="nom-selected"></div>
+    <div class="fb" id="nom-fb"></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="abtn" style="background:transparent;border:1px solid #1a2535;color:#546e7a;flex:1;min-width:80px" onclick="nomReset()">↺ Reset</button>
+      <button class="abtn" id="nom-tipp-btn" style="background:transparent;border:1px solid #ffab40;color:#ffab40;flex:1;min-width:80px" onclick="nomShowTipp()">💡 Tipp</button>
+      <button class="abtn" style="background:#40c4ff;color:#000;flex:2;min-width:110px" onclick="nomCheck()">✓ Prüfen</button>
+      <button class="abtn" id="nom-next" style="display:none;background:transparent;border:1px solid #40c4ff;color:#40c4ff;flex:1;min-width:80px" onclick="nomNext()">Weiter →</button>
+    </div>
+  </div>
+  <div id="nom-end" style="display:none;text-align:center;padding:26px 0">
+    <div style="font-size:2.5rem;margin-bottom:9px">🔤</div>
+    <div style="font-family:Georgia,serif;font-size:1.25rem;color:#40c4ff;margin-bottom:7px">Nomenklatur gemeistert!</div>
+    <div style="font-family:'Courier New',monospace;font-size:1.9rem;color:#ffd600;margin-bottom:15px"><span id="nom-fin-pts">0</span> Punkte</div>
+    <button class="abtn" style="background:transparent;border:1px solid #40c4ff;color:#40c4ff" onclick="showGame('6')">Weiter →</button>
+  </div>
+</section>
+
+<!-- GAME 6: REIHEN-DETEKTOR -->
+<section class="gsec" id="g6">
+  <div class="g-header">
+    <div class="g-icon">🧬</div>
+    <div><div class="g-title">Reihen-Detektor</div><div class="g-sub">Homologe Reihe · Name & Formel · mit Tipps</div></div>
+    <div class="g-pts-box"><span class="g-pts-num" id="rd-pts" style="color:#ffab40">0</span><span class="g-pts-lbl">Punkte</span></div>
+  </div>
+  <div class="rd-intro">
+    Die <strong>homologe Reihe der Alkohole</strong> folgt einem Muster: jedes Glied hat eine CH₂-Gruppe mehr. Ergänze die Lücken! Tipps kosten Punkte.
+  </div>
+  <div id="rd-rows-wrap"></div>
+  <div class="rd-pattern" id="rd-pattern"></div>
+  <div class="fb" id="rd-fb"></div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:11px">
+    <button class="abtn" style="background:transparent;border:1px solid #1a2535;color:#546e7a;flex:1" onclick="rdReset()">↺ Reset</button>
+    <button class="abtn" style="background:#ffab40;color:#000;flex:2" onclick="rdCheck()">✓ Prüfen</button>
+    <button class="abtn" id="rd-next" style="display:none;background:transparent;border:1px solid #ffab40;color:#ffab40;flex:1" onclick="showGame('7')">Weiter →</button>
+  </div>
+</section>
+
+<!-- GAME 7: WERTIGKEIT-SORTIERER -->
+<section class="gsec" id="g7">
+  <div class="g-header">
+    <div class="g-icon">🏷️</div>
+    <div><div class="g-title">Wertigkeit-Sortierer</div><div class="g-sub">OH-Gruppen · Endungen · Drag & Drop</div></div>
+    <div class="g-pts-box"><span class="g-pts-num" id="ws-pts" style="color:#b9f6ca">0</span><span class="g-pts-lbl">Punkte</span></div>
+  </div>
+  <div style="font-size:.82rem;color:#546e7a;margin-bottom:14px;line-height:1.6">Sortiere die Alkohole je nach Anzahl ihrer OH-Gruppen in die richtige Spalte!</div>
+  <div class="ws-cols" id="ws-cols"></div>
+  <div style="font-size:.68rem;color:#546e7a;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em">Noch zu sortieren:</div>
+  <div class="ws-bank" id="ws-bank"></div>
+  <div class="fb" id="ws-fb"></div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:11px">
+    <button class="abtn" style="background:transparent;border:1px solid #1a2535;color:#546e7a;flex:1" onclick="wsReset()">↺ Reset</button>
+    <button class="abtn" style="background:#b9f6ca;color:#000;flex:2" onclick="wsCheck()">✓ Prüfen</button>
+    <button class="abtn" id="ws-done-btn" style="display:none;background:transparent;border:1px solid #b9f6ca;color:#b9f6ca;flex:1" onclick="showGame('end')">🏆 Auswertung</button>
+  </div>
+</section>
+
+<!-- END SCREEN -->
+<section id="gend">
+  <div class="end-trophy" id="end-trophy"></div>
+  <div class="end-title-big" id="end-title"></div>
+  <div class="end-sub-txt" id="end-sub"></div>
+  <div class="end-score-row">
+    <div class="end-score-num" id="end-pts-num">0</div>
+    <div class="end-score-max" id="end-pts-max">/ 0</div>
+  </div>
+  <div class="end-pct" id="end-pct-txt"></div>
+  <div class="end-msg-box" id="end-msg"></div>
+  <div class="end-breakdown-ttl">📊 Teilthemen-Auswertung</div>
+  <div class="end-cards" id="end-cards"></div>
+  <button class="end-restart" onclick="location.reload()">↺ Alles nochmal spielen</button>
+</section>
+<script>
+/* ============================================================
+   GLOBAL STATE & SCORE SYSTEM
+   Regel: G.pts kann NIEMALS > G.maxPts werden.
+   Jedes Spiel wird nach Abschluss gesperrt (locked).
+   Neustart eines Spiels bringt keine weiteren globalen Punkte.
+   ============================================================ */
+const G = {
+  pts: 0,
+  maxPts: 0,
+  gameScores: {},
+  start: Date.now()
+};
+
+function initGame(name, maxPts, label) {
+  G.gameScores[name] = { got: 0, max: maxPts, locked: false, label: label };
+  G.maxPts += maxPts;
+  document.getElementById('gmaxpts').textContent = '/ ' + G.maxPts;
+}
+
+function award(pts, game) {
+  const gs = G.gameScores[game];
+  if (!gs || gs.locked) return; // gesperrt → keine Punkte
+  const actual = Math.min(pts, gs.max - gs.got); // nie über Spielmaximum
+  if (actual <= 0) return;
+  gs.got += actual;
+  G.pts = Math.min(G.pts + actual, G.maxPts); // nie über Gesamtmaximum
+  updateScoreDisplay();
+}
+
+function lockGame(game) {
+  if (G.gameScores[game]) G.gameScores[game].locked = true;
+}
+
+function updateScoreDisplay() {
+  const el = document.getElementById('gscore');
+  el.textContent = G.pts;
+  el.classList.remove('bump');
+  void el.offsetWidth;
+  el.classList.add('bump');
+}
+
+function showGame(id) {
+  document.querySelectorAll('.gsec').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+  if (id === 'end') {
+    document.getElementById('gend').classList.add('on');
+    document.querySelector('[data-g="end"]').classList.add('on');
+    buildEndScreen();
+  } else {
+    document.getElementById('g' + id).classList.add('on');
+    document.querySelector('[data-g="' + id + '"]').classList.add('on');
+  }
+  window.scrollTo(0, 0);
+}
+
+function shuffle(a) {
+  const arr = [...a];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/* ============================================================
+   SPIEL-MAXIMA (einmalig hier definiert)
+   Quiz: 12 Fragen × 15 Punkte max = 180
+   Memory: 128 (16 Paare × 8)
+   Zuordnung: 45 (3 Modi × 5 Runden × 3 Pkt)
+   Strukturformeln: 100 (10 × 10)
+   Nomenklatur: 100 (10 × 10)
+   Reihen: 40
+   Wertigkeit: 14 (7 Karten × 2)
+   ============================================================ */
+initGame('Quiz', 180, '🎯 Quiz – Faktenwissen');
+initGame('Memory', 128, '🧩 Memory – Begriffe & Definitionen');
+initGame('Zuordnung', 45, '🔭 Zuordnung – Eigenschaften & Verwendung');
+initGame('Strukturformeln', 100, '⚗️ Strukturformel-Labor');
+initGame('Nomenklatur', 100, '🔤 Nomenklatur-Builder');
+initGame('Reihen', 40, '🧬 Reihen-Detektor');
+initGame('Wertigkeit', 14, '🏷️ Wertigkeit-Sortierer');
+
+/* ============================================================
+   GAME 1 – QUIZ
+   Jede Frage einmal. Nach Abschluss: lockGame('Quiz').
+   Neustart = Üben ohne Wertung.
+   ============================================================ */
+const QUIZ_Q = [
+  {q:"Welche funktionelle Gruppe ist für alle Alkohole charakteristisch?",
+   opts:["Carboxylgruppe (–COOH)","Hydroxy-Gruppe (–OH)","Aminogruppe (–NH₂)","Carbonylgruppe (C=O)"],c:1,
+   ex:"Jeder Alkohol trägt mindestens eine OH-Gruppe (Hydroxy-Gruppe) – das defininierende Merkmal aller Alkohole."},
+  {q:"Woran erkennt man Alkohole an ihrem Namen?",
+   opts:["An der Endung –an","An der Endung –ol","An der Vorsilbe Oxy–","An der Endung –säure"],c:1,
+   ex:"Alkohole erkennt man an der Endung –ol (z. B. Ethanol, Methanol, Propanol)."},
+  {q:"Warum eignet sich Ethanol als Fensterreiniger?",
+   opts:["Es ist farblos und geruchlos","Es löst Fette und verdunstet schnell ohne Schlieren (Sdp. 78 °C)","Es reagiert mit Schmutz zu harmlosen Salzen","Es hat einen hohen Siedepunkt"],c:1,
+   ex:"Ethanol löst Fette und verdunstet durch seinen niedrigen Siedepunkt von 78 °C rückstandsfrei."},
+  {q:"Was bedeutet E10 bei Kraftstoff?",
+   opts:["10 Oktan Zusatz","100 % Ethanol","10 % Ethanol, 90 % Benzin","10 % Erdöl, 90 % Ethanol"],c:2,
+   ex:"E = Ethanol, 10 = 10 %. Der Kraftstoff enthält 10 % Ethanol und 90 % Benzin, um Erdöl zu sparen."},
+  {q:"Warum ist Methanol lebensgefährlich?",
+   opts:["Es riecht extrem scharf","Im Körper entsteht Formaldehyd und Ameisensäure → Erblindung, Tod","Es hat einen sehr hohen Flammpunkt","Es reagiert explosiv mit Wasser"],c:1,
+   ex:"Methanol wird im Körper zu Methanal (Formaldehyd) und Ameisensäure metabolisiert, was die Sehnerven zerstört."},
+  {q:"Welcher Alkohol ist Hauptbestandteil von Frostschutzmitteln für Autokühler?",
+   opts:["Methanol","Ethanol","Ethandiol","Glycerin"],c:2,
+   ex:"Ethandiol senkt den Gefrierpunkt von Wasser massiv ab und ist daher der Hauptbestandteil von Frostschutzmitteln."},
+  {q:"Warum hat Ethandiol einen so hohen Siedepunkt (ca. 197 °C)?",
+   opts:["Wegen seines hohen Molekulargewichts","Wegen der zwei OH-Gruppen → starke Wasserstoffbrückenbindungen","Wegen einer Doppelbindung","Wegen des hohen Kohlenstoffanteils"],c:1,
+   ex:"Die zwei OH-Gruppen des Ethandiols ermöglichen starke Wasserstoffbrückenbindungen – viel Energie nötig zum Aufbrechen."},
+  {q:"Was bedeutet 'hygroskopisch' bei Glycerin?",
+   opts:["Es ist sehr dickflüssig","Es leitet elektrischen Strom","Es zieht Wasser aus der Umgebung an","Es verdunstet besonders langsam"],c:2,
+   ex:"Hygroskopisch = Wasser aus der Umgebung anziehen. Glycerins drei OH-Gruppen machen es sehr hygroskopisch."},
+  {q:"Wofür wird Glycerin (Propantriol) in Cremes eingesetzt?",
+   opts:["Als Duftstoff","Als Konservierungsmittel","Als Feuchthaltemittel – hält Feuchtigkeit in der Haut","Als UV-Filter"],c:2,
+   ex:"Die hygroskopische Wirkung der drei OH-Gruppen hält Feuchtigkeit in der Haut. Daher ist Glycerin in Hautcremes."},
+  {q:"Was ist Sorbit und wofür wird er verwendet?",
+   opts:["Ein Desinfektionsmittel","Ein sechswertiger Zuckeralkohol als Zuckerersatz in Diabetikerprodukten","Ein dreiwertiger Alkohol als Frostschutzmittel","Ein einwertiger Alkohol als Kraftstoffzusatz"],c:1,
+   ex:"Sorbit ist ein sechswertiger Zuckeralkohol. Weniger Kalorien als Haushaltszucker, verursacht keine Karies."},
+  {q:"Was ist der Grundbaustein von Fetten?",
+   opts:["Methanol","Ethanol","Ethandiol","Glycerin (Propantriol)"],c:3,
+   ex:"Glycerin (Propantriol) ist der Grundbaustein von Fetten (Triglyceriden) und wird auch für Nitroglycerin genutzt."},
+  {q:"Welche tödliche Menge Ethanol wurde für 50 kg Körpergewicht angegeben?",
+   opts:["50 ml","100 ml","150 ml","200 ml"],c:2,
+   ex:"Für 50 kg Körpergewicht können bereits 150 ml reines Ethanol tödlich sein."}
+];
+
+let qList = [], qIdx = 0, qOk = 0, qErr = 0, qStreak = 0, qLocalPts = 0;
+let qAnswered = false, qTimer = null, qTimeLeft = 15, qPracticeMode = false;
+
+function qMult() { return qStreak >= 5 ? 2 : qStreak >= 3 ? 1.5 : 1; }
+
+function qLoad() {
+  if (qIdx >= qList.length) { qShowEnd(); return; }
+  qAnswered = false;
+  const q = qList[qIdx];
+  const total = qList.length;
+  document.getElementById('q-num').textContent = 'FRAGE ' + String(qIdx + 1).padStart(2, '0');
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('q-prog').textContent = `Frage ${qIdx + 1} von ${total}`;
+  document.getElementById('q-pct').textContent = Math.round(qIdx / total * 100) + ' %';
+  document.getElementById('q-bar').style.width = Math.round(qIdx / total * 100) + '%';
+  document.getElementById('q-mult').textContent = '×' + qMult();
+  const letters = ['A', 'B', 'C', 'D'];
+  const indexed = q.opts.map((o, i) => ({ text: o, isC: i === q.c }));
+  const sh = shuffle(indexed);
+  const optsEl = document.getElementById('q-opts');
+  optsEl.innerHTML = '';
+  sh.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'qo';
+    b.innerHTML = `<span class="ql">${letters[i]}</span>${opt.text}`;
+    b.onclick = () => qAnswer(b, opt.isC, q.ex, sh);
+    optsEl.appendChild(b);
+  });
+  document.getElementById('q-fb').className = 'fb';
+  document.getElementById('q-next').style.display = 'none';
+  qStartTimer();
+}
+
+function qStartTimer() {
+  qTimeLeft = 15;
+  clearInterval(qTimer);
+  const fill = document.getElementById('q-timer');
+  fill.style.width = '100%';
+  qTimer = setInterval(() => {
+    qTimeLeft -= 0.1;
+    fill.style.width = Math.max(0, qTimeLeft / 15 * 100) + '%';
+    if (qTimeLeft <= 0) { clearInterval(qTimer); if (!qAnswered) qAnswer(null, false, '⏰ Zeit abgelaufen!', null); }
+  }, 100);
+}
+
+function qAnswer(btn, isC, explain, shArr) {
+  if (qAnswered) return;
+  qAnswered = true;
+  clearInterval(qTimer);
+  document.querySelectorAll('.qo').forEach(b => b.disabled = true);
+  const fb = document.getElementById('q-fb');
+  const timeBonus = Math.round(qTimeLeft / 15 * 5);
+  if (isC) {
+    btn && btn.classList.add('correct');
+    qOk++; qStreak++;
+    const mult = qMult();
+    const pts = Math.round((10 + timeBonus) * mult);
+    qLocalPts += pts;
+    document.getElementById('q-pts').textContent = qLocalPts;
+    if (!qPracticeMode) award(pts, 'Quiz');
+    fb.className = 'fb ok show';
+    fb.innerHTML = `✅ Richtig! +${pts} Punkte${mult > 1 ? ' (×' + mult + ' Streak-Bonus!)' : ''}. ${explain}`;
+  } else {
+    btn && btn.classList.add('wrong');
+    if (shArr) document.querySelectorAll('.qo').forEach((b, i) => { if (shArr[i] && shArr[i].isC) b.classList.add('correct'); });
+    qErr++; qStreak = 0;
+    if (!qPracticeMode) award(0, 'Quiz');
+    fb.className = 'fb err show';
+    fb.innerHTML = `❌ Leider falsch. ${explain}`;
+  }
+  document.getElementById('q-ok').textContent = qOk;
+  document.getElementById('q-err').textContent = qErr;
+  document.getElementById('q-streak').textContent = qStreak;
+  document.getElementById('q-mult').textContent = '×' + qMult();
+  document.getElementById('q-next').style.display = 'block';
+}
+
+function qNext() {
+  qIdx++;
+  if (qIdx >= qList.length) qShowEnd();
+  else qLoad();
+}
+
+function qShowEnd() {
+  clearInterval(qTimer);
+  if (!qPracticeMode) lockGame('Quiz'); // SPERREN
+  document.getElementById('q-card').style.display = 'none';
+  const pct = Math.round(qLocalPts / 180 * 100);
+  document.getElementById('q-fin-pts').textContent = qLocalPts;
+  document.getElementById('q-fin-msg').textContent = pct >= 80 ? 'Ausgezeichnet!' : pct >= 60 ? 'Gut gemacht!' : pct >= 40 ? 'Weiter üben!' : 'Nochmal versuchen!';
+  document.getElementById('q-end').style.display = 'block';
+  document.getElementById('q-bar').style.width = '100%';
+}
+
+function qPractice() {
+  // Üben ohne Wertung – Quiz zurücksetzen, aber locked bleibt
+  qPracticeMode = true;
+  qIdx = 0; qOk = 0; qErr = 0; qStreak = 0; qLocalPts = 0;
+  document.getElementById('q-ok').textContent = 0;
+  document.getElementById('q-err').textContent = 0;
+  document.getElementById('q-streak').textContent = 0;
+  document.getElementById('q-pts').textContent = 0;
+  document.getElementById('q-end').style.display = 'none';
+  document.getElementById('q-card').style.display = 'block';
+  qList = shuffle(QUIZ_Q);
+  qLoad();
+}
+
+// Init Quiz
+qList = shuffle(QUIZ_Q);
+qLoad();
+</script>
+<script>
+/* ============================================================
+   GAME 2 – MEMORY (einmalig gewertet)
+   ============================================================ */
+const MEM_PAIRS = [
+  {t:'Methanol',d:'CH₃OH · einfachster Alkohol · hochgiftig · → Formaldehyd & Ameisensäure im Körper → Erblindung'},
+  {t:'Ethanol',d:'C₂H₅OH · Trinkalkohol · Sdp. 78 °C · löst Fette · Reiniger, Parfum, Desinfektionsmittel, E10'},
+  {t:'Ethandiol',d:'Diol · 2 OH-Gruppen · Frostschutzmittel · Sdp. ~197 °C · süßlich, aber giftig!'},
+  {t:'Glycerin (Propantriol)',d:'Triol · 3 OH-Gruppen · hygroskopisch · Cremes · Grundbaustein der Fette'},
+  {t:'Sorbit (Sorbitol)',d:'Sechswertiger Zuckeralkohol · Zuckerersatz · kein Karies · Diabetikerprodukte'},
+  {t:'OH-Gruppe',d:'Hydroxy-Gruppe · funktionelle Gruppe aller Alkohole · bestimmt Eigenschaften'},
+  {t:'Einwertig (-ol)',d:'1 OH-Gruppe · Endung: -ol · z. B. Methanol, Ethanol, Propanol'},
+  {t:'Zweiwertig (-diol)',d:'2 OH-Gruppen · Endung: -diol · z. B. Ethandiol'},
+  {t:'Dreiwertig (-triol)',d:'3 OH-Gruppen · Endung: -triol · z. B. Propantriol = Glycerin'},
+  {t:'Sechswertig (-hexol)',d:'6 OH-Gruppen · Endung: -hexol · z. B. Sorbit (Sorbitol)'},
+  {t:'Hygroskopisch',d:'Zieht Wasser aus der Umgebung an · Eigenschaft von Glycerin → Feuchthaltemittel'},
+  {t:'Homologe Reihe',d:'Reihe verwandter Stoffe · jedes Folgeglied +CH₂ · gleiche funktionelle Gruppe'},
+  {t:'Wasserstoffbrückenbindung',d:'Starke zwischenmolekulare Kraft durch OH-Gruppen → erklärt hohe Siedepunkte'},
+  {t:'Desinfektionsmittel',d:'Ethanol tötet Keime, da es für die meisten Lebewesen giftig ist'},
+  {t:'E10-Kraftstoff',d:'10 % Ethanol + 90 % Benzin · spart Erdöl'},
+  {t:'Propantriol',d:'Chemischer Name für Glycerin · 3 C-Atome · dreiwertig · 3 OH-Gruppen'}
+];
+
+let mDiff = 8, mCards = [], mFlipped = [], mMatched = 0, mTries = 0;
+let mTimer = null, mSecs = 0, mLocked = false, mLocalPts = 0, mPracticeMode = false;
+
+function mSetDiff(n, btn) {
+  document.querySelectorAll('.mdb').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  mDiff = n;
+  mPracticeMode = false;
+  mBuild();
+}
+
+function mBuild() {
+  clearInterval(mTimer);
+  mFlipped = []; mMatched = 0; mTries = 0; mSecs = 0; mLocked = false;
+  document.getElementById('m-found').textContent = 0;
+  document.getElementById('m-tries').textContent = 0;
+  document.getElementById('m-time').textContent = '0:00';
+  document.getElementById('m-win').style.display = 'none';
+  const pairs = shuffle(MEM_PAIRS).slice(0, mDiff);
+  mCards = [];
+  pairs.forEach((p, i) => {
+    mCards.push({ id: i * 2, pairId: i, type: 'term', text: p.t });
+    mCards.push({ id: i * 2 + 1, pairId: i, type: 'def', text: p.d });
+  });
+  mCards = shuffle(mCards);
+  const cols = 4;
+  const grid = document.getElementById('mem-grid');
+  grid.style.gridTemplateColumns = `repeat(${cols},1fr)`;
+  grid.innerHTML = '';
+  mCards.forEach((card, idx) => {
+    const el = document.createElement('div');
+    el.className = 'mc';
+    el.style.aspectRatio = '1/1';
+    el.dataset.idx = idx;
+    el.innerHTML = `<div class="mc-inner">
+      <div class="mc-face mc-back"><span>🧪</span><span class="mc-back-lbl">Alkohole</span></div>
+      <div class="mc-face mc-front">
+        <span class="mtype">${card.type === 'term' ? '🔬 Begriff' : '📋 Info'}</span>
+        <span>${card.text}</span>
+      </div></div>`;
+    el.addEventListener('click', () => mFlip(idx));
+    el.addEventListener('touchend', e => { e.preventDefault(); mFlip(idx); }, { passive: false });
+    grid.appendChild(el);
+  });
+  mStartTimer();
+}
+
+function mStartTimer() {
+  clearInterval(mTimer); mSecs = 0;
+  mTimer = setInterval(() => {
+    mSecs++;
+    const m = Math.floor(mSecs / 60), s = String(mSecs % 60).padStart(2, '0');
+    document.getElementById('m-time').textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+function mFlip(idx) {
+  if (mLocked) return;
+  const el = document.querySelectorAll('.mc')[idx];
+  const card = mCards[idx];
+  if (el.classList.contains('flip') || el.classList.contains('done') || mFlipped.length === 2) return;
+  el.classList.add('flip');
+  mFlipped.push({ idx, card, el });
+  if (mFlipped.length === 2) {
+    mTries++;
+    document.getElementById('m-tries').textContent = mTries;
+    mLocked = true;
+    const [a, b] = mFlipped;
+    if (a.card.pairId === b.card.pairId && a.card.type !== b.card.type) {
+      setTimeout(() => {
+        a.el.classList.remove('flip'); b.el.classList.remove('flip');
+        a.el.classList.add('done'); b.el.classList.add('done');
+        mMatched++;
+        document.getElementById('m-found').textContent = mMatched;
+        mFlipped = []; mLocked = false;
+        if (mMatched === mDiff) mWin();
+      }, 500);
+    } else {
+      setTimeout(() => {
+        a.el.classList.remove('flip'); b.el.classList.remove('flip');
+        mFlipped = []; mLocked = false;
+      }, 900);
+    }
+  }
+}
+
+function mWin() {
+  clearInterval(mTimer);
+  const timeBonus = Math.max(0, 300 - mSecs);
+  const effBonus = Math.max(0, 20 - mTries) * 2;
+  const raw = mDiff * 8 + Math.round(timeBonus * mDiff / 16) + Math.round(effBonus * mDiff / 16);
+  const pts = Math.min(raw, 128); // nie über max
+  mLocalPts += pts;
+  document.getElementById('m-pts').textContent = mLocalPts;
+  if (!mPracticeMode) { award(pts, 'Memory'); lockGame('Memory'); }
+  const m = Math.floor(mSecs / 60), s = String(mSecs % 60).padStart(2, '0');
+  document.getElementById('m-fin-pts').textContent = pts;
+  document.getElementById('m-fin-info').textContent = `Zeit: ${m}:${s} · Versuche: ${mTries} · Zeitbonus: +${Math.round(timeBonus * mDiff / 16)} · Effizienz: +${Math.round(effBonus * mDiff / 16)}`;
+  document.getElementById('m-win').style.display = 'block';
+}
+
+function mPractice() { mPracticeMode = true; mBuild(); }
+
+// init
+mBuild();
+
+/* ============================================================
+   GAME 3 – ZUORDNUNG (Drag & Drop) — 3 Modi, je 5 Runden
+   ============================================================ */
+const Z_MODES = {
+  eigenschaften: {
+    label: 'Welche Eigenschaften passen zu diesem Alkohol?',
+    rounds: [
+      { name:'Methanol', sub:'CH₃OH · einwertig', hint:'Das kleinste und giftigste Alkohol',
+        zones:[{l:'Giftigkeit',c:['Hochgradig giftig – schon kleine Mengen tödlich']},{l:'Abbau im Körper',c:['Wird zu Formaldehyd & Ameisensäure metabolisiert']},{l:'Folgen',c:['Schädigt Sehnerven → Erblindung, lebensgefährlich']}],
+        dist:['Sdp. 78 °C – verdunstet schnell','Senkt Gefrierpunkt von Wasser','Zieht Wasser aus der Luft an']},
+      { name:'Ethanol', sub:'C₂H₅OH · einwertig · Sdp. 78 °C', hint:'Der bekannteste Alkohol',
+        zones:[{l:'Siedepunkt & Verdunstung',c:['Sdp. 78 °C – verdunstet schnell, keine Schlieren']},{l:'Löseeigenschaft',c:['Löst Fette sehr gut']},{l:'Wirkung auf Keime',c:['Giftig für Mikroorganismen → Desinfektionsmittel']}],
+        dist:['Hochgradig giftig für Menschen','Siedepunkt ~197 °C','6 OH-Gruppen']},
+      { name:'Ethandiol', sub:'C₂H₄(OH)₂ · zweiwertig (Diol)', hint:'Schützt Autokühler vor dem Einfrieren',
+        zones:[{l:'Siedepunkt',c:['Sdp. ~197 °C wegen starker Wasserstoffbrücken']},{l:'Wirkung in Wasser',c:['Senkt den Gefrierpunkt von Wasser']},{l:'Äußerlich',c:['Farblos, geruchlos, süßlich – aber giftig!']}],
+        dist:['Sdp. 78 °C','Zieht Wasser aus der Luft','3 OH-Gruppen']},
+      { name:'Glycerin (Propantriol)', sub:'C₃H₅(OH)₃ · dreiwertig (Triol)', hint:'Steckt in Cremes und Fetten',
+        zones:[{l:'Konsistenz',c:['Sehr viskos (dickflüssig)']},{l:'Wasserverhalten',c:['Hygroskopisch – zieht Wasser aus der Umgebung']},{l:'Biochemie',c:['Grundbaustein von Fetten']}],
+        dist:['Sdp. 78 °C','2 OH-Gruppen','Stark giftig für Menschen']},
+      { name:'Sorbit (Sorbitol)', sub:'Sechswertiger Zuckeralkohol', hint:'In Diabetiker-Kaugummis',
+        zones:[{l:'Kalorienwert',c:['Weniger Kalorien als Haushaltszucker']},{l:'Wirkung auf Zähne',c:['Verursacht keine Karies']},{l:'Verwendung',c:['Zuckerersatz in Diabetikerprodukten & zuckerfreien Kaugummis']}],
+        dist:['Löst Fette gut','Hauptbestandteil von Frostschutzmitteln','Wirkt desinfizierend']}
+    ]},
+  verwendung: {
+    label: 'Ordne die Verwendungszwecke zu!',
+    rounds: [
+      { name:'Ethanol', sub:'Trinkalkohol · einwertig', hint:'In vielen Alltagsprodukten',
+        zones:[{l:'Haushalt',c:['Fensterreiniger (löst Fette, keine Schlieren)']},{l:'Medizin & Pflege',c:['Desinfektionsmittel, Lösemittel in Medikamenten']},{l:'Mobilität',c:['Kraftstoffzusatz (E10 = 10 % Ethanol)']}],
+        dist:['Frostschutzmittel für Autokühler','Zuckerersatz in Kaugummis','Rohstoff für Sprengstoffe']},
+      { name:'Methanol', sub:'Einfachster Alkohol · CH₃OH', hint:'Industrieller Rohstoff',
+        zones:[{l:'Industrie',c:['Wichtiger chemischer Rohstoff']},{l:'Sport',c:['Treibstoff im Rennsport']},{l:'Wichtiger Hinweis',c:['Hochgiftig – kein Trinkalkohol!']}],
+        dist:['Feuchthaltemittel in Cremes','Frostschutzmittel für Autokühler','Zuckerersatz']},
+      { name:'Ethandiol', sub:'Zweiwertig · Diol', hint:'Unverzichtbar im Winter',
+        zones:[{l:'Auto',c:['Frostschutzmittel für Autokühler']},{l:'Eigenschaft genutzt',c:['Senkt den Gefrierpunkt von Wasser']},{l:'Vorsicht',c:['Süßlich schmeckend, aber giftig!']}],
+        dist:['Fensterreiniger','Feuchthaltemittel in Cremes','Treibstoff']},
+      { name:'Glycerin (Propantriol)', sub:'Dreiwertig · Triol', hint:'In Küche, Bad und Sprengstoff',
+        zones:[{l:'Kosmetik',c:['Feuchthaltemittel in Cremes']},{l:'Lebensmittel',c:['Feuchthaltemittel in Nahrungsmitteln']},{l:'Chemie/Technik',c:['Grundbaustein für Nitroglycerin (Sprengstoff)']}],
+        dist:['Zuckerersatz','Kraftstoffzusatz','Desinfektionsmittel']},
+      { name:'Sorbit (Sorbitol)', sub:'Sechswertig · Hexol', hint:'In zuckerfreien Produkten',
+        zones:[{l:'Lebensmittel',c:['Zuckerfreie Kaugummis']},{l:'Medizin',c:['Diabetikerprodukte als Zuckerersatz']},{l:'Vorteile',c:['Weniger Kalorien & kein Karies']}],
+        dist:['Parfüm-Lösemittel','Motoröl-Additiv','Desinfektionsmittel']}
+    ]},
+  formeln: {
+    label: 'Ordne Formeln und Wertigkeit zu!',
+    rounds: [
+      { name:'Methanol', sub:'?', hint:'1 Kohlenstoffatom, 1 OH-Gruppe',
+        zones:[{l:'Summenformel',c:['CH₃OH']},{l:'Wertigkeit',c:['Einwertig (1 OH-Gruppe)']},{l:'Endung',c:['-ol']}],
+        dist:['C₂H₅OH','Zweiwertig','-diol','C₃H₇OH','Dreiwertig','-triol']},
+      { name:'Ethanol', sub:'?', hint:'2 Kohlenstoffatome, 1 OH-Gruppe',
+        zones:[{l:'Summenformel',c:['C₂H₅OH']},{l:'Wertigkeit',c:['Einwertig (1 OH-Gruppe)']},{l:'Endung',c:['-ol']}],
+        dist:['CH₃OH','Zweiwertig','-diol','C₃H₇OH','Dreiwertig','-triol']},
+      { name:'Propanol', sub:'?', hint:'3 Kohlenstoffatome, 1 OH-Gruppe',
+        zones:[{l:'Summenformel',c:['C₃H₇OH']},{l:'Wertigkeit',c:['Einwertig (1 OH-Gruppe)']},{l:'Endung',c:['-ol']}],
+        dist:['C₂H₅OH','Zweiwertig','-diol','CH₃OH','Dreiwertig','-triol']},
+      { name:'Ethandiol', sub:'?', hint:'2 Kohlenstoffatome, 2 OH-Gruppen',
+        zones:[{l:'Anzahl OH-Gruppen',c:['2 OH-Gruppen']},{l:'Wertigkeit',c:['Zweiwertig (Diol)']},{l:'Endung',c:['-diol']}],
+        dist:['1 OH-Gruppe','Einwertig','-ol','3 OH-Gruppen','Dreiwertig','-triol']},
+      { name:'Glycerin (Propantriol)', sub:'C₃H₅(OH)₃', hint:'3 Kohlenstoffatome, 3 OH-Gruppen',
+        zones:[{l:'Anzahl OH-Gruppen',c:['3 OH-Gruppen']},{l:'Wertigkeit',c:['Dreiwertig (Triol)']},{l:'Endung',c:['-triol']}],
+        dist:['2 OH-Gruppen','Zweiwertig','-diol','1 OH-Gruppe','Einwertig','-ol']}
+    ]}
+};
+
+let zMode = 'eigenschaften', zRound = 0, zWrong = 0, zChecked = false, zLocalPts = 0;
+let zDragItem = null, zDragSrc = null, zGhost = null;
+
+function zSetMode(mode, btn) {
+  document.querySelectorAll('.zmb').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  zMode = mode; zRound = 0; zWrong = 0; zChecked = false;
+  document.getElementById('z-end').style.display = 'none';
+  zLoadRound();
+}
+
+function zLoadRound() {
+  const rounds = Z_MODES[zMode].rounds;
+  if (zRound >= rounds.length) { zShowEnd(); return; }
+  zChecked = false; zWrong = 0;
+  const r = rounds[zRound];
+  document.getElementById('z-task-lbl').textContent = Z_MODES[zMode].label;
+  document.getElementById('z-alc-name').textContent = r.name;
+  document.getElementById('z-alc-sub').textContent = r.sub;
+  document.getElementById('z-hint').style.display = 'none';
+  document.getElementById('z-hint').textContent = '💡 ' + r.hint;
+  document.getElementById('z-prog').textContent = `Runde ${zRound + 1} von ${rounds.length}`;
+  document.getElementById('z-ppct').textContent = `${zLocalPts} Pkt`;
+  document.getElementById('z-bar').style.width = `${zRound / rounds.length * 100}%`;
+  document.getElementById('z-fb').className = 'fb';
+  document.getElementById('z-next-btn').style.display = 'none';
+  // zones
+  const zonesEl = document.getElementById('z-zones');
+  zonesEl.innerHTML = '';
+  r.zones.forEach((z, zi) => {
+    const el = document.createElement('div');
+    el.className = 'zzone'; el.dataset.zi = zi;
+    el.innerHTML = `<div class="zzone-lbl">${z.l}</div>`;
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => { e.preventDefault(); el.classList.remove('drag-over'); zDropOnZone(zi); });
+    zonesEl.appendChild(el);
+  });
+  // bank
+  const allC = [];
+  r.zones.forEach(z => z.c.forEach(c => allC.push(c)));
+  const allChips = shuffle([...allC, ...r.dist]);
+  const bank = document.getElementById('z-bank');
+  bank.innerHTML = '';
+  allChips.forEach(text => {
+    const chip = document.createElement('div');
+    chip.className = 'bchip'; chip.dataset.text = text;
+    chip.textContent = text; chip.draggable = true;
+    chip.addEventListener('dragstart', () => { zDragItem = text; zDragSrc = 'bank'; chip.classList.add('dragging'); });
+    chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
+    zAddTouch(chip, text, 'bank');
+    bank.appendChild(chip);
+  });
+}
+
+function zDropOnZone(zi) {
+  if (!zDragItem || zChecked) return;
+  const zones = document.querySelectorAll('.zzone');
+  if (zDragSrc === 'bank') {
+    document.querySelectorAll('.bchip').forEach(c => { if (c.dataset.text === zDragItem) c.classList.add('used'); });
+  } else if (typeof zDragSrc === 'number') {
+    zones[zDragSrc].querySelectorAll('.zchip').forEach(c => { if (c.dataset.text === zDragItem) c.remove(); });
+    document.querySelectorAll('.bchip').forEach(c => { if (c.dataset.text === zDragItem) c.classList.remove('used'); });
+  }
+  const t = zDragItem;
+  const chip = document.createElement('div');
+  chip.className = 'zchip'; chip.dataset.text = t;
+  chip.innerHTML = `${t}<span class="zx">✕</span>`;
+  chip.draggable = true;
+  chip.addEventListener('dragstart', () => { zDragItem = t; zDragSrc = zi; chip.classList.add('dragging'); });
+  chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
+  chip.addEventListener('click', () => { if (!zChecked) { chip.remove(); document.querySelectorAll('.bchip').forEach(c => { if (c.dataset.text === t) c.classList.remove('used'); }); } });
+  zAddTouch(chip, t, zi);
+  zones[zi].appendChild(chip);
+  zDragItem = null; zDragSrc = null;
+}
+
+function zAddTouch(el, text, src) {
+  let ghost = null;
+  el.addEventListener('touchstart', e => {
+    e.preventDefault();
+    zDragItem = text; zDragSrc = src;
+    const touch = e.touches[0], rect = el.getBoundingClientRect();
+    ghost = document.createElement('div');
+    ghost.className = 'drag-ghost';
+    ghost.textContent = text.length > 30 ? text.substring(0, 28) + '…' : text;
+    ghost.style.left = rect.left + 'px'; ghost.style.top = rect.top + 'px';
+    document.body.appendChild(ghost);
+    el.classList.add('dragging');
+  }, { passive: false });
+  el.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (!ghost) return;
+    const t = e.touches[0];
+    ghost.style.left = (t.clientX - 50) + 'px'; ghost.style.top = (t.clientY - 15) + 'px';
+  }, { passive: false });
+  el.addEventListener('touchend', e => {
+    e.preventDefault();
+    if (ghost) { ghost.remove(); ghost = null; }
+    el.classList.remove('dragging');
+    const t = e.changedTouches[0];
+    let dropped = false;
+    document.querySelectorAll('.zzone').forEach((zone, zi) => {
+      const r = zone.getBoundingClientRect();
+      if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) {
+        zDropOnZone(zi); dropped = true;
+      }
+    });
+    if (!dropped && typeof zDragSrc === 'number') {
+      document.querySelectorAll('.zzone')[zDragSrc].querySelectorAll('.zchip').forEach(c => { if (c.dataset.text === zDragItem) c.remove(); });
+      document.querySelectorAll('.bchip').forEach(c => { if (c.dataset.text === zDragItem) c.classList.remove('used'); });
+    }
+    zDragItem = null; zDragSrc = null;
+  }, { passive: false });
+}
+
+function zReset() { zLoadRound(); }
+
+function zCheck() {
+  if (zChecked) return;
+  const r = Z_MODES[zMode].rounds[zRound];
+  const zones = document.querySelectorAll('.zzone');
+  let allOk = true, hasChips = false;
+  zones.forEach((zEl, zi) => {
+    const zone = r.zones[zi];
+    const chips = zEl.querySelectorAll('.zchip');
+    if (chips.length === 0) { allOk = false; return; }
+    chips.forEach(chip => {
+      hasChips = true;
+      const isOk = zone.c.includes(chip.dataset.text);
+      chip.classList.remove('ok-chip', 'err-chip');
+      if (isOk) chip.classList.add('ok-chip');
+      else { chip.classList.add('err-chip'); allOk = false; }
+    });
+  });
+  const fb = document.getElementById('z-fb');
+  if (allOk && hasChips) {
+    zChecked = true;
+    const pts = zWrong === 0 ? 3 : zWrong === 1 ? 2 : 1;
+    zLocalPts += pts;
+    document.getElementById('z-pts').textContent = zLocalPts;
+    award(pts, 'Zuordnung');
+    fb.className = 'fb ok show';
+    fb.innerHTML = `✅ Korrekt! +${pts} Punkt${pts > 1 ? 'e' : ''}.`;
+    document.getElementById('z-next-btn').style.display = 'block';
+    document.getElementById('z-ppct').textContent = `${zLocalPts} Pkt`;
+  } else {
+    zWrong++;
+    award(0, 'Zuordnung');
+    fb.className = 'fb err show';
+    fb.textContent = '❌ Noch nicht richtig – rote Karten passen nicht. Nochmal versuchen!';
+    if (zWrong >= 2) document.getElementById('z-hint').style.display = 'block';
+  }
+}
+
+function zNext() { zRound++; zLoadRound(); }
+
+function zShowEnd() {
+  document.getElementById('z-end').style.display = 'block';
+  document.getElementById('z-fin-pts').textContent = zLocalPts;
+}
+
+function zRestart() { zRound = 0; zWrong = 0; zChecked = false; document.getElementById('z-end').style.display = 'none'; zLoadRound(); }
+
+zLoadRound();
+</script>
+<script>
+/* ============================================================
+   LEWIS-SVG HILFSFUNKTIONEN
+   ============================================================ */
+function atom(x,y,sym,col){return `<text x="${x}" y="${y}" fill="${col}" font-size="13" font-family="'Courier New',monospace" text-anchor="middle" dominant-baseline="middle">${sym}</text>`;}
+function bond(x1,y1,x2,y2,col,w=1.6){return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col||'#cccccc'}" stroke-width="${w}" stroke-linecap="round"/>`;}
+const C='#e0e0e0',H='#aaaaaa',CB='#cccccc',OHC='#4caf50';
+
+function svgWrap(w,h,content){return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" style="max-width:${w}px;width:100%;display:block">${content}</svg>`;}
+
+/* Methanol: H-C(-H)(-H)-O-H */
+function makeMethanol(scale=1){
+  const s=scale;
+  return svgWrap(200*s,110*s,
+    atom(70*s,55*s,'C',C)+
+    atom(70*s,22*s,'H',H)+bond(70*s,30*s,70*s,43*s,H)+
+    atom(35*s,55*s,'H',H)+bond(43*s,55*s,58*s,55*s,H)+
+    atom(70*s,88*s,'H',H)+bond(70*s,67*s,70*s,78*s,H)+
+    bond(82*s,55*s,108*s,55*s,CB)+
+    atom(118*s,55*s,'O',OHC)+
+    bond(130*s,55*s,152*s,55*s,OHC)+
+    atom(162*s,55*s,'H',OHC)
+  );
+}
+
+/* Ethanol: H-C(-H)(-H)-C(-H)(-H)-O-H */
+function makeEthanol(scale=1){
+  const s=scale;
+  return svgWrap(290*s,110*s,
+    atom(45*s,55*s,'C',C)+
+    atom(45*s,22*s,'H',H)+bond(45*s,30*s,45*s,43*s,H)+
+    atom(12*s,55*s,'H',H)+bond(20*s,55*s,33*s,55*s,H)+
+    atom(45*s,88*s,'H',H)+bond(45*s,67*s,45*s,78*s,H)+
+    bond(57*s,55*s,93*s,55*s,CB)+
+    atom(105*s,55*s,'C',C)+
+    atom(105*s,22*s,'H',H)+bond(105*s,30*s,105*s,43*s,H)+
+    atom(105*s,88*s,'H',H)+bond(105*s,67*s,105*s,78*s,H)+
+    bond(117*s,55*s,148*s,55*s,CB)+
+    atom(158*s,55*s,'O',OHC)+
+    bond(170*s,55*s,196*s,55*s,OHC)+
+    atom(206*s,55*s,'H',OHC)
+  );
+}
+
+/* Propanol: 3 C dann O-H */
+function makePropanol(scale=1){
+  const s=scale;
+  return svgWrap(360*s,110*s,
+    atom(35*s,55*s,'C',C)+
+    atom(35*s,22*s,'H',H)+bond(35*s,30*s,35*s,43*s,H)+
+    atom(8*s,55*s,'H',H)+bond(16*s,55*s,23*s,55*s,H)+
+    atom(35*s,88*s,'H',H)+bond(35*s,67*s,35*s,78*s,H)+
+    bond(47*s,55*s,83*s,55*s,CB)+
+    atom(95*s,55*s,'C',C)+
+    atom(95*s,22*s,'H',H)+bond(95*s,30*s,95*s,43*s,H)+
+    atom(95*s,88*s,'H',H)+bond(95*s,67*s,95*s,78*s,H)+
+    bond(107*s,55*s,143*s,55*s,CB)+
+    atom(155*s,55*s,'C',C)+
+    atom(155*s,22*s,'H',H)+bond(155*s,30*s,155*s,43*s,H)+
+    atom(155*s,88*s,'H',H)+bond(155*s,67*s,155*s,78*s,H)+
+    bond(167*s,55*s,198*s,55*s,CB)+
+    atom(208*s,55*s,'O',OHC)+
+    bond(220*s,55*s,246*s,55*s,OHC)+
+    atom(256*s,55*s,'H',OHC)
+  );
+}
+
+/* Ethandiol: beide C tragen je eine OH-Gruppe */
+function makeEthandiol(scale=1){
+  const s=scale;
+  return svgWrap(240*s,135*s,
+    atom(50*s,65*s,'C',C)+
+    atom(50*s,32*s,'H',H)+bond(50*s,40*s,50*s,53*s,H)+
+    atom(18*s,65*s,'H',H)+bond(26*s,65*s,38*s,65*s,H)+
+    atom(50*s,98*s,'O',OHC)+bond(50*s,77*s,50*s,86*s,OHC)+
+    atom(50*s,122*s,'H',OHC)+bond(50*s,110*s,50*s,116*s,OHC)+
+    bond(62*s,65*s,98*s,65*s,CB)+
+    atom(110*s,65*s,'C',C)+
+    atom(110*s,32*s,'H',H)+bond(110*s,40*s,110*s,53*s,H)+
+    atom(142*s,65*s,'H',H)+bond(122*s,65*s,134*s,65*s,H)+
+    atom(110*s,98*s,'O',OHC)+bond(110*s,77*s,110*s,86*s,OHC)+
+    atom(110*s,122*s,'H',OHC)+bond(110*s,110*s,110*s,116*s,OHC)
+  );
+}
+
+/* Glycerin (Propantriol): 3 C, je eine OH-Gruppe */
+function makeGlycerin(scale=1){
+  const s=scale;
+  return svgWrap(280*s,135*s,
+    atom(38*s,65*s,'C',C)+
+    atom(38*s,32*s,'H',H)+bond(38*s,40*s,38*s,53*s,H)+
+    atom(8*s,65*s,'H',H)+bond(16*s,65*s,26*s,65*s,H)+
+    atom(38*s,98*s,'O',OHC)+bond(38*s,77*s,38*s,86*s,OHC)+
+    atom(38*s,122*s,'H',OHC)+bond(38*s,110*s,38*s,116*s,OHC)+
+    bond(50*s,65*s,86*s,65*s,CB)+
+    atom(98*s,65*s,'C',C)+
+    atom(98*s,32*s,'H',H)+bond(98*s,40*s,98*s,53*s,H)+
+    atom(98*s,98*s,'O',OHC)+bond(98*s,77*s,98*s,86*s,OHC)+
+    atom(98*s,122*s,'H',OHC)+bond(98*s,110*s,98*s,116*s,OHC)+
+    bond(110*s,65*s,146*s,65*s,CB)+
+    atom(158*s,65*s,'C',C)+
+    atom(158*s,32*s,'H',H)+bond(158*s,40*s,158*s,53*s,H)+
+    atom(188*s,65*s,'H',H)+bond(170*s,65*s,180*s,65*s,H)+
+    atom(158*s,98*s,'O',OHC)+bond(158*s,77*s,158*s,86*s,OHC)+
+    atom(158*s,122*s,'H',OHC)+bond(158*s,110*s,158*s,116*s,OHC)
+  );
+}
+
+/* ============================================================
+   GAME 4 – STRUKTURFORMEL-LABOR
+   WICHTIG: Bei name2svg-Modus kein Molekülname auf Antwortkarten!
+   Stattdessen: Summenformel als Label.
+   ============================================================ */
+const SF_MOLECULES = [
+  { id:'methanol',  name:'Methanol',  formula:'CH₃OH',       svgFn: makeMethanol },
+  { id:'ethanol',   name:'Ethanol',   formula:'C₂H₅OH',      svgFn: makeEthanol  },
+  { id:'propanol',  name:'Propanol',  formula:'C₃H₇OH',      svgFn: makePropanol },
+  { id:'ethandiol', name:'Ethandiol', formula:'C₂H₄(OH)₂',   svgFn: makeEthandiol},
+  { id:'glycerin',  name:'Glycerin',  formula:'C₃H₅(OH)₃',   svgFn: makeGlycerin },
+];
+
+// 10 Runden: jedes Molekül max. 2× als Hauptfrage
+const SF_PLAN = [
+  {mode:'svg2name', mol:'methanol'},
+  {mode:'name2svg', mol:'ethanol'},
+  {mode:'svg2name', mol:'propanol'},
+  {mode:'svg2name', mol:'ethandiol'},
+  {mode:'name2svg', mol:'glycerin'},
+  {mode:'svg2name', mol:'ethanol'},
+  {mode:'name2svg', mol:'methanol'},
+  {mode:'svg2name', mol:'glycerin'},
+  {mode:'name2svg', mol:'ethandiol'},
+  {mode:'svg2name', mol:'propanol'},
+];
+
+let sfRounds = [], sfIdx = 0, sfLocalPts = 0, sfAnswered = false;
+
+function sfGetMol(id) { return SF_MOLECULES.find(m => m.id === id); }
+
+function sfLoad() {
+  if (sfIdx >= sfRounds.length) { sfShowEnd(); return; }
+  sfAnswered = false;
+  const r = sfRounds[sfIdx];
+  const mol = sfGetMol(r.mol);
+  document.getElementById('sf-prog').textContent = `Runde ${sfIdx+1} von ${sfRounds.length}`;
+  document.getElementById('sf-pct').textContent = Math.round(sfIdx/sfRounds.length*100)+' %';
+  document.getElementById('sf-bar').style.width = Math.round(sfIdx/sfRounds.length*100)+'%';
+  document.getElementById('sf-fb').className = 'fb';
+  document.getElementById('sf-next').style.display = 'none';
+  const display = document.getElementById('sf-display');
+  const opts = document.getElementById('sf-opts');
+  opts.innerHTML = '';
+
+  if (r.mode === 'svg2name') {
+    document.getElementById('sf-mode-lbl').textContent = '🔬 Welcher Name passt zu dieser Lewis-Strukturformel?';
+    display.innerHTML = `<div class="sf-svg-box">${mol.svgFn(1)}</div>`;
+    // 4 Antworten: richtiger Name + 3 andere Namen
+    const others = SF_MOLECULES.filter(m => m.id !== mol.id);
+    const distractors = shuffle(others).slice(0,3);
+    const choices = shuffle([mol, ...distractors]);
+    choices.forEach(choice => {
+      const b = document.createElement('button');
+      b.className = 'sfo';
+      b.textContent = choice.name;
+      b.onclick = () => sfAnswer(b, choice.id === mol.id, mol);
+      opts.appendChild(b);
+    });
+  } else {
+    // name2svg: Antwortkarten zeigen NUR Summenformel – KEIN Molekülname
+    document.getElementById('sf-mode-lbl').textContent = '🏷️ Welche Strukturformel gehört zu: ' + mol.name + '?';
+    display.innerHTML = `<div class="sf-name-show">${mol.name}<br><small style="font-size:.6em;color:#546e7a;font-family:'Courier New',monospace">${mol.formula}</small></div>`;
+    const others = SF_MOLECULES.filter(m => m.id !== mol.id);
+    const distractors = shuffle(others).slice(0,3);
+    const choices = shuffle([mol, ...distractors]);
+    choices.forEach((choice, i) => {
+      const b = document.createElement('button');
+      b.className = 'sfo';
+      // KEIN Molekülname – nur Summenformel als Label
+      b.innerHTML = `<div style="pointer-events:none;max-height:100px;overflow:hidden">${choice.svgFn(0.65)}</div>
+        <span class="sfo-lbl">${choice.formula}</span>`;
+      b.onclick = () => sfAnswer(b, choice.id === mol.id, mol);
+      opts.appendChild(b);
+    });
+  }
+}
+
+function sfAnswer(btn, isC, mol) {
+  if (sfAnswered) return;
+  sfAnswered = true;
+  document.querySelectorAll('.sfo').forEach(b => b.disabled = true);
+  const fb = document.getElementById('sf-fb');
+  if (isC) {
+    btn.classList.add('correct');
+    sfLocalPts += 10;
+    document.getElementById('sf-pts').textContent = sfLocalPts;
+    award(10, 'Strukturformeln');
+    fb.className = 'fb ok show';
+    fb.textContent = `✅ Richtig! +10 Punkte. ${mol.name} hat die Formel ${mol.formula}.`;
+  } else {
+    btn.classList.add('wrong');
+    award(0, 'Strukturformeln');
+    fb.className = 'fb err show';
+    fb.textContent = `❌ Falsch. Gesucht war ${mol.name} (${mol.formula}).`;
+  }
+  document.getElementById('sf-next').style.display = 'block';
+}
+
+function sfNext() {
+  sfIdx++;
+  if (sfIdx >= sfRounds.length) sfShowEnd();
+  else sfLoad();
+}
+
+function sfShowEnd() {
+  lockGame('Strukturformeln');
+  document.getElementById('sf-card').style.display = 'none';
+  document.getElementById('sf-fin-pts').textContent = sfLocalPts;
+  document.getElementById('sf-end').style.display = 'block';
+}
+
+sfRounds = shuffle(SF_PLAN);
+sfLoad();
+
+/* ============================================================
+   GAME 5 – NOMENKLATUR-BUILDER
+   Whitelist gültiger Namen – verhindert "Methandiol" als richtig.
+   Tipp-System: Tipp1=halbe Punkte, Tipp2=0 Punkte.
+   ============================================================ */
+
+// Whitelist: ALLE gültigen Alkan-Alkohol-Kombinationen die im AB vorkommen
+const NOM_WHITELIST = {
+  'methanol': true,
+  'ethanol': true,
+  'propanol': true,
+  'butanol': true,
+  'pentanol': true,
+  'hexanol': true,
+  'ethandiol': true,
+  'propandiol': false,  // existiert, aber nicht im AB behandelt
+  'propantriol': true,  // = Glycerin, im AB
+  // Alles andere: nicht in der Liste → automatisch falsch
+};
+
+const NOM_TASKS = [
+  {desc:'Alkohol mit <strong>1 Kohlenstoffatom</strong> und <strong>1 OH-Gruppe</strong>',
+   answer:{pre:'meth',suf:'ol'}, name:'Methanol',
+   tipp1:'Schau auf die Vorsilben: meth=1 C, eth=2 C, prop=3 C. Wie viele C-Atome hat der gesuchte Stoff?',
+   tipp2:'meth- steht für 1 Kohlenstoffatom. -ol steht für 1 OH-Gruppe. → Methanol'},
+  {desc:'Alkohol mit <strong>2 Kohlenstoffatomen</strong> und <strong>1 OH-Gruppe</strong> (= Trinkalkohol)',
+   answer:{pre:'eth',suf:'ol'}, name:'Ethanol',
+   tipp1:'eth- steht für 2 C-Atome. Welche Endung zeigt 1 OH-Gruppe an?',
+   tipp2:'eth- = 2 C-Atome · -ol = 1 OH-Gruppe → Ethanol'},
+  {desc:'Alkohol mit <strong>3 Kohlenstoffatomen</strong> und <strong>1 OH-Gruppe</strong>',
+   answer:{pre:'prop',suf:'ol'}, name:'Propanol',
+   tipp1:'prop- steht für 3 C-Atome. Eine OH-Gruppe → welche Endung?',
+   tipp2:'prop- = 3 C-Atome · -ol = 1 OH-Gruppe → Propanol'},
+  {desc:'Alkohol mit <strong>4 Kohlenstoffatomen</strong> und <strong>1 OH-Gruppe</strong>',
+   answer:{pre:'but',suf:'ol'}, name:'Butanol',
+   tipp1:'but- steht für 4 C-Atome. Die Endung für 1 OH-Gruppe kennst du bereits.',
+   tipp2:'but- = 4 C-Atome · -ol = 1 OH-Gruppe → Butanol'},
+  {desc:'Alkohol mit <strong>2 Kohlenstoffatomen</strong> und <strong>2 OH-Gruppen</strong> (= Frostschutzmittel)',
+   answer:{pre:'eth',suf:'diol'}, name:'Ethandiol',
+   tipp1:'eth- = 2 C-Atome. Für 2 OH-Gruppen gibt es eine besondere Endung – nicht -ol!',
+   tipp2:'eth- = 2 C-Atome · -diol = 2 OH-Gruppen → Ethandiol'},
+  {desc:'Alkohol mit <strong>3 Kohlenstoffatomen</strong> und <strong>3 OH-Gruppen</strong> (= Glycerin)',
+   answer:{pre:'prop',suf:'triol'}, name:'Propantriol',
+   tipp1:'prop- = 3 C-Atome. Für 3 OH-Gruppen gibt es eine spezielle Endung.',
+   tipp2:'prop- = 3 C-Atome · -triol = 3 OH-Gruppen → Propantriol (= Glycerin)'},
+  {desc:'Alkohol mit <strong>5 Kohlenstoffatomen</strong> und <strong>1 OH-Gruppe</strong>',
+   answer:{pre:'pent',suf:'ol'}, name:'Pentanol',
+   tipp1:'pent- steht für 5 C-Atome. Für 1 OH-Gruppe: welche Endung?',
+   tipp2:'pent- = 5 C-Atome · -ol = 1 OH-Gruppe → Pentanol'},
+  {desc:'Alkohol mit <strong>6 Kohlenstoffatomen</strong> und <strong>1 OH-Gruppe</strong>',
+   answer:{pre:'hex',suf:'ol'}, name:'Hexanol',
+   tipp1:'hex- steht für 6 C-Atome. Eine OH-Gruppe → welche Endung?',
+   tipp2:'hex- = 6 C-Atome · -ol = 1 OH-Gruppe → Hexanol'},
+  {desc:'Wie lautet der systematische Name für <strong>Glycerin</strong>? (3 C-Atome, 3 OH-Gruppen)',
+   answer:{pre:'prop',suf:'triol'}, name:'Propantriol',
+   tipp1:'Glycerin hat 3 Kohlenstoffatome (prop-) und 3 OH-Gruppen. Welche Endung passt?',
+   tipp2:'prop- = 3 C-Atome · -triol = 3 OH-Gruppen → Propantriol'},
+  {desc:'Wie lautet der Name des <strong>Frostschutzmittels</strong> mit 2 C-Atomen und 2 OH-Gruppen?',
+   answer:{pre:'eth',suf:'diol'}, name:'Ethandiol',
+   tipp1:'2 C-Atome = eth-. Zwei OH-Gruppen heißen im Namen wie?',
+   tipp2:'eth- = 2 C-Atome · -diol = 2 OH-Gruppen → Ethandiol'},
+];
+
+const NOM_PRE = [
+  {val:'meth',label:'meth–',tip:'1 C'},
+  {val:'eth', label:'eth–', tip:'2 C'},
+  {val:'prop',label:'prop–',tip:'3 C'},
+  {val:'but', label:'but–', tip:'4 C'},
+  {val:'pent',label:'pent–',tip:'5 C'},
+  {val:'hex', label:'hex–', tip:'6 C'},
+];
+const NOM_SUF = [
+  {val:'ol',   label:'–ol',   tip:'1 OH'},
+  {val:'diol', label:'–diol', tip:'2 OH'},
+  {val:'triol',label:'–triol',tip:'3 OH'},
+];
+
+let nomList=[], nomIdx=0, nomLocalPts=0, nomSel=[], nomChecked=false, nomTippsUsed=0;
+
+function nomBuild() {
+  const preEl = document.getElementById('nom-prefixes');
+  preEl.innerHTML = '';
+  NOM_PRE.forEach(p => {
+    const b = document.createElement('button');
+    b.className = 'piece pre-p';
+    b.dataset.val = p.val; b.dataset.type = 'pre';
+    b.innerHTML = `${p.label} <sup style="font-size:.58em;color:#546e7a">${p.tip}</sup>`;
+    b.onclick = () => nomSelect(p.val, 'pre');
+    preEl.appendChild(b);
+  });
+  const sufEl = document.getElementById('nom-suffixes');
+  sufEl.innerHTML = '';
+  NOM_SUF.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'piece suf-p';
+    b.dataset.val = s.val; b.dataset.type = 'suf';
+    b.innerHTML = `${s.label} <sup style="font-size:.58em;color:#546e7a">${s.tip}</sup>`;
+    b.onclick = () => nomSelect(s.val, 'suf');
+    sufEl.appendChild(b);
+  });
+}
+
+function nomLoad() {
+  if (nomIdx >= nomList.length) { nomShowEnd(); return; }
+  nomSel = []; nomChecked = false; nomTippsUsed = 0;
+  const t = nomList[nomIdx];
+  document.getElementById('nom-prog').textContent = `Aufgabe ${nomIdx+1} von ${nomList.length}`;
+  document.getElementById('nom-pct').textContent = Math.round(nomIdx/nomList.length*100)+' %';
+  document.getElementById('nom-bar').style.width = Math.round(nomIdx/nomList.length*100)+'%';
+  document.getElementById('nom-task').innerHTML = t.desc;
+  document.getElementById('nom-rule').innerHTML = `💡 Regel: <span>Vorsilbe (C-Anzahl) + –an– + Endung (OH-Anzahl)</span><br><span style="font-size:.78em">meth=1·eth=2·prop=3·but=4·pent=5·hex=6 | -ol=1OH · -diol=2OH · -triol=3OH</span>`;
+  document.getElementById('nom-fb').className = 'fb';
+  document.getElementById('nom-next').style.display = 'none';
+  document.getElementById('nom-tipp-bar').className = 'tipp-bar';
+  document.getElementById('nom-tipp-btn').disabled = false;
+  document.getElementById('nom-tipp-btn').textContent = '💡 Tipp (halbe Punkte)';
+  nomUpdateDisplay();
+  nomBuild();
+}
+
+function nomSelect(val, type) {
+  if (nomChecked) return;
+  nomSel = nomSel.filter(s => s.type !== type);
+  nomSel.push({ val, type });
+  document.querySelectorAll('.piece').forEach(b => {
+    b.classList.remove('used');
+    if (b.dataset.type === type && b.dataset.val === val) b.classList.add('used');
+  });
+  nomUpdateDisplay();
+}
+
+function nomUpdateDisplay() {
+  const pre = nomSel.find(s => s.type === 'pre');
+  const suf = nomSel.find(s => s.type === 'suf');
+  const disp = document.getElementById('nom-display');
+  if (!pre && !suf) { disp.innerHTML = '<span class="np placeholder">_ _ _ _ _ _</span>'; }
+  else {
+    let html = '';
+    if (pre) html += `<span class="np pre">${pre.val}</span><span class="np stem">an</span>`;
+    if (suf) html += `<span class="np suf">${suf.val}</span>`;
+    disp.innerHTML = html;
+  }
+  const selDiv = document.getElementById('nom-selected');
+  selDiv.innerHTML = '';
+  nomSel.forEach(s => {
+    const chip = document.createElement('span');
+    chip.className = 'nom-sel-chip';
+    chip.textContent = s.type === 'pre' ? s.val + 'an–' : '–' + s.val;
+    chip.onclick = () => {
+      nomSel = nomSel.filter(x => x !== s);
+      document.querySelectorAll('.piece').forEach(b => { if (b.dataset.type === (s.type === 'pre' ? 'pre' : 'suf') && b.dataset.val === s.val) b.classList.remove('used'); });
+      nomUpdateDisplay();
+    };
+    selDiv.appendChild(chip);
+  });
+}
+
+function nomShowTipp() {
+  if (nomChecked) return;
+  const t = nomList[nomIdx];
+  nomTippsUsed++;
+  const tb = document.getElementById('nom-tipp-bar');
+  tb.className = 'tipp-bar show';
+  if (nomTippsUsed === 1) {
+    tb.innerHTML = `<span class="tipp-cost">⚠️ Tipp 1 genutzt → nur halbe Punkte erreichbar</span><br>${t.tipp1}`;
+    document.getElementById('nom-tipp-btn').textContent = '💡 Tipp 2 (0 Punkte)';
+  } else {
+    tb.innerHTML = `<span class="tipp-cost">⚠️ Tipp 2 genutzt → keine Punkte für diese Aufgabe</span><br>${t.tipp2}`;
+    document.getElementById('nom-tipp-btn').disabled = true;
+  }
+}
+
+function nomReset() {
+  nomSel = []; nomChecked = false;
+  document.getElementById('nom-fb').className = 'fb';
+  document.getElementById('nom-next').style.display = 'none';
+  nomBuild(); nomUpdateDisplay();
+}
+
+function nomCheck() {
+  if (nomChecked) return;
+  const t = nomList[nomIdx];
+  const pre = nomSel.find(s => s.type === 'pre');
+  const suf = nomSel.find(s => s.type === 'suf');
+  const fb = document.getElementById('nom-fb');
+  if (!pre || !suf) {
+    fb.className = 'fb warn show';
+    fb.textContent = '⚠️ Bitte wähle sowohl eine Vorsilbe als auch eine Endung!';
+    return;
+  }
+  nomChecked = true;
+  // Whitelist-Prüfung: Gesamtname muss gültig sein
+  const fullName = pre.val + 'an' + suf.val; // z.B. "methanol", "propantriol"
+  const isValidChem = NOM_WHITELIST[fullName] === true;
+  const isCorrect = pre.val === t.answer.pre && suf.val === t.answer.suf && isValidChem;
+  if (isCorrect) {
+    const pts = nomTippsUsed === 0 ? 10 : nomTippsUsed === 1 ? 5 : 0;
+    nomLocalPts += pts;
+    document.getElementById('nom-pts').textContent = nomLocalPts;
+    award(pts, 'Nomenklatur');
+    fb.className = 'fb ok show';
+    fb.innerHTML = `✅ Richtig! <strong>${pre.val}an${suf.val}</strong> = ${t.name}. +${pts} Punkte${nomTippsUsed>0?' (Tipp genutzt)':''}`;
+  } else {
+    award(0, 'Nomenklatur');
+    fb.className = 'fb err show';
+    if (!isValidChem && pre && suf) {
+      fb.innerHTML = `❌ „${pre.val}an${suf.val}" ist keine gültige chemische Verbindung. Die richtige Antwort: <strong>${t.answer.pre}an${t.answer.suf}</strong> = ${t.name}`;
+    } else {
+      fb.innerHTML = `❌ Nicht ganz. Richtig wäre: <strong>${t.answer.pre}an${t.answer.suf}</strong> = ${t.name}`;
+    }
+  }
+  document.getElementById('nom-next').style.display = 'block';
+}
+
+function nomNext() { nomIdx++; nomLoad(); }
+
+function nomShowEnd() {
+  lockGame('Nomenklatur');
+  document.getElementById('nom-fin-pts').textContent = nomLocalPts;
+  document.getElementById('nom-end').style.display = 'block';
+  document.getElementById('g5').querySelector('.card').style.display = 'none';
+}
+
+nomList = shuffle(NOM_TASKS);
+nomBuild(); nomLoad();
+
+/* ============================================================
+   GAME 6 – REIHEN-DETEKTOR
+   Summenformeln als CₙH₂ₙ₊₁OH · Keine Strukturformel-Spalte
+   Tipp-System pro Zeile
+   ============================================================ */
+const RD_DATA = [
+  { name:'Methanol',  formula:'CH₃OH',    cAtoms:'1', sdp:'65 °C',
+    nameGiven:true,  formulaGiven:false, sdpGiven:false,
+    tipps:{formula:{t1:'CₙH₂ₙ₊₁OH – für n=1: C₁H₃OH. Vereinfacht?',t2:'1 C-Atom, 2n+1=3 H → CH₃OH'},
+           sdp:{t1:'Die Siedepunkte steigen in der homologen Reihe an. Methanol siedet am niedrigsten.',t2:'Methanol: ca. 65 °C'}}},
+  { name:'Ethanol',   formula:'C₂H₅OH',   cAtoms:'2', sdp:'78 °C',
+    nameGiven:false, formulaGiven:true,  sdpGiven:false,
+    tipps:{name:{t1:'2 C-Atome → welche Vorsilbe? eth- oder prop-?',t2:'eth- = 2 C-Atome, -ol = 1 OH-Gruppe → Ethanol'},
+           sdp:{t1:'Ethanol siedet etwas höher als Methanol.',t2:'Ethanol: ca. 78 °C'}}},
+  { name:'Propanol',  formula:'C₃H₇OH',   cAtoms:'3', sdp:'97 °C',
+    nameGiven:false, formulaGiven:false, sdpGiven:true,
+    tipps:{name:{t1:'3 C-Atome → prop-. Eine OH-Gruppe → welche Endung?',t2:'prop- = 3 C · -ol = 1 OH → Propanol'},
+           formula:{t1:'CₙH₂ₙ₊₁OH mit n=3. Berechne: 2×3+1=7 H.',t2:'3 C, 7 H, 1 OH → C₃H₇OH'}}},
+  { name:'Butanol',   formula:'C₄H₉OH',   cAtoms:'4', sdp:'118 °C',
+    nameGiven:false, formulaGiven:false, sdpGiven:false,
+    tipps:{name:{t1:'4 C-Atome → but-. Schreibung wie die anderen?',t2:'but- = 4 C-Atome, -ol = 1 OH → Butanol'},
+           formula:{t1:'CₙH₂ₙ₊₁OH mit n=4. Berechne 2×4+1.',t2:'n=4: C₄H₉OH'},
+           sdp:{t1:'Jedes Glied siedet ca. 18–20 °C höher als das vorherige.',t2:'Butanol: ca. 118 °C'}}},
+  { name:'Pentanol',  formula:'C₅H₁₁OH',  cAtoms:'5', sdp:'138 °C',
+    nameGiven:false, formulaGiven:false, sdpGiven:true,
+    tipps:{name:{t1:'5 C-Atome → welche Vorsilbe? (nach pent- kommt hex-)',t2:'pent- = 5 C-Atome, -ol = 1 OH → Pentanol'},
+           formula:{t1:'CₙH₂ₙ₊₁OH mit n=5. Berechne 2×5+1.',t2:'n=5: C₅H₁₁OH'}}},
+];
+
+let rdLocalPts = 0, rdTippsState = {}; // { 'Butanol-name': 0 (kein Tipp), 1, 2 }
+
+function rdBuild() {
+  rdTippsState = {};
+  const wrap = document.getElementById('rd-rows-wrap');
+  wrap.innerHTML = '';
+  // Tabelle
+  const table = document.createElement('table');
+  table.className = 'rd-table';
+  table.innerHTML = '<thead><tr><th>Name</th><th>Summenformel</th><th>C-Atome</th><th>Siedepunkt (ca.)</th></tr></thead>';
+  const tbody = document.createElement('tbody');
+  RD_DATA.forEach(row => {
+    const tr = document.createElement('tr');
+    const cols = ['name','formula','cAtoms','sdp'];
+    const given = [row.nameGiven, row.formulaGiven, true, row.sdpGiven];
+    const vals = [row.name, row.formula, row.cAtoms, row.sdp];
+    cols.forEach((col, ci) => {
+      const td = document.createElement('td');
+      if (given[ci] || col === 'cAtoms') {
+        td.innerHTML = `<span class="rd-given">${vals[ci]}</span>`;
+      } else {
+        const inp = document.createElement('input');
+        inp.className = 'rd-inp';
+        inp.dataset.row = row.name;
+        inp.dataset.col = col;
+        inp.placeholder = '?';
+        td.appendChild(inp);
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+    // Tipp-Zeile für diese Reihe
+    const tippRow = document.createElement('tr');
+    const tippTd = document.createElement('td');
+    tippTd.colSpan = 4;
+    tippTd.style.padding = '4px 10px 8px';
+    const leerfelder = cols.filter((col,ci) => !given[ci] && col !== 'cAtoms');
+    if (leerfelder.length > 0) {
+      const btn = document.createElement('button');
+      btn.className = 'rd-tipp-btn';
+      btn.dataset.row = row.name;
+      btn.textContent = `💡 Tipp für ${row.name} (kostet Punkte)`;
+      btn.onclick = () => rdShowTipp(row.name, leerfelder[0]);
+      tippTd.appendChild(btn);
+      const tippText = document.createElement('div');
+      tippText.id = 'rd-tipp-' + row.name;
+      tippText.style.cssText = 'display:none;font-size:.76rem;color:#ffab40;margin-top:5px;line-height:1.5';
+      tippTd.appendChild(tippText);
+    }
+    tippRow.appendChild(tippTd);
+    tbody.appendChild(tippRow);
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+}
+
+function rdShowTipp(rowName, firstEmptyCol) {
+  const row = RD_DATA.find(r => r.name === rowName);
+  if (!row || !row.tipps[firstEmptyCol]) return;
+  const key = rowName + '-' + firstEmptyCol;
+  rdTippsState[key] = (rdTippsState[key] || 0) + 1;
+  const tippEl = document.getElementById('rd-tipp-' + rowName);
+  const btn = document.querySelector(`.rd-tipp-btn[data-row="${rowName}"]`);
+  const level = rdTippsState[key];
+  if (level === 1) {
+    tippEl.style.display = 'block';
+    tippEl.innerHTML = `<span style="color:#ff9800;font-weight:600">⚠️ Tipp 1 (halbe Punkte für diese Zeile):</span> ${row.tipps[firstEmptyCol].t1}`;
+    btn.textContent = `💡 Tipp 2 für ${rowName} (0 Punkte)`;
+  } else if (level === 2) {
+    tippEl.innerHTML = `<span style="color:#ff5252;font-weight:600">⚠️ Tipp 2 (0 Punkte für diese Zeile):</span> ${row.tipps[firstEmptyCol].t2}`;
+    btn.disabled = true;
+  }
+}
+
+function rdReset() {
+  document.querySelectorAll('.rd-inp').forEach(inp => { inp.value = ''; inp.className = 'rd-inp'; });
+  document.getElementById('rd-fb').className = 'fb';
+  document.getElementById('rd-pattern').className = 'rd-pattern';
+  document.getElementById('rd-next').style.display = 'none';
+  rdTippsState = {};
+  document.querySelectorAll('.rd-tipp-btn').forEach(btn => {
+    btn.disabled = false;
+    const row = btn.dataset.row;
+    btn.textContent = `💡 Tipp für ${row} (kostet Punkte)`;
+  });
+  document.querySelectorAll('[id^="rd-tipp-"]').forEach(el => el.style.display = 'none');
+}
+
+function rdNormalize(s) { return s.trim().toLowerCase().replace(/\s/g,'').replace(/[₀-₉]/g,c=>String.fromCharCode(c.charCodeAt(0)-8272)); }
+
+function rdCheck() {
+  const ANSWERS = {
+    'Methanol':  { formula:'CH₃OH',   sdp:'65°C' },
+    'Ethanol':   { name:'Ethanol',    sdp:'78°C' },
+    'Propanol':  { name:'Propanol',   formula:'C₃H₇OH' },
+    'Butanol':   { name:'Butanol',    formula:'C₄H₉OH', sdp:'118°C' },
+    'Pentanol':  { name:'Pentanol',   formula:'C₅H₁₁OH' },
+  };
+  const ALT_ANSWERS = {
+    // allow degree symbol or not
+    sdp: (v,ans) => rdNormalize(v) === rdNormalize(ans) || rdNormalize(v) === rdNormalize(ans.replace('°C','')) || rdNormalize(v)+'°c' === rdNormalize(ans)
+  };
+  let gotPts = 0, maxRowPts = 0;
+  document.querySelectorAll('.rd-inp').forEach(inp => {
+    const rowName = inp.dataset.row;
+    const col = inp.dataset.col;
+    const ans = ANSWERS[rowName] && ANSWERS[rowName][col];
+    if (!ans) { inp.classList.add('ok'); return; }
+    const val = rdNormalize(inp.value);
+    const correct = rdNormalize(ans);
+    const isOk = val === correct || (col === 'sdp' && ALT_ANSWERS.sdp(inp.value, ans));
+    inp.classList.remove('ok','err');
+    const key = rowName + '-' + col;
+    const tippsUsed = rdTippsState[key] || 0;
+    const rowMax = 2;
+    const rowPts = tippsUsed === 0 ? rowMax : tippsUsed === 1 ? 1 : 0;
+    maxRowPts += rowMax;
+    if (isOk) { inp.classList.add('ok'); gotPts += rowPts; }
+    else inp.classList.add('err');
+  });
+  const totalMax = Math.min(maxRowPts, 40);
+  const pts = Math.min(gotPts, totalMax);
+  rdLocalPts += pts;
+  document.getElementById('rd-pts').textContent = rdLocalPts;
+  award(pts, 'Reihen');
+  lockGame('Reihen');
+  const fb = document.getElementById('rd-fb');
+  const allInps = document.querySelectorAll('.rd-inp');
+  const okCount = document.querySelectorAll('.rd-inp.ok').length;
+  if (okCount === allInps.length) {
+    fb.className = 'fb ok show';
+    fb.textContent = `✅ Alles richtig! +${pts} Punkte.`;
+  } else {
+    fb.className = 'fb warn show';
+    fb.textContent = `⚠️ ${okCount} von ${allInps.length} Feldern richtig. +${pts} Punkte. Rote Felder nochmal prüfen.`;
+  }
+  document.getElementById('rd-pattern').className = 'rd-pattern show';
+  document.getElementById('rd-pattern').innerHTML =
+    `<strong>Muster der homologen Reihe:</strong><br>
+    Formel: CₙH₂ₙ₊₁OH (n = Anzahl C-Atome)<br>
+    Vorsilben: meth(1) · eth(2) · prop(3) · but(4) · pent(5) · hex(6)<br>
+    Siedepunkt steigt mit Kettenlänge (~18–20 °C pro CH₂-Gruppe mehr).`;
+  document.getElementById('rd-next').style.display = 'block';
+}
+
+rdBuild();
+
+/* ============================================================
+   GAME 7 – WERTIGKEIT-SORTIERER
+   ============================================================ */
+const WS_COLS_DEF = [
+  { oh:'1 OH', end:'-ol',    ids:[0,1,2,3] },
+  { oh:'2 OH', end:'-diol',  ids:[4] },
+  { oh:'3 OH', end:'-triol', ids:[5] },
+  { oh:'6 OH', end:'-hexol', ids:[6] },
+];
+const WS_CARDS = [
+  {id:0,text:'Methanol',sub:'CH₃OH',col:0},
+  {id:1,text:'Ethanol',sub:'C₂H₅OH',col:0},
+  {id:2,text:'Propanol',sub:'C₃H₇OH',col:0},
+  {id:3,text:'Butanol',sub:'C₄H₉OH',col:0},
+  {id:4,text:'Ethandiol',sub:'Frostschutzmittel',col:1},
+  {id:5,text:'Glycerin (Propantriol)',sub:'In Cremes',col:2},
+  {id:6,text:'Sorbit (Sorbitol)',sub:'Zuckeralkohol',col:3},
+];
+
+let wsDrag=null,wsDragSrc=null,wsGhost=null,wsLocalPts=0;
+
+function wsBuild() {
+  const colsEl = document.getElementById('ws-cols');
+  colsEl.innerHTML = '';
+  WS_COLS_DEF.forEach((col, ci) => {
+    const el = document.createElement('div');
+    el.className = 'wcol'; el.dataset.ci = ci;
+    el.innerHTML = `<div class="wcol-h"><span class="oh">${col.oh}</span><span class="end">${col.end}</span></div>`;
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => { e.preventDefault(); el.classList.remove('drag-over'); wsDropOnCol(ci); });
+    colsEl.appendChild(el);
+  });
+  const bank = document.getElementById('ws-bank');
+  bank.innerHTML = '';
+  shuffle(WS_CARDS).forEach(card => {
+    const el = wsCreateCard(card, 'bank');
+    bank.appendChild(el);
+  });
+}
+
+function wsCreateCard(card, src) {
+  const el = document.createElement('div');
+  el.className = 'wcard'; el.dataset.id = card.id;
+  el.innerHTML = `<strong>${card.text}</strong><br><span style="font-size:.7rem;color:#546e7a">${card.sub}</span>`;
+  el.draggable = true;
+  el.addEventListener('dragstart', () => { wsDrag = card.id; wsDragSrc = src; el.classList.add('dragging'); });
+  el.addEventListener('dragend', () => el.classList.remove('dragging'));
+  wsAddTouch(el, card.id, src);
+  return el;
+}
+
+function wsDropOnCol(ci) {
+  if (wsDrag === null) return;
+  const card = WS_CARDS[wsDrag];
+  if (wsDragSrc === 'bank') {
+    document.querySelectorAll('#ws-bank .wcard').forEach(el => { if (+el.dataset.id === wsDrag) el.remove(); });
+  } else {
+    document.querySelectorAll('#ws-cols .wcard').forEach(el => { if (+el.dataset.id === wsDrag) el.remove(); });
+  }
+  const id = wsDrag;
+  const el = document.createElement('div');
+  el.className = 'wcard'; el.dataset.id = id;
+  el.innerHTML = `<strong>${card.text}</strong>`;
+  el.draggable = true;
+  el.addEventListener('dragstart', () => { wsDrag = id; wsDragSrc = ci; el.classList.add('dragging'); });
+  el.addEventListener('dragend', () => el.classList.remove('dragging'));
+  wsAddTouch(el, id, ci);
+  document.querySelectorAll('.wcol')[ci].appendChild(el);
+  wsDrag = null; wsDragSrc = null;
+}
+
+function wsAddTouch(el, id, src) {
+  el.addEventListener('touchstart', e => {
+    e.preventDefault();
+    wsDrag = id; wsDragSrc = src;
+    const touch = e.touches[0], rect = el.getBoundingClientRect();
+    wsGhost = document.createElement('div');
+    wsGhost.className = 'drag-ghost';
+    wsGhost.textContent = WS_CARDS[id].text;
+    wsGhost.style.left = rect.left + 'px'; wsGhost.style.top = rect.top + 'px';
+    document.body.appendChild(wsGhost);
+    el.classList.add('dragging');
+  }, {passive:false});
+  el.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (!wsGhost) return;
+    const t = e.touches[0];
+    wsGhost.style.left = (t.clientX - 50) + 'px'; wsGhost.style.top = (t.clientY - 15) + 'px';
+  }, {passive:false});
+  el.addEventListener('touchend', e => {
+    e.preventDefault();
+    if (wsGhost) { wsGhost.remove(); wsGhost = null; }
+    el.classList.remove('dragging');
+    const t = e.changedTouches[0];
+    let dropped = false;
+    document.querySelectorAll('.wcol').forEach((col, ci) => {
+      const r = col.getBoundingClientRect();
+      if (t.clientX>=r.left&&t.clientX<=r.right&&t.clientY>=r.top&&t.clientY<=r.bottom) { wsDropOnCol(ci); dropped=true; }
+    });
+    if (!dropped) { wsDrag=null; wsDragSrc=null; }
+  }, {passive:false});
+}
+
+function wsReset() { wsDrag=null; wsDragSrc=null; wsBuild(); document.getElementById('ws-fb').className='fb'; document.getElementById('ws-done-btn').style.display='none'; }
+
+function wsCheck() {
+  let ok = 0;
+  document.querySelectorAll('#ws-cols .wcard').forEach(el => {
+    const id = +el.dataset.id;
+    const card = WS_CARDS[id];
+    const ci = +el.closest('.wcol').dataset.ci;
+    const isOk = card.col === ci;
+    el.classList.remove('ok-card','err-card');
+    if (isOk) { el.classList.add('ok-card'); ok++; }
+    else el.classList.add('err-card');
+  });
+  const pts = ok * 2;
+  wsLocalPts += pts;
+  document.getElementById('ws-pts').textContent = wsLocalPts;
+  award(pts, 'Wertigkeit');
+  lockGame('Wertigkeit');
+  const fb = document.getElementById('ws-fb');
+  if (ok === WS_CARDS.length) {
+    fb.className = 'fb ok show';
+    fb.textContent = `🏆 Perfekt! Alle ${ok} Alkohole korrekt sortiert! +${pts} Punkte`;
+    document.getElementById('ws-done-btn').style.display = 'block';
+  } else {
+    fb.className = 'fb warn show';
+    fb.textContent = `⚠️ ${ok} von ${WS_CARDS.length} richtig. +${pts} Punkte. Rote Karten nochmal verschieben.`;
+  }
+}
+
+wsBuild();
+
+/* ============================================================
+   END SCREEN – Molekül-Abzeichen als Trophy (anders als letztes Mal)
+   ============================================================ */
+function buildEndScreen() {
+  const total = G.pts;
+  const max = G.maxPts || 1;
+  const pct = Math.round(total / max * 100);
+  const elapsed = Math.round((Date.now() - G.start) / 1000);
+  const em = Math.floor(elapsed / 60), es = String(elapsed % 60).padStart(2, '0');
+
+  document.getElementById('end-pts-num').textContent = total;
+  document.getElementById('end-pts-max').textContent = '/ ' + max + ' Punkte';
+  document.getElementById('end-pct-txt').textContent = `${pct} % · Zeit: ${em}:${es}`;
+
+  let trophy = '', title = '', sub = '', msg = '';
+  if (pct >= 90) {
+    title = '🔬 Chemie-Experte!'; sub = 'Höchste Auszeichnung';
+    msg = 'Außergewöhnliche Leistung! Du beherrschst das Thema Alkohole vollständig – von der Lewis-Formel bis zur homologen Reihe.';
+    trophy = buildMolekuleBadgeGold();
+    spawnConfetti();
+  } else if (pct >= 70) {
+    title = '⚗️ Chemie-Profi'; sub = 'Sehr gute Leistung';
+    msg = 'Sehr gute Arbeit! Du beherrschst die meisten Konzepte. Schau dir die rot markierten Teilthemen nochmal an.';
+    trophy = buildMolekuleBadgeSilver();
+  } else if (pct >= 50) {
+    title = '🧪 Chemie-Lehrling'; sub = 'Solide Grundlage';
+    msg = 'Guter Einstieg! Mit etwas mehr Übung meisterst du das Thema. Lies das Arbeitsblatt nochmal durch.';
+    trophy = buildMolekuleBadgeBronze();
+  } else {
+    title = '📋 Teilnehmer-Urkunde'; sub = 'Dabei sein ist alles!';
+    msg = 'Gut, dass du mitgemacht hast! Lies das Arbeitsblatt nochmal in Ruhe durch und starte dann erneut – du schaffst das!';
+    trophy = buildUrkunde();
+  }
+
+  document.getElementById('end-trophy').innerHTML = trophy;
+  document.getElementById('end-title').textContent = title;
+  document.getElementById('end-sub').textContent = sub;
+  document.getElementById('end-msg').textContent = msg;
+
+  const TIPS = {
+    '🎯 Quiz – Faktenwissen': 'Wiederhole die Fakten zu Ethanol, Methanol und Glycerin.',
+    '🧩 Memory – Begriffe & Definitionen': 'Präge dir die Begriffspaare nochmals ein.',
+    '🔭 Zuordnung – Eigenschaften & Verwendung': 'Übe die Zuordnung der Alkohole zu ihren Verwendungszwecken.',
+    '⚗️ Strukturformel-Labor': 'Zeichne Lewis-Formeln nochmals selbst und zähle alle Bindungen.',
+    '🔤 Nomenklatur-Builder': 'Merke: meth=1·eth=2·prop=3 und -ol=1OH·-diol=2OH·-triol=3OH.',
+    '🧬 Reihen-Detektor': 'Schreibe die homologe Reihe komplett auf: CₙH₂ₙ₊₁OH.',
+    '🏷️ Wertigkeit-Sortierer': 'Merke: -ol=1OH, -diol=2OH, -triol=3OH, -hexol=6OH.',
+  };
+  const cards = document.getElementById('end-cards');
+  cards.innerHTML = '';
+  Object.entries(G.gameScores).forEach(([key, s]) => {
+    if (s.max === 0) return;
+    const p = Math.round(s.got / s.max * 100);
+    const col = p >= 80 ? '#00e676' : p >= 50 ? '#ffab40' : '#ff5252';
+    const icon = p >= 80 ? '✅' : p >= 50 ? '⚠️' : '❌';
+    const tip = p >= 80 ? 'Gut beherrscht!' : ('Noch üben: ' + (TIPS[s.label] || ''));
+    const card = document.createElement('div');
+    card.className = 'end-card';
+    card.innerHTML = `<div class="end-card-name">${s.label}</div>
+      <div class="end-card-bar-bg"><div class="end-card-bar-fill" style="width:${p}%;background:${col}"></div></div>
+      <div class="end-card-tip" style="color:${col}">${icon} ${p}% · ${tip}</div>`;
+    cards.appendChild(card);
+  });
+}
+
+// Molekül-Abzeichen (Hexagon-Benzol-Ring Design) – Gold
+function buildMolekuleBadgeGold(){
+  return `<svg viewBox="0 0 180 200" xmlns="http://www.w3.org/2000/svg" width="180" style="animation:float 2s ease-in-out infinite">
+    <defs><radialGradient id="gg" cx="50%" cy="40%"><stop offset="0%" stop-color="#fff9c4"/><stop offset="100%" stop-color="#f9a825"/></radialGradient></defs>
+    <!-- Hexagon -->
+    <polygon points="90,18 148,52 148,118 90,152 32,118 32,52" fill="url(#gg)" stroke="#f57f17" stroke-width="3"/>
+    <!-- Innenring -->
+    <polygon points="90,38 130,62 130,108 90,132 50,108 50,62" fill="none" stroke="#fff9c4" stroke-width="1.5" stroke-dasharray="5,3" opacity=".7"/>
+    <!-- Atome an Ecken -->
+    <circle cx="90" cy="18" r="6" fill="#fff59d" stroke="#f9a825" stroke-width="1.5"/>
+    <circle cx="148" cy="52" r="6" fill="#fff59d" stroke="#f9a825" stroke-width="1.5"/>
+    <circle cx="148" cy="118" r="6" fill="#fff59d" stroke="#f9a825" stroke-width="1.5"/>
+    <circle cx="90" cy="152" r="6" fill="#fff59d" stroke="#f9a825" stroke-width="1.5"/>
+    <circle cx="32" cy="118" r="6" fill="#fff59d" stroke="#f9a825" stroke-width="1.5"/>
+    <circle cx="32" cy="52" r="6" fill="#fff59d" stroke="#f9a825" stroke-width="1.5"/>
+    <!-- Stern -->
+    <text x="90" y="100" font-size="32" text-anchor="middle" dominant-baseline="middle">⭐</text>
+    <!-- Sockel -->
+    <rect x="60" y="158" width="60" height="10" rx="5" fill="#f9a825"/>
+    <rect x="50" y="168" width="80" height="8" rx="4" fill="#f57f17"/>
+    <text x="90" y="186" font-size="9" text-anchor="middle" fill="#f9a825" font-family="Georgia,serif" letter-spacing="1">CHEMIE-EXPERTE</text>
+  </svg>`;
+}
+
+function buildMolekuleBadgeSilver(){
+  return `<svg viewBox="0 0 180 200" xmlns="http://www.w3.org/2000/svg" width="180" style="animation:float 2.5s ease-in-out infinite">
+    <defs><radialGradient id="sg2" cx="50%" cy="40%"><stop offset="0%" stop-color="#eceff1"/><stop offset="100%" stop-color="#78909c"/></radialGradient></defs>
+    <polygon points="90,18 148,52 148,118 90,152 32,118 32,52" fill="url(#sg2)" stroke="#546e7a" stroke-width="3"/>
+    <polygon points="90,38 130,62 130,108 90,132 50,108 50,62" fill="none" stroke="#eceff1" stroke-width="1.5" stroke-dasharray="5,3" opacity=".6"/>
+    <circle cx="90" cy="18" r="6" fill="#cfd8dc" stroke="#78909c" stroke-width="1.5"/>
+    <circle cx="148" cy="52" r="6" fill="#cfd8dc" stroke="#78909c" stroke-width="1.5"/>
+    <circle cx="148" cy="118" r="6" fill="#cfd8dc" stroke="#78909c" stroke-width="1.5"/>
+    <circle cx="90" cy="152" r="6" fill="#cfd8dc" stroke="#78909c" stroke-width="1.5"/>
+    <circle cx="32" cy="118" r="6" fill="#cfd8dc" stroke="#78909c" stroke-width="1.5"/>
+    <circle cx="32" cy="52" r="6" fill="#cfd8dc" stroke="#78909c" stroke-width="1.5"/>
+    <text x="90" y="100" font-size="30" text-anchor="middle" dominant-baseline="middle">🥈</text>
+    <rect x="60" y="158" width="60" height="10" rx="5" fill="#78909c"/>
+    <rect x="50" y="168" width="80" height="8" rx="4" fill="#546e7a"/>
+    <text x="90" y="186" font-size="9" text-anchor="middle" fill="#90a4ae" font-family="Georgia,serif" letter-spacing="1">CHEMIE-PROFI</text>
+  </svg>`;
+}
+
+function buildMolekuleBadgeBronze(){
+  return `<svg viewBox="0 0 180 200" xmlns="http://www.w3.org/2000/svg" width="180" style="animation:pulse 2s ease-in-out infinite">
+    <defs><radialGradient id="bg3" cx="50%" cy="40%"><stop offset="0%" stop-color="#ffcc80"/><stop offset="100%" stop-color="#bf360c"/></radialGradient></defs>
+    <polygon points="90,18 148,52 148,118 90,152 32,118 32,52" fill="url(#bg3)" stroke="#e64a19" stroke-width="3"/>
+    <text x="90" y="100" font-size="30" text-anchor="middle" dominant-baseline="middle">🥉</text>
+    <rect x="60" y="158" width="60" height="10" rx="5" fill="#e64a19"/>
+    <rect x="50" y="168" width="80" height="8" rx="4" fill="#bf360c"/>
+    <text x="90" y="186" font-size="9" text-anchor="middle" fill="#ff7043" font-family="Georgia,serif" letter-spacing="1">CHEMIE-LEHRLING</text>
+  </svg>`;
+}
+
+function buildUrkunde(){
+  return `<svg viewBox="0 0 210 200" xmlns="http://www.w3.org/2000/svg" width="210" style="animation:rollIn .7s ease;transform-origin:top center">
+    <rect x="15" y="15" width="180" height="170" rx="8" fill="#111827" stroke="#1e3a5f" stroke-width="2"/>
+    <rect x="25" y="25" width="160" height="150" rx="5" fill="#0a111e" stroke="#1e3a5f" stroke-width="1"/>
+    <text x="105" y="58" font-size="20" text-anchor="middle">📋</text>
+    <text x="105" y="80" font-size="8" text-anchor="middle" fill="#90a4ae" font-family="Georgia,serif" letter-spacing="2">TEILNAHME-URKUNDE</text>
+    <line x1="35" y1="88" x2="175" y2="88" stroke="#1e3a5f" stroke-width="1"/>
+    <text x="105" y="108" font-size="8" text-anchor="middle" fill="#546e7a" font-family="Georgia,serif">Chemie · Klasse 10</text>
+    <text x="105" y="126" font-size="8" text-anchor="middle" fill="#546e7a" font-family="Georgia,serif">Thema: Alkohole</text>
+    <text x="105" y="150" font-size="8" text-anchor="middle" fill="#37474f" font-family="Georgia,serif">Weiter so! 💪</text>
+    <circle cx="105" cy="172" r="9" fill="#1e3a5f"/>
+    <text x="105" y="176" font-size="11" text-anchor="middle" fill="#40c4ff" dominant-baseline="middle">⚗</text>
+  </svg>`;
+}
+
+function spawnConfetti() {
+  const colors = ['#ffd600','#00e5ff','#69ff47','#ff6d00','#ea80fc','#ff5252','#b9f6ca'];
+  for (let i = 0; i < 65; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `left:${Math.random()*100}vw;top:-15px;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;animation-duration:${2.5+Math.random()*3}s;animation-delay:${Math.random()*1.8}s;border-radius:${Math.random()>.5?'50%':'2px'}`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 6000);
+  }
+}
+</script>
+</body></html>
