@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Versuchsprotokoll – Lernspiele</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#e8f4f8;min-height:100vh;color:#1e293b}
+
+header{background:linear-gradient(135deg,#1e40af,#0891b2);color:#fff;padding:22px 16px;text-align:center}
+header h1{font-size:1.7em;letter-spacing:.4px}
+header p{opacity:.85;margin-top:5px;font-size:.93em}
+
+.game-nav{display:flex;justify-content:center;gap:8px;padding:13px 12px;flex-wrap:wrap;background:#fff;border-bottom:2px solid #e2e8f0;position:sticky;top:0;z-index:10}
+.nav-btn{padding:8px 16px;border:2px solid #2563eb;background:#fff;color:#2563eb;border-radius:20px;cursor:pointer;font-size:.85em;font-weight:600;transition:all .18s}
+.nav-btn.active,.nav-btn:hover{background:#2563eb;color:#fff}
+
+.game-panel{display:none;max-width:860px;margin:28px auto 60px;padding:0 16px}
+.game-panel.active{display:block}
+.game-title{text-align:center;color:#1e40af;font-size:1.4em;margin-bottom:6px}
+.game-desc{text-align:center;color:#64748b;margin-bottom:22px;font-size:.93em;line-height:1.5}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:8px;border:none;cursor:pointer;font-size:.96em;font-weight:600;transition:all .18s}
+.btn-primary{background:#2563eb;color:#fff}.btn-primary:hover{background:#1d4ed8}
+.btn-secondary{background:#f1f5f9;color:#374151;border:2px solid #e2e8f0}.btn-secondary:hover{background:#e2e8f0}
+.btn-row{display:flex;justify-content:center;gap:12px;margin-top:22px;flex-wrap:wrap}
+
+.fb{margin-top:16px;padding:12px 16px;border-radius:8px;text-align:center;font-weight:600;display:none}
+.fb.ok{background:#f0fdf4;color:#16a34a;border:2px solid #86efac;display:block}
+.fb.err{background:#fef2f2;color:#dc2626;border:2px solid #fca5a5;display:block}
+
+/* ═══════════════════════════════════════
+   GAME 1 – KLICK-REIHENFOLGE
+═══════════════════════════════════════ */
+.sort-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:580px){.sort-grid{grid-template-columns:1fr}}
+.sec-title{font-weight:700;color:#374151;margin-bottom:10px;font-size:.95em}
+.sort-pool{display:flex;flex-direction:column;gap:7px;min-height:280px;background:#f1f5f9;border-radius:12px;padding:11px;border:2px dashed #94a3b8}
+.sort-card{background:#fff;border:2px solid #e2e8f0;border-radius:10px;padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.sort-card:hover{border-color:#2563eb;transform:translateY(-2px);box-shadow:0 4px 12px rgba(37,99,235,.16)}
+.sort-card.sel{border-color:#7c3aed;background:#faf5ff;box-shadow:0 0 0 3px rgba(124,58,237,.2);transform:translateY(-2px)}
+.sort-card .c-icon{font-size:1.4em;flex-shrink:0}
+.sort-card strong{font-size:.93em}
+.sort-card small{color:#64748b;font-size:.78em}
+.sort-slots{display:flex;flex-direction:column;gap:7px}
+.sort-slot{background:#fff;border:2px dashed #94a3b8;border-radius:10px;padding:11px 13px;min-height:60px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:all .18s}
+.sort-slot:hover{border-color:#7c3aed;background:#faf5ff}
+.slot-n{font-weight:800;color:#94a3b8;font-size:1.05em;min-width:20px}
+.slot-hint{color:#94a3b8;font-style:italic;font-size:.83em}
+.sort-slot.sc{border-color:#16a34a;background:#f0fdf4;border-style:solid}
+.sort-slot.sw{border-color:#dc2626;background:#fef2f2;border-style:solid}
+
+/* ═══════════════════════════════════════
+   GAME 2 – ZUORDNUNG
+═══════════════════════════════════════ */
+.match-grid{display:grid;grid-template-columns:5fr 3fr;gap:18px}
+@media(max-width:620px){.match-grid{grid-template-columns:1fr}}
+.match-stmts{display:flex;flex-direction:column;gap:7px}
+.m-stmt{background:#fff;border:2px solid #e2e8f0;border-radius:9px;padding:10px 13px;cursor:pointer;font-size:.87em;line-height:1.45;transition:all .18s}
+.m-stmt:hover:not(.m-done):not(.m-ok){border-color:#2563eb}
+.m-stmt.m-sel{border-color:#7c3aed;background:#faf5ff;box-shadow:0 0 0 3px rgba(124,58,237,.18)}
+.m-stmt.m-done{opacity:.45;cursor:default;pointer-events:none}
+.m-stmt.m-ok{border-color:#16a34a!important;background:#f0fdf4!important;opacity:1;pointer-events:none}
+.m-stmt.m-err{border-color:#dc2626!important;background:#fef2f2!important}
+.match-targets{display:flex;flex-direction:column;gap:7px}
+.m-target{background:#fff;border:2px solid #e2e8f0;border-radius:9px;padding:10px 13px;cursor:pointer;transition:all .18s}
+.m-target:hover{border-color:#0891b2;background:#f0f9ff}
+.m-target-head{font-weight:700;font-size:.88em;display:flex;align-items:center;gap:5px}
+.m-badges{margin-top:5px;display:flex;flex-direction:column;gap:3px}
+.mbadge{font-size:.74em;border-radius:5px;padding:2px 7px;background:#e0e7ff;color:#3730a3}
+.mbadge.mb-ok{background:#dcfce7;color:#166534}
+.mbadge.mb-err{background:#fee2e2;color:#991b1b}
+.match-hint{text-align:center;color:#7c3aed;font-size:.84em;margin-bottom:10px;font-weight:600;min-height:18px}
+
+/* ═══════════════════════════════════════
+   GAME 3 – QUIZ
+═══════════════════════════════════════ */
+.q-status{display:flex;justify-content:space-between;font-size:.87em;color:#64748b;margin-bottom:5px}
+.q-bar{height:8px;background:#e2e8f0;border-radius:4px;margin-bottom:13px;overflow:hidden}
+.q-fill{height:100%;background:linear-gradient(90deg,#2563eb,#0891b2);border-radius:4px;transition:width .4s}
+.q-dots{display:flex;justify-content:center;gap:7px;margin-bottom:16px;flex-wrap:wrap}
+.qdot{width:11px;height:11px;border-radius:50%;background:#e2e8f0;transition:background .3s}
+.qdot.qd-ok{background:#16a34a}.qdot.qd-err{background:#dc2626}.qdot.qd-cur{background:#2563eb}
+.q-card{background:#fff;border-radius:13px;padding:22px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.q-text{font-size:1.04em;font-weight:700;color:#1e40af;margin-bottom:16px;line-height:1.5}
+.q-opts{display:flex;flex-direction:column;gap:8px}
+.q-opt{padding:11px 15px;border:2px solid #e2e8f0;border-radius:9px;cursor:pointer;background:#fff;text-align:left;font-size:.92em;transition:all .18s;width:100%}
+.q-opt:hover:not(:disabled){border-color:#2563eb;background:#eff6ff}
+.q-opt.qo-ok{border-color:#16a34a!important;background:#f0fdf4!important;color:#166534!important;font-weight:600}
+.q-opt.qo-err{border-color:#dc2626!important;background:#fef2f2!important;color:#991b1b!important}
+.q-opt:disabled{cursor:default}
+.q-exp{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:.87em;line-height:1.5;display:none}
+.q-exp.show{display:block}
+.q-exp.e-ok{background:#f0fdf4;color:#166534;border:1px solid #86efac}
+.q-exp.e-err{background:#fef2f2;color:#991b1b;border:1px solid #fca5a5}
+.result-box{background:#fff;border-radius:13px;padding:28px 20px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.result-box h2{font-size:1.55em;color:#1e40af}
+.s-ring{width:96px;height:96px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:14px auto;font-size:1.5em;font-weight:800;border:4px solid}
+.sr-good{border-color:#86efac;color:#16a34a;background:#f0fdf4}
+.sr-ok{border-color:#fcd34d;color:#d97706;background:#fffbeb}
+.sr-poor{border-color:#fca5a5;color:#dc2626;background:#fef2f2}
+
+/* ═══════════════════════════════════════
+   GAME 4 – WAHR / FALSCH
+═══════════════════════════════════════ */
+.tf-sb{text-align:center;font-size:1.04em;font-weight:700;color:#1e40af;padding:11px;background:#fff;border-radius:10px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.tf-card{background:#fff;border-radius:13px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.08);margin-bottom:16px}
+.tf-stmt{font-size:.99em;font-weight:500;line-height:1.55;padding:11px 14px;background:#f8fafc;border-radius:8px;border-left:4px solid #2563eb;margin-bottom:14px}
+.tf-btns{display:flex;gap:11px;justify-content:center}
+.tf-btn{padding:10px 28px;border-radius:8px;border:2px solid;cursor:pointer;font-size:.96em;font-weight:700;transition:all .18s;background:#fff}
+.tf-t{border-color:#16a34a;color:#16a34a}.tf-t:hover:not(:disabled){background:#16a34a;color:#fff}
+.tf-f{border-color:#dc2626;color:#dc2626}.tf-f:hover:not(:disabled){background:#dc2626;color:#fff}
+.tf-btn:disabled{cursor:default;opacity:.65}
+.tf-btn.bc-ok{background:#16a34a!important;color:#fff!important;border-color:#16a34a!important;opacity:1!important}
+.tf-btn.bc-err{background:#dc2626!important;color:#fff!important;border-color:#dc2626!important;opacity:1!important}
+.tf-exp{margin-top:11px;padding:10px 14px;border-radius:8px;font-size:.86em;line-height:1.5;display:none}
+.tf-exp.show{display:block}
+.tf-exp.te-ok{background:#f0fdf4;color:#166534;border:1px solid #86efac}
+.tf-exp.te-err{background:#fef2f2;color:#991b1b;border:1px solid #fca5a5}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧪 Das Versuchsprotokoll</h1>
+  <p>Lernspiele – Übe, wie man ein Protokoll richtig schreibt!</p>
+</header>
+
+<nav class="game-nav">
+  <button class="nav-btn active" onclick="showGame(0)">🔢 Reihenfolge</button>
+  <button class="nav-btn" onclick="showGame(1)">🎯 Zuordnung</button>
+  <button class="nav-btn" onclick="showGame(2)">❓ Quiz</button>
+  <button class="nav-btn" onclick="showGame(3)">✅ Wahr oder Falsch?</button>
+</nav>
+
+<div id="game0" class="game-panel active">
+  <h2 class="game-title">🔢 Reihenfolge per Klick</h2>
+  <p class="game-desc">Klicke eine Karte an (lila = ausgewählt), dann klicke auf den Ziel-Slot.</p>
+  <div class="sort-grid">
+    <div>
+      <div class="sec-title">📦 Karten</div>
+      <div class="sort-pool" id="sort-pool"></div>
+    </div>
+    <div>
+      <div class="sec-title">📋 Dein Protokoll (1–5)</div>
+      <div class="sort-slots" id="sort-slots"></div>
+    </div>
+  </div>
+  <div id="sort-fb" class="fb"></div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="resetSort()">🔄 Neu mischen</button>
+    <button class="btn btn-primary" onclick="checkSort()">✔ Überprüfen</button>
+  </div>
+</div>
+
+<div id="game1" class="game-panel">
+  <h2 class="game-title">🎯 Was gehört wohin?</h2>
+  <p class="game-desc">Wähle eine Aussage links (lila = ausgewählt), dann klicke den passenden Protokoll-Teil rechts.</p>
+  <div class="match-hint" id="match-hint">← Wähle zuerst eine Aussage aus</div>
+  <div class="match-grid">
+    <div>
+      <div class="sec-title">💬 Aussagen</div>
+      <div class="match-stmts" id="match-stmts"></div>
+    </div>
+    <div>
+      <div class="sec-title">📋 Protokoll-Teile</div>
+      <div class="match-targets" id="match-targets"></div>
+    </div>
+  </div>
+  <div id="match-fb" class="fb"></div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="resetMatch()">🔄 Zurücksetzen</button>
+    <button class="btn btn-primary" onclick="checkMatch()">✔ Überprüfen</button>
+  </div>
+</div>
+
+<div id="game2" class="game-panel">
+  <h2 class="game-title">❓ Quiz</h2>
+  <p class="game-desc">Beantworte alle Fragen über das Versuchsprotokoll!</p>
+  <div class="q-status"><span id="q-lbl">Frage 1 von 8</span><span id="q-slv">0 richtig</span></div>
+  <div class="q-bar"><div class="q-fill" id="q-fill" style="width:0%"></div></div>
+  <div class="q-dots" id="q-dots"></div>
+  <div id="q-content"></div>
+  <div class="btn-row" id="q-btnrow" style="display:none">
+    <button class="btn btn-primary" onclick="quizNext()">Weiter →</button>
+  </div>
+</div>
+
+<div id="game3" class="game-panel">
+  <h2 class="game-title">✅ Wahr oder Falsch?</h2>
+  <p class="game-desc">Sind diese Aussagen richtig oder falsch?</p>
+  <div class="tf-sb" id="tf-sb">Punkte: 0 / 0</div>
+  <div id="tf-content"></div>
+  <div id="tf-final" style="display:none" class="result-box">
+    <h2>Fertig! 🎉</h2><div id="tf-fin"></div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════
+const PARTS = [
+  { id:'frage',   icon:'🔍', name:'Versuchsfrage',        hint:'Was möchte ich herausfinden?' },
+  { id:'geraete', icon:'⚗️', name:'Geräte & Chemikalien', hint:'Was brauche ich für den Versuch?' },
+  { id:'durch',   icon:'🧑‍🔬', name:'Durchführung',         hint:'Wie gehe ich Schritt für Schritt vor?' },
+  { id:'beob',    icon:'👀', name:'Beobachtung',           hint:'Was sehe, höre oder rieche ich?' },
+  { id:'auswert', icon:'🧠', name:'Auswertung',            hint:'Warum ist das passiert?' },
+];
+
+const MATCH_DATA = [
+  { text:'Das Magnesium leuchtet sehr hell.',                                  correct:'beob'    },
+  { text:'Magnesium reagiert mit Sauerstoff zu Magnesiumoxid.',                correct:'auswert' },
+  { text:'Man hält das Magnesiumband mit einer Zange in die Flamme.',          correct:'durch'   },
+  { text:'Was passiert, wenn man Magnesium erhitzt?',                          correct:'frage'   },
+  { text:'Geräte: Reagenzglas, Stativ, Brenner',                               correct:'geraete' },
+  { text:'Es entsteht ein weißer Stoff.',                                      correct:'beob'    },
+  { text:'Wie reagiert Essig mit Kalk?',                                       correct:'frage'   },
+  { text:'Die Hypothese wird bestätigt: Magnesium verbrennt mit Sauerstoff.',  correct:'auswert' },
+  { text:'Man gibt 10 ml Salzsäure in das Reagenzglas.',                       correct:'durch'   },
+  { text:'Chemikalien: Magnesiumband, Salzsäure',                              correct:'geraete' },
+];
+
+const QUIZ_DATA = [
+  { q:'Wozu dient die Versuchsfrage im Protokoll?',
+    opts:['Um zu erklären, was chemisch passiert ist','Um festzuhalten, was man herausfinden möchte','Um alle Geräte aufzulisten','Um die Ergebnisse zusammenzufassen'],
+    ok:1, exp:'Die Versuchsfrage beschreibt, was man herausfinden möchte – z. B. „Was passiert, wenn man Magnesium erhitzt?"' },
+  { q:'Welche Zeitform verwendet man in der Durchführung?',
+    opts:['Vergangenheit (Präteritum)','Zukunft (Futur)','Gegenwart (Präsens)','Perfekt'],
+    ok:2, exp:'Die Durchführung wird im Präsens geschrieben: „Man hält das Magnesiumband mit einer Zange."' },
+  { q:'"Das Magnesium leuchtet sehr hell." – In welchen Abschnitt gehört dieser Satz?',
+    opts:['Auswertung','Durchführung','Beobachtung','Versuchsfrage'],
+    ok:2, exp:'Das Leuchten ist etwas, was man sieht – das ist eine Beobachtung. Erklärungen kommen erst in die Auswertung.' },
+  { q:'Was gehört NICHT in die Beobachtung?',
+    opts:['Farben, die sich verändern','Gerüche, die entstehen','Erklärungen, warum etwas passiert','Geräusche beim Experiment'],
+    ok:2, exp:'In die Beobachtung schreibst du nur, was du siehst, hörst oder riechst – keine Erklärungen! Die kommen in die Auswertung.' },
+  { q:'Was wird in der Auswertung beantwortet?',
+    opts:['Welche Materialien wurden verwendet?','Wie hat man den Versuch durchgeführt?','Was hat man beobachtet?','Ob die Hypothese bestätigt oder widerlegt wurde'],
+    ok:3, exp:'In der Auswertung erklärst du deine Beobachtungen und gibst an, ob deine Hypothese bestätigt oder widerlegt wurde.' },
+  { q:'Welche Schreibform verwendet man in der Durchführung?',
+    opts:['Ich-Form (Ich gebe…)','Man-Form (Man gibt…)','Wir-Form (Wir geben…)','Ihr-Form (Ihr gebt…)'],
+    ok:1, exp:'In der Durchführung verwendet man die Man-Form: „Man gibt 10 ml Salzsäure in das Reagenzglas."' },
+  { q:'Warum ist ein Versuchsprotokoll wichtig?',
+    opts:['Damit man eine gute Note bekommt','Damit der Lehrer sieht, dass man aufgepasst hat','Damit der Versuch später nachvollzogen und wiederholt werden kann','Damit man die Geräte nicht vergisst'],
+    ok:2, exp:'Ein Protokoll dokumentiert den Versuch so genau, dass andere ihn nachvollziehen und selbst durchführen können.' },
+  { q:'"Magnesium reagiert mit Sauerstoff zu Magnesiumoxid." – Wohin gehört dieser Satz?',
+    opts:['Beobachtung','Durchführung','Auswertung','Versuchsfrage'],
+    ok:2, exp:'Das ist eine Erklärung mit einem Fachbegriff – das gehört in die Auswertung, nicht in die Beobachtung!' },
+];
+
+const TF_DATA = [
+  { text:'In der Beobachtung darf ich erklären, warum etwas passiert ist.',
+    ok:false, exp:'❌ Falsch! Erklärungen kommen erst in die Auswertung. Die Beobachtung hält nur fest, was man sieht, hört oder riecht.' },
+  { text:'In der Durchführung beschreibe ich den Versuch so genau, dass andere ihn wiederholen könnten.',
+    ok:true,  exp:'✅ Richtig! Die Durchführung ist eine Schritt-für-Schritt-Anleitung, damit andere den Versuch nachvollziehen können.' },
+  { text:'Bei den Geräten und Chemikalien schreibt man vollständige Sätze.',
+    ok:false, exp:'❌ Falsch! Bei Geräten und Chemikalien reichen Stichpunkte – keine vollständigen Sätze nötig!' },
+  { text:'Wenn meine Hypothese falsch war, muss ich das in der Auswertung erwähnen.',
+    ok:true,  exp:'✅ Richtig! In der Auswertung erläuterst du, ob deine Hypothese bestätigt oder widerlegt wurde.' },
+  { text:'Die Versuchsfrage beginnt oft mit „Wie …?" oder „Was passiert, wenn …?"',
+    ok:true,  exp:'✅ Richtig! Solche Frageformulierungen leiten eine klare Versuchsfrage ein.' },
+  { text:'Im Versuchsprotokoll muss kein Name und kein Datum stehen.',
+    ok:false, exp:'❌ Falsch! Name und Datum gehören immer ins Protokoll – so weiß man, wer es wann erstellt hat.' },
+  { text:'"Es entsteht ein weißer Stoff." ist eine Beobachtung.',
+    ok:true,  exp:'✅ Richtig! Das ist etwas, was man sehen kann – also eine Beobachtung, keine Erklärung.' },
+  { text:'Die Durchführung wird im Präteritum (Vergangenheit) geschrieben.',
+    ok:false, exp:'❌ Falsch! Die Durchführung wird im Präsens (Gegenwart) geschrieben, z. B. „Man erhitzt das Magnesiumband."' },
+];
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+function showGame(i) {
+  document.querySelectorAll('.game-panel').forEach((p,j)=>p.classList.toggle('active',j===i));
+  document.querySelectorAll('.nav-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+}
+
+// ════════════════════════════════════════
+// GAME 1 – KLICK-REIHENFOLGE
+// ════════════════════════════════════════
+let sortSel = null;
+
+function makeSortCard(part) {
+  const d = document.createElement('div');
+  d.className = 'sort-card';
+  d.dataset.pid = part.id;
+  d.innerHTML = `<span class="c-icon">${part.icon}</span><div><strong>${part.name}</strong><small>${part.hint}</small></div>`;
+  d.addEventListener('click', sortCardClick);
+  return d;
+}
+
+function initSort() {
+  sortSel = null;
+  const pool = document.getElementById('sort-pool');
+  pool.innerHTML = '';
+  [...PARTS].sort(()=>Math.random()-.5).forEach(p=>pool.appendChild(makeSortCard(p)));
+  const slots = document.getElementById('sort-slots');
+  slots.innerHTML = '';
+  PARTS.forEach((_,i)=>{
+    const s = document.createElement('div');
+    s.className = 'sort-slot';
+    s.dataset.idx = i;
+    s.innerHTML = `<span class="slot-n">${i+1}.</span><span class="slot-hint">Hier ablegen …</span>`;
+    s.addEventListener('click', sortSlotClick);
+    slots.appendChild(s);
+  });
+  document.getElementById('sort-fb').className='fb';
+}
+
+function sortCardClick(e) {
+  e.stopPropagation();
+  const card = e.currentTarget;
+  if (sortSel?.el === card) { card.classList.remove('sel'); sortSel=null; return; }
+  if (sortSel) sortSel.el.classList.remove('sel');
+  sortSel = { el:card, from:card.parentElement };
+  card.classList.add('sel');
+}
+
+function sortSlotClick(e) {
+  const slot = e.currentTarget;
+  if (!sortSel) {
+    const c = slot.querySelector('.sort-card');
+    if (c) { sortSel={el:c,from:slot}; c.classList.add('sel'); }
+    return;
+  }
+  const {el,from} = sortSel;
+  const existing = slot.querySelector('.sort-card');
+  if (existing && existing!==el) from.appendChild(existing);
+  el.classList.remove('sel');
+  slot.appendChild(el);
+  const hint = slot.querySelector('.slot-hint');
+  if (hint) hint.style.display = 'none';
+  if (from.classList.contains('sort-slot')) {
+    const ph = from.querySelector('.slot-hint');
+    if (ph && !from.querySelector('.sort-card')) ph.style.display='';
+  }
+  sortSel = null;
+}
+
+function checkSort() {
+  const slots = document.querySelectorAll('#sort-slots .sort-slot');
+  let filled=0, correct=0;
+  slots.forEach((s,i)=>{
+    s.classList.remove('sc','sw');
+    const c=s.querySelector('.sort-card');
+    if (c) { filled++; if(c.dataset.pid===PARTS[i].id){s.classList.add('sc');correct++;}else s.classList.add('sw'); }
+  });
+  const fb=document.getElementById('sort-fb');
+  if (filled<5){fb.className='fb err';fb.textContent='⚠️ Bitte alle 5 Felder befüllen!';return;}
+  if (correct===5){fb.className='fb ok';fb.textContent='🎉 Perfekt! Alle 5 Teile in der richtigen Reihenfolge!';}
+  else{fb.className='fb err';fb.textContent=`❌ ${correct} von 5 richtig. Grün = korrekt, Rot = falsch. Versuche es nochmal!`;}
+}
+
+function resetSort() {
+  document.querySelectorAll('#sort-slots .sort-card').forEach(c=>document.getElementById('sort-pool').appendChild(c));
+  document.querySelectorAll('#sort-slots .sort-slot').forEach(s=>{
+    s.classList.remove('sc','sw');
+    const h=s.querySelector('.slot-hint'); if(h) h.style.display='';
+  });
+  const pool=document.getElementById('sort-pool');
+  [...pool.querySelectorAll('.sort-card')].sort(()=>Math.random()-.5).forEach(c=>pool.appendChild(c));
+  document.getElementById('sort-fb').className='fb';
+}
+
+// ════════════════════════════════════════
+// GAME 2 – ZUORDNUNG
+// ════════════════════════════════════════
+let mSel=null, mMap={}, mShuf=[];
+
+function initMatch() {
+  mSel=null; mMap={};
+  mShuf=[...MATCH_DATA].sort(()=>Math.random()-.5);
+  const sc=document.getElementById('match-stmts');
+  sc.innerHTML='';
+  mShuf.forEach((s,i)=>{
+    const d=document.createElement('div'); d.className='m-stmt'; d.dataset.idx=i;
+    d.textContent=`„${s.text}"`;
+    d.addEventListener('click',()=>mSelectStmt(d,i,s));
+    sc.appendChild(d);
+  });
+  const tc=document.getElementById('match-targets');
+  tc.innerHTML='';
+  PARTS.forEach(p=>{
+    const d=document.createElement('div'); d.className='m-target'; d.dataset.pid=p.id;
+    d.innerHTML=`<div class="m-target-head"><span>${p.icon}</span><span>${p.name}</span></div><div class="m-badges" id="mb-${p.id}"></div>`;
+    d.addEventListener('click',()=>mAssign(p.id));
+    tc.appendChild(d);
+  });
+  document.getElementById('match-fb').className='fb';
+  document.getElementById('match-hint').textContent='← Wähle zuerst eine Aussage aus';
+}
+
+function mSelectStmt(el,idx,s) {
+  if (el.classList.contains('m-done')||el.classList.contains('m-ok')) return;
+  if (mSel?.el===el){el.classList.remove('m-sel');mSel=null;document.getElementById('match-hint').textContent='← Wähle zuerst eine Aussage aus';return;}
+  if (mSel) mSel.el.classList.remove('m-sel');
+  mSel={el,idx,s}; el.classList.add('m-sel');
+  document.getElementById('match-hint').textContent='→ Jetzt den passenden Protokoll-Teil rechts anklicken';
+}
+
+function mAssign(partId) {
+  if (!mSel) return;
+  const {el,idx,s}=mSel; mMap[idx]=partId;
+  const badge=document.createElement('div'); badge.className='mbadge'; badge.dataset.si=idx;
+  badge.textContent=s.text.length>34?s.text.slice(0,34)+'…':s.text;
+  document.getElementById('mb-'+partId).appendChild(badge);
+  el.classList.remove('m-sel'); el.classList.add('m-done'); mSel=null;
+  const rem=mShuf.length-Object.keys(mMap).length;
+  document.getElementById('match-hint').textContent=rem>0?`← Noch ${rem} übrig`:'✔ Alle zugeordnet – jetzt überprüfen!';
+}
+
+function checkMatch() {
+  const total=Object.keys(mMap).length;
+  if(!total){const fb=document.getElementById('match-fb');fb.className='fb err';fb.textContent='⚠️ Bitte erst Aussagen zuordnen!';return;}
+  document.querySelectorAll('.mbadge').forEach(b=>b.classList.remove('mb-ok','mb-err'));
+  let right=0;
+  Object.entries(mMap).forEach(([idx,pid])=>{
+    const isOk=mShuf[idx].correct===pid; if(isOk)right++;
+    const el=document.querySelector(`.m-stmt[data-idx="${idx}"]`);
+    if(el){el.classList.remove('m-done','m-err','m-ok');el.classList.add(isOk?'m-ok':'m-err');}
+    const badge=document.querySelector(`.mbadge[data-si="${idx}"]`);
+    if(badge)badge.classList.add(isOk?'mb-ok':'mb-err');
+  });
+  const allDone=total===mShuf.length;
+  const fb=document.getElementById('match-fb');
+  fb.className=(right===total&&allDone)?'fb ok':'fb err';
+  fb.textContent=(right===total&&allDone)?`🎉 Super! Alle ${total} Zuordnungen richtig!`:`📊 ${right} von ${total} richtig${allDone?'':` – noch ${mShuf.length-total} ausstehend`}. Grün = richtig, Rot = falsch.`;
+}
+
+function resetMatch(){initMatch();}
+
+// ════════════════════════════════════════
+// GAME 3 – QUIZ
+// ════════════════════════════════════════
+let qIdx=0,qScore=0,qRes=[],qAns=false;
+
+function initQuiz(){qIdx=0;qScore=0;qRes=[];qAns=false;renderQ();}
+
+function renderQ(){
+  const n=QUIZ_DATA.length;
+  document.getElementById('q-lbl').textContent=qIdx<n?`Frage ${qIdx+1} von ${n}`:'Fertig!';
+  document.getElementById('q-slv').textContent=`${qScore} richtig`;
+  document.getElementById('q-fill').style.width=`${(qIdx/n)*100}%`;
+  const dots=document.getElementById('q-dots'); dots.innerHTML='';
+  for(let i=0;i<n;i++){const d=document.createElement('div');d.className='qdot'+(i<qIdx?(qRes[i]?' qd-ok':' qd-err'):i===qIdx?' qd-cur':'');dots.appendChild(d);}
+  if(qIdx>=n){showQResult();return;}
+  const q=QUIZ_DATA[qIdx]; qAns=false;
+  document.getElementById('q-btnrow').style.display='none';
+  document.getElementById('q-content').innerHTML=`
+    <div class="q-card">
+      <div class="q-text">${q.q}</div>
+      <div class="q-opts">${q.opts.map((o,i)=>`<button class="q-opt" onclick="answerQ(${i})">${o}</button>`).join('')}</div>
+      <div id="q-exp" class="q-exp"></div>
+    </div>`;
+}
+
+function answerQ(chosen){
+  if(qAns)return; qAns=true;
+  const q=QUIZ_DATA[qIdx];
+  document.querySelectorAll('.q-opt').forEach((b,i)=>{b.disabled=true;if(i===q.ok)b.classList.add('qo-ok');if(i===chosen&&chosen!==q.ok)b.classList.add('qo-err');});
+  const ok=chosen===q.ok; if(ok)qScore++; qRes.push(ok);
+  const exp=document.getElementById('q-exp');
+  exp.className=`q-exp show ${ok?'e-ok':'e-err'}`;
+  exp.textContent=(ok?'✅ Richtig! ':'❌ Leider falsch. ')+q.exp;
+  document.getElementById('q-btnrow').style.display='flex';
+  document.getElementById('q-slv').textContent=`${qScore} richtig`;
+  const dots=document.getElementById('q-dots');
+  if(dots.children[qIdx])dots.children[qIdx].className=`qdot ${ok?'qd-ok':'qd-err'}`;
+}
+
+function quizNext(){qIdx++;renderQ();}
+
+function showQResult(){
+  document.getElementById('q-btnrow').style.display='none';
+  document.getElementById('q-fill').style.width='100%';
+  const n=QUIZ_DATA.length,pct=qScore/n;
+  const cls=pct>=.75?'sr-good':pct>=.5?'sr-ok':'sr-poor';
+  const msg=pct>=.75?'Ausgezeichnet!':pct>=.5?'Gut gemacht!':'Weiter üben!';
+  const em=pct>=.75?'🎉':pct>=.5?'👍':'💪';
+  document.getElementById('q-content').innerHTML=`
+    <div class="result-box">
+      <h2>${em} ${msg}</h2>
+      <div class="s-ring ${cls}">${qScore}<span style="font-size:.5em">/${n}</span></div>
+      <p style="color:#64748b;margin:10px 0">Du hast ${qScore} von ${n} Fragen richtig beantwortet.</p>
+      <button class="btn btn-primary" onclick="initQuiz()" style="margin-top:8px">🔄 Nochmal versuchen</button>
+    </div>`;
+}
+
+// ════════════════════════════════════════
+// GAME 4 – WAHR / FALSCH
+// ════════════════════════════════════════
+let tfScore=0,tfTotal=0,tfDone=[];
+
+function initTF(){
+  tfScore=0;tfTotal=0;tfDone=new Array(TF_DATA.length).fill(false);
+  document.getElementById('tf-sb').textContent='Punkte: 0 / 0';
+  document.getElementById('tf-final').style.display='none';
+  const c=document.getElementById('tf-content'); c.innerHTML='';
+  TF_DATA.forEach((s,i)=>{
+    const card=document.createElement('div');card.className='tf-card';card.id=`tfc${i}`;
+    card.innerHTML=`<div class="tf-stmt">${s.text}</div>
+      <div class="tf-btns">
+        <button class="tf-btn tf-t" onclick="answerTF(${i},true)">✓ Richtig</button>
+        <button class="tf-btn tf-f" onclick="answerTF(${i},false)">✗ Falsch</button>
+      </div>
+      <div id="tfe${i}" class="tf-exp"></div>`;
+    c.appendChild(card);
+  });
+}
+
+function answerTF(i,ans){
+  if(tfDone[i])return;
+  tfDone[i]=true;tfTotal++;
+  const s=TF_DATA[i];const ok=ans===s.ok;if(ok)tfScore++;
+  document.getElementById('tf-sb').textContent=`Punkte: ${tfScore} / ${tfTotal}`;
+  const card=document.getElementById(`tfc${i}`);
+  const btns=card.querySelectorAll('.tf-btn');btns.forEach(b=>b.disabled=true);
+  const tb=btns[0],fb=btns[1];
+  if(ans) tb.classList.add(ok?'bc-ok':'bc-err');
+  else    fb.classList.add(ok?'bc-ok':'bc-err');
+  if(!ok){if(s.ok)tb.classList.add('bc-ok');else fb.classList.add('bc-ok');}
+  const exp=document.getElementById(`tfe${i}`);
+  exp.className=`tf-exp show ${ok?'te-ok':'te-err'}`;
+  exp.textContent=s.exp;
+  if(tfDone.every(Boolean))setTimeout(showTFResult,600);
+}
+
+function showTFResult(){
+  const n=TF_DATA.length,pct=tfScore/n;
+  const em=pct>=.75?'🎉':pct>=.5?'👍':'💪';
+  const msg=pct>=.75?'Sehr gut!':pct>=.5?'Gut gemacht!':'Weiter üben!';
+  document.getElementById('tf-final').style.display='block';
+  document.getElementById('tf-fin').innerHTML=`
+    <p style="font-size:1.2em;color:#1e40af;margin:8px 0">${em} ${msg}</p>
+    <p style="color:#64748b">${tfScore} von ${n} Aussagen richtig bewertet</p>
+    <button class="btn btn-primary" onclick="initTF()" style="margin-top:14px">🔄 Nochmal</button>`;
+  document.getElementById('tf-final').scrollIntoView({behavior:'smooth'});
+}
+
+// ════════════════════════════════════════
+// INIT ALL
+// ════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{initSort();initMatch();initQuiz();initTF();});
+</script>
+</body>
+</html>
