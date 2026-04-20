@@ -3,11 +3,282 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DHR</title>
+<title>Herr P. – Unterrichtsmaterialien</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<style>* { box-sizing: border-box; margin: 0; padding: 0; } body { background: #FAF8F3; }</style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #171b26;
+    --bg3: #1e2335;
+    --text: #e8eaf2;
+    --muted: #7a80a0;
+    --border: rgba(255,255,255,0.08);
+    --ma: #f59e42;
+    --ch: #34d399;
+    --in: #60a5fa;
+    --bi: #f472b6;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Courier New', 'Lucida Console', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    overflow-x: hidden;
+  }
+
+  /* Animierter Hintergrund-Grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 660px;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Oops-Badge */
+  .oops {
+    display: inline-block;
+    background: rgba(239,68,68,0.15);
+    border: 1px solid rgba(239,68,68,0.35);
+    color: #f87171;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.9rem;
+    border-radius: 2px;
+    margin-bottom: 1.8rem;
+    animation: blink-border 2.4s ease-in-out infinite;
+  }
+
+  @keyframes blink-border {
+    0%, 100% { border-color: rgba(239,68,68,0.35); }
+    50%       { border-color: rgba(239,68,68,0.7); }
+  }
+
+  h1 {
+    font-size: clamp(1.5rem, 5vw, 2.4rem);
+    font-weight: normal;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    margin-bottom: 0.6rem;
+    color: var(--text);
+  }
+
+  h1 span { color: var(--muted); font-size: 0.75em; }
+
+  .subtitle {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 3rem;
+    line-height: 1.6;
+  }
+
+  /* Periodensystem-Kacheln */
+  .elements {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 3rem;
+  }
+
+  .element {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.1rem 0.5rem 1rem;
+    cursor: default;
+    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .element::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .element:hover {
+    transform: translateY(-4px) scale(1.03);
+    background: var(--bg3);
+  }
+
+  .element.ma { --c: var(--ma); }
+  .element.ch { --c: var(--ch); }
+  .element.in { --c: var(--in); }
+  .element.bi { --c: var(--bi); }
+
+  .element:hover {
+    border-color: var(--c);
+    box-shadow: 0 0 18px rgba(255,255,255,0.04), 0 4px 24px color-mix(in srgb, var(--c) 20%, transparent);
+  }
+
+  .el-number {
+    font-size: 0.65rem;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .el-symbol {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: var(--c);
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.35rem;
+    letter-spacing: -0.04em;
+  }
+
+  .el-name {
+    font-size: 0.65rem;
+    color: var(--text);
+    display: block;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .el-mass {
+    font-size: 0.6rem;
+    color: var(--muted);
+    display: block;
+    margin-top: 0.3rem;
+  }
+
+  /* Terminal-Block */
+  .terminal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.2rem 1.4rem;
+    text-align: left;
+    font-size: 0.78rem;
+    line-height: 1.9;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  .terminal .prompt { color: var(--ch); }
+  .terminal .cmd    { color: var(--text); }
+  .terminal .out    { color: var(--muted); }
+  .terminal .err    { color: #f87171; }
+  .terminal .link   { color: var(--in); }
+
+  /* Cursor-Blinker */
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1em;
+    background: var(--text);
+    vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+    margin-left: 2px;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  .footer {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    opacity: 0.6;
+  }
+
+  /* Einblend-Animation */
+  .container > * {
+    animation: fadein 0.5s ease both;
+  }
+  .oops       { animation-delay: 0.05s; }
+  h1          { animation-delay: 0.15s; }
+  .subtitle   { animation-delay: 0.22s; }
+  .elements   { animation-delay: 0.32s; }
+  .terminal   { animation-delay: 0.45s; }
+  .footer     { animation-delay: 0.55s; }
+
+  @keyframes fadein {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 480px) {
+    .elements { grid-template-columns: repeat(2, 1fr); }
+    .el-symbol { font-size: 1.8rem; }
+  }
+</style>
 </head>
 <body>
+<div class="container">
 
+  <div class="oops">⚠ Falsche Seite — Umleitung fehlgeschlagen</div>
+
+  <h1>Hier gibt's nichts zu sehen.<br><span>(...außer vielleicht das hier.)</span></h1>
+
+  <p class="subtitle">
+    Du hast die Startseite gefunden. Gut gemacht.<br>
+    Dein Link war aber eigentlich woanders. Einfach zurückgehen!
+  </p>
+
+  <!-- Periodensystem-Kacheln -->
+  <div class="elements">
+    <div class="element ma">
+      <span class="el-number">1</span>
+      <span class="el-symbol">Ma</span>
+      <span class="el-name">Mathematik</span>
+      <span class="el-mass">Klasse 5–10</span>
+    </div>
+    <div class="element ch">
+      <span class="el-number">2</span>
+      <span class="el-symbol">Ch</span>
+      <span class="el-name">Chemie</span>
+      <span class="el-mass">Mol &amp; mehr</span>
+    </div>
+    <div class="element in">
+      <span class="el-number">3</span>
+      <span class="el-symbol">In</span>
+      <span class="el-name">Informatik</span>
+      <span class="el-mass">0101 0111</span>
+    </div>
+    <div class="element bi">
+      <span class="el-number">4</span>
+      <span class="el-symbol">Bi</span>
+      <span class="el-name">Biologie</span>
+      <span class="el-mass">C₆H₁₂O₆</span>
+    </div>
+  </div>
+
+  <!-- Terminal -->
+  <div class="terminal">
+    <div><span class="prompt">$</span> <span class="cmd">cd /unterricht/startseite</span></div>
+    <div><span class="out">» Willkommen. Aber du brauchst einen direkten Link.</span></div>
+    <div><span class="prompt">$</span> <span class="cmd">ls materialien/</span></div>
+    <div><span class="err">Zugriff verweigert. Frag deinen Lehrer.</span></div>
+    <div><span class="prompt">$</span> <span class="cmd">echo "Zurück zum Unterricht, bitte."</span></div>
+    <div><span class="out">Zurück zum Unterricht, bitte.</span></div>
+    <div><span class="prompt">$</span> <span class="cursor"></span></div>
+  </div>
+
+  <p class="footer">© Unterrichtsmaterialien — Zugang nur über direkte Links</p>
+
+</div>
 </body>
 </html>
