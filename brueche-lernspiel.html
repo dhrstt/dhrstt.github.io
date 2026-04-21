@@ -5,161 +5,205 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Brüche-Abenteuer 🎯</title>
 <style>
-:root{--bg:#0f0e17;--surface:#1a1830;--surface2:#242040;--accent1:#ff6b35;--accent2:#f7c59f;--accent3:#5bc0eb;--accent4:#9b5de5;--accent5:#00f5d4;--text:#fffffe;--text-muted:#a7a9be;--correct:#06d6a0;--wrong:#ef233c;--gold:#ffd60a;--radius:16px;--shadow:0 8px 32px rgba(0,0,0,0.4);}
+:root{
+  --bg:#0f0e17;--surface:#1a1830;--surface2:#242040;
+  --a1:#ff6b35;--a2:#f7c59f;--a3:#5bc0eb;--a4:#9b5de5;--a5:#00f5d4;
+  --text:#fffffe;--muted:#a7a9be;--ok:#06d6a0;--err:#ef233c;--gold:#ffd60a;
+  --r:16px;--sh:0 8px 32px rgba(0,0,0,.4);
+  --den-col:#f7c59f;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Trebuchet MS','Lucida Sans Unicode',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-.stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;
+body{font-family:'Trebuchet MS',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;
   background:radial-gradient(1px 1px at 10% 20%,rgba(255,255,255,.6) 0%,transparent 100%),
   radial-gradient(1px 1px at 30% 60%,rgba(255,255,255,.4) 0%,transparent 100%),
   radial-gradient(1px 1px at 50% 10%,rgba(255,255,255,.5) 0%,transparent 100%),
   radial-gradient(2px 2px at 45% 50%,rgba(255,214,10,.4) 0%,transparent 100%),
   radial-gradient(2px 2px at 85% 70%,rgba(155,93,229,.3) 0%,transparent 100%);}
-#app{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:16px;}
-header{text-align:center;padding:20px 0 14px;}
-.logo{font-size:clamp(1.8rem,6vw,3rem);font-weight:900;letter-spacing:-2px;
-  background:linear-gradient(135deg,var(--accent1),var(--accent4),var(--accent3));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
-.tagline{color:var(--text-muted);font-size:.82rem;margin-top:4px;letter-spacing:2px;text-transform:uppercase;}
-.score-bar{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border-radius:var(--radius);padding:10px 18px;margin-bottom:18px;border:1px solid rgba(255,255,255,.08);box-shadow:var(--shadow);flex-wrap:wrap;gap:8px;}
-.score-item{text-align:center;}
-.score-label{font-size:.62rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;}
-.score-value{font-size:1.4rem;font-weight:900;color:var(--gold);}
-.score-value.blue{color:var(--accent3);}
-.score-value.purple{color:var(--accent4);}
+#app{position:relative;z-index:1;max-width:940px;margin:0 auto;padding:14px;}
+header{text-align:center;padding:18px 0 12px;}
+.logo{font-size:clamp(1.6rem,5vw,2.8rem);font-weight:900;letter-spacing:-2px;
+  background:linear-gradient(135deg,var(--a1),var(--a4),var(--a3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.tagline{color:var(--muted);font-size:.78rem;margin-top:3px;letter-spacing:2px;text-transform:uppercase;}
+/* score bar */
+.score-bar{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border-radius:var(--r);padding:9px 16px;margin-bottom:16px;border:1px solid rgba(255,255,255,.08);box-shadow:var(--sh);flex-wrap:wrap;gap:7px;}
+.si{text-align:center;}
+.sl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.sv{font-size:1.3rem;font-weight:900;color:var(--gold);}
+.sv.b{color:var(--a3);}.sv.p{color:var(--a4);}
+/* screens */
 .screen{display:none;}.screen.active{display:block;}
-.section-title{font-size:.82rem;text-transform:uppercase;letter-spacing:3px;color:var(--text-muted);margin:22px 0 11px;display:flex;align-items:center;gap:10px;}
-.section-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1);}
-.home-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
-.topic-card{background:var(--surface);border:2px solid transparent;border-radius:var(--radius);padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;box-shadow:var(--shadow);}
-.topic-card:hover{transform:translateY(-3px);border-color:var(--card-color,var(--accent1));}
-.card-emoji{font-size:2.2rem;display:block;margin-bottom:8px;}
-.card-title{font-size:.95rem;font-weight:800;margin-bottom:3px;color:var(--card-color,var(--text));}
-.card-desc{font-size:.75rem;color:var(--text-muted);line-height:1.4;}
-.card-badge{position:absolute;top:9px;right:9px;background:var(--card-color,var(--accent1));color:var(--bg);font-size:.58rem;font-weight:900;padding:2px 7px;border-radius:20px;text-transform:uppercase;}
-.games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:11px;}
-.game-card{background:linear-gradient(135deg,var(--g1),var(--g2));border-radius:var(--radius);padding:18px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);}
-.game-card:hover{transform:translateY(-3px) scale(1.02);}
-.game-emoji{font-size:2rem;margin-bottom:7px;display:block;}
-.game-name{font-size:.95rem;font-weight:800;margin-bottom:3px;}
-.game-desc{font-size:.72rem;opacity:.85;line-height:1.4;}
-.tutorial-box{background:var(--surface);border-radius:var(--radius);padding:22px;margin-bottom:14px;border-left:4px solid var(--accent3);box-shadow:var(--shadow);}
-.tutorial-box h2{font-size:1.15rem;margin-bottom:12px;color:var(--accent3);}
-.tutorial-steps{list-style:none;}
-.tut-step{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.06);}
-.tut-step:last-child{border-bottom:none;}
-.step-num{width:26px;height:26px;border-radius:50%;flex-shrink:0;background:var(--accent4);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.82rem;}
-.step-text{font-size:.85rem;line-height:1.6;color:var(--text-muted);}
-.step-text strong{color:var(--text);}
-.tip-box{background:rgba(255,214,10,.07);border:1px dashed var(--gold);border-radius:9px;padding:11px 14px;margin-top:11px;font-size:.8rem;color:var(--accent2);line-height:1.5;}
-.tip-box strong{color:var(--gold);}
-
-/* ── FRACTION RENDERING ── */
+/* home */
+.sec-title{font-size:.78rem;text-transform:uppercase;letter-spacing:3px;color:var(--muted);margin:20px 0 10px;display:flex;align-items:center;gap:8px;}
+.sec-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1);}
+.home-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:11px;}
+.tc{background:var(--surface);border:2px solid transparent;border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;box-shadow:var(--sh);}
+.tc:hover{transform:translateY(-3px);border-color:var(--cc,var(--a1));}
+.tc .em{font-size:2rem;display:block;margin-bottom:7px;}
+.tc .ti{font-size:.9rem;font-weight:800;margin-bottom:2px;color:var(--cc,var(--text));}
+.tc .de{font-size:.72rem;color:var(--muted);line-height:1.35;}
+.tc .ba{position:absolute;top:8px;right:8px;background:var(--cc,var(--a1));color:var(--bg);font-size:.55rem;font-weight:900;padding:2px 6px;border-radius:20px;text-transform:uppercase;}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px;}
+.gc{background:linear-gradient(135deg,var(--g1),var(--g2));border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;box-shadow:var(--sh);}
+.gc:hover{transform:translateY(-3px) scale(1.02);}
+.gc .em{font-size:1.9rem;margin-bottom:6px;display:block;}
+.gc .gn{font-size:.9rem;font-weight:800;margin-bottom:2px;}
+.gc .gd{font-size:.7rem;opacity:.85;line-height:1.35;}
+/* tutorial */
+.tbox{background:var(--surface);border-radius:var(--r);padding:20px;margin-bottom:12px;border-left:4px solid var(--a3);box-shadow:var(--sh);}
+.tbox h2{font-size:1.1rem;margin-bottom:11px;color:var(--a3);}
+.tsteps{list-style:none;}
+.tstep{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.tstep:last-child{border-bottom:none;}
+.snum{width:24px;height:24px;border-radius:50%;flex-shrink:0;background:var(--a4);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.78rem;}
+.stxt{font-size:.82rem;line-height:1.55;color:var(--muted);}
+.stxt strong{color:var(--text);}
+.tipbox{background:rgba(255,214,10,.07);border:1px dashed var(--gold);border-radius:8px;padding:10px 13px;margin-top:10px;font-size:.78rem;color:var(--a2);line-height:1.5;}
+.tipbox strong{color:var(--gold);}
+/* fractions */
 .frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px;line-height:1.2;}
-.frac .fn,.frac .fd{font-weight:900;padding:0 4px;}
-.frac .fl{width:100%;height:3px;background:currentColor;margin:3px 0;border-radius:1px;min-width:20px;}
-.frac.big .fn,.frac.big .fd{font-size:1.5rem;}
-.frac.med .fn,.frac.med .fd{font-size:1.1rem;}
-.frac.sm .fn,.frac.sm .fd{font-size:.88rem;}
-.op-sym{font-size:1.5rem;font-weight:900;color:var(--accent1);margin:0 8px;vertical-align:middle;}
-.eq-sym{font-size:1.5rem;font-weight:900;color:var(--text-muted);margin:0 8px;vertical-align:middle;}
-
-/* ── INPUTS ── */
-.frac-input{display:inline-flex;flex-direction:column;align-items:center;background:var(--surface2);border-radius:9px;padding:7px 11px;border:2px solid rgba(255,255,255,.12);transition:border-color .2s;vertical-align:middle;margin:0 3px;}
-.frac-input:focus-within{border-color:var(--accent3);}
-.frac-input input{width:65px;background:transparent;border:none;outline:none;text-align:center;color:var(--text);font-size:1.35rem;font-weight:900;font-family:inherit;}
-.frac-input input[type=number]{-moz-appearance:textfield;}
-.frac-input input::-webkit-inner-spin-button,.frac-input input::-webkit-outer-spin-button{-webkit-appearance:none;}
-.frac-input .fi-line{width:100%;height:3px;background:var(--accent2);margin:4px 0;}
-.single-inp{display:inline-block;background:var(--surface2);border:2px solid rgba(255,255,255,.12);border-radius:9px;padding:6px 10px;color:var(--text);font-size:1.35rem;font-weight:900;font-family:inherit;width:70px;text-align:center;outline:none;vertical-align:middle;transition:border-color .2s;}
-.single-inp:focus{border-color:var(--accent3);}
-.single-inp[type=number]{-moz-appearance:textfield;}
-.single-inp::-webkit-inner-spin-button,.single-inp::-webkit-outer-spin-button{-webkit-appearance:none;}
-
-/* scaffold level badge */
-.level-badge{display:inline-block;background:rgba(155,93,229,.25);border:1px solid var(--accent4);border-radius:20px;font-size:.68rem;color:var(--accent4);font-weight:700;padding:2px 10px;margin-bottom:10px;letter-spacing:1px;}
-
-/* ── EXERCISE ── */
-.progress-bar-wrap{background:rgba(255,255,255,.08);border-radius:20px;height:7px;margin-bottom:14px;overflow:hidden;}
-.progress-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--accent4),var(--accent3));transition:width .5s ease;}
-.exercise-card{background:var(--surface);border-radius:var(--radius);padding:22px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.06);}
-.exercise-label{font-size:.68rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:9px;}
-.ex-q{font-size:1rem;line-height:2;margin-bottom:14px;}
-.q-center{text-align:center;margin:10px 0;line-height:2.8;}
-.phase-box{background:var(--surface2);border-radius:11px;padding:14px;margin-top:12px;border:1px solid rgba(255,255,255,.07);}
-.phase-lbl{font-size:.8rem;color:var(--text-muted);margin-bottom:9px;font-weight:bold;}
-.phase-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:7px;justify-content:center;}
-.factor-hint{font-size:.85rem;color:var(--text-muted);background:var(--surface2);border-radius:7px;padding:10px 14px;border:1px dashed rgba(255,255,255,.12);margin-top:14px;line-height:1.5;}
-.factor-hint strong{color:var(--accent2);}
-.feedback-box{border-radius:9px;padding:11px 14px;margin-top:11px;font-weight:700;font-size:.87rem;display:none;animation:pop .3s cubic-bezier(.36,.07,.19,.97);}
+.frac .fn,.frac .fd{font-weight:900;padding:0 3px;}
+.frac .fl{width:100%;height:3px;background:currentColor;margin:2px 0;border-radius:1px;min-width:18px;}
+.frac.big .fn,.frac.big .fd{font-size:1.45rem;}
+.frac.med .fn,.frac.med .fd{font-size:1.05rem;}
+.frac.sm .fn,.frac.sm .fd{font-size:.85rem;}
+.den-hi{color:var(--den-col)!important;font-weight:900;}
+.op{font-size:1.4rem;font-weight:900;color:var(--a1);margin:0 7px;vertical-align:middle;}
+.eq{font-size:1.4rem;font-weight:900;color:var(--muted);margin:0 7px;vertical-align:middle;}
+/* inputs */
+.fi{display:inline-flex;flex-direction:column;align-items:center;background:var(--surface2);border-radius:8px;padding:6px 10px;border:2px solid rgba(255,255,255,.12);transition:border-color .2s;vertical-align:middle;margin:0 3px;}
+.fi:focus-within{border-color:var(--a3);}
+.fi input{width:58px;background:transparent;border:none;outline:none;text-align:center;color:var(--text);font-size:1.28rem;font-weight:900;font-family:inherit;}
+.fi input[type=number]{-moz-appearance:textfield;}
+.fi input::-webkit-inner-spin-button,.fi input::-webkit-outer-spin-button{-webkit-appearance:none;}
+.fi .fil{width:100%;height:3px;background:var(--a2);margin:3px 0;}
+.fi .fil-den{background:var(--den-col);}
+.ni{display:inline-block;background:var(--surface2);border:2px solid rgba(255,255,255,.12);border-radius:8px;padding:5px 9px;color:var(--text);font-size:1.28rem;font-weight:900;font-family:inherit;width:64px;text-align:center;outline:none;vertical-align:middle;transition:border-color .2s;}
+.ni:focus{border-color:var(--a3);}
+.ni[type=number]{-moz-appearance:textfield;}
+.ni::-webkit-inner-spin-button,.ni::-webkit-outer-spin-button{-webkit-appearance:none;}
+/* Shared-bar fraction for ungleich (from test-ungleich-add) */
+.ext-frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 4px;line-height:1.2;}
+.ext-frac .ef-top,.ext-frac .ef-bot{display:flex;align-items:center;gap:3px;font-size:1.35rem;font-weight:900;}
+.ext-frac .ef-bar{height:3px;background:var(--text);margin:2px 0;border-radius:2px;min-width:80px;}
+.fbook{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 4px;line-height:1.2;}
+.fbook .fb-top,.fbook .fb-bot{display:flex;align-items:center;gap:4px;font-size:1.35rem;font-weight:900;}
+.fbook .fb-bar{height:3px;background:var(--text);margin:2px 0;border-radius:2px;min-width:80px;}
+.fixed-den{font-size:1.35rem;font-weight:900;color:var(--den-col);}
+.step2-hidden{opacity:.3;pointer-events:none;}
+/* level badge */
+.lvbadge{display:inline-flex;align-items:center;gap:6px;background:rgba(155,93,229,.22);border:1px solid var(--a4);border-radius:20px;font-size:.7rem;color:var(--a4);font-weight:800;padding:3px 12px;margin-bottom:10px;letter-spacing:.5px;}
+.lvbadge.lv2{background:rgba(91,192,235,.18);border-color:var(--a3);color:var(--a3);}
+.lvbadge.lv3{background:rgba(255,107,53,.18);border-color:var(--a1);color:var(--a1);}
+/* exercise */
+.pbwrap{background:rgba(255,255,255,.08);border-radius:20px;height:7px;margin-bottom:13px;overflow:hidden;}
+.pbfill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--a4),var(--a3));transition:width .5s ease;}
+.excard{background:var(--surface);border-radius:var(--r);padding:20px;margin-bottom:11px;box-shadow:var(--sh);border:1px solid rgba(255,255,255,.06);}
+.exlbl{font-size:.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:8px;}
+.exq{font-size:.97rem;line-height:1.9;margin-bottom:12px;}
+.qctr{text-align:center;margin:9px 0;line-height:2.7;}
+.pbox{background:var(--surface2);border-radius:10px;padding:13px;margin-top:11px;border:1px solid rgba(255,255,255,.07);}
+.plbl{font-size:.78rem;color:var(--muted);margin-bottom:8px;font-weight:bold;}
+.prow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;justify-content:center;}
+.fhint{font-size:.82rem;color:var(--muted);background:var(--surface2);border-radius:7px;padding:9px 13px;border:1px dashed rgba(255,255,255,.12);margin-top:12px;line-height:1.5;}
+.fhint strong{color:var(--a2);}
+/* feedback */
+.fbbox{border-radius:8px;padding:10px 13px;margin-top:10px;font-weight:700;font-size:.85rem;display:none;animation:pop .3s cubic-bezier(.36,.07,.19,.97);}
 @keyframes pop{0%{transform:scale(.9);opacity:0}70%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
-.feedback-box.correct{background:rgba(6,214,160,.11);border:2px solid var(--correct);color:var(--correct);display:block;}
-.feedback-box.wrong{background:rgba(239,35,60,.11);border:2px solid var(--wrong);color:var(--wrong);display:block;}
-.feedback-box.hint{background:rgba(247,197,159,.11);border:2px solid var(--accent2);color:var(--accent2);display:block;}
-.feedback-box.partial{background:rgba(255,214,10,.09);border:2px solid var(--gold);color:var(--gold);display:block;}
-.btn-check{padding:11px 26px;background:linear-gradient(135deg,var(--accent1),#e84855);border:none;border-radius:9px;color:#fff;font-size:.9rem;font-weight:900;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(255,107,53,.3);}
-.btn-check:hover{transform:translateY(-2px);}
-.btn-next{padding:11px 26px;background:linear-gradient(135deg,var(--correct),#059669);border:none;border-radius:9px;color:#fff;font-size:.9rem;font-weight:900;cursor:pointer;transition:all .2s;display:none;}
-.btn-next:hover{transform:translateY(-2px);}
-.btn-hint{padding:8px 16px;background:transparent;border:2px solid var(--accent4);border-radius:8px;color:var(--accent4);font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;}
-.btn-hint:hover{background:rgba(155,93,229,.14);}
-.btn-back{padding:8px 16px;background:transparent;border:2px solid rgba(255,255,255,.16);border-radius:8px;color:var(--text-muted);font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;margin-bottom:12px;}
-.btn-back:hover{border-color:var(--text-muted);color:var(--text);}
-.btn-start-topic{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent4),var(--accent3));border:none;border-radius:var(--radius);color:#fff;font-size:.95rem;font-weight:900;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(155,93,229,.3);}
-.btn-start-topic:hover{transform:translateY(-2px);}
-.btn-home{padding:13px 34px;background:linear-gradient(135deg,var(--accent1),var(--accent4));border:none;border-radius:var(--radius);color:#fff;font-size:.95rem;font-weight:900;cursor:pointer;transition:all .2s;}
-.btn-home:hover{transform:translateY(-2px);}
-.floating-point{position:fixed;font-size:1.7rem;font-weight:900;color:var(--gold);pointer-events:none;z-index:1000;animation:floatUp 1.2s ease forwards;}
-@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-80px) scale(1.3)}}
-/* QUIZ */
-.quiz-q-box{background:var(--surface);border-radius:var(--radius);padding:22px;text-align:center;margin-bottom:14px;box-shadow:var(--shadow);}
-.quiz-timer{font-size:2rem;font-weight:900;color:var(--accent1);margin:7px 0;}
-.quiz-timer.urgent{color:var(--wrong);animation:pulse .5s ease infinite;}
+.fbbox.ok{background:rgba(6,214,160,.11);border:2px solid var(--ok);color:var(--ok);display:block;}
+.fbbox.ng{background:rgba(239,35,60,.11);border:2px solid var(--err);color:var(--err);display:block;}
+.fbbox.hi{background:rgba(247,197,159,.11);border:2px solid var(--a2);color:var(--a2);display:block;}
+.fbbox.pt{background:rgba(255,214,10,.09);border:2px solid var(--gold);color:var(--gold);display:block;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.blink{animation:blink .6s ease infinite;}
+/* buttons */
+.bcheck{padding:10px 24px;background:linear-gradient(135deg,var(--a1),#e84855);border:none;border-radius:8px;color:#fff;font-size:.88rem;font-weight:900;cursor:pointer;transition:all .2s;box-shadow:0 3px 12px rgba(255,107,53,.3);}
+.bcheck:hover{transform:translateY(-2px);}
+.bnext{padding:10px 24px;background:linear-gradient(135deg,var(--ok),#059669);border:none;border-radius:8px;color:#fff;font-size:.88rem;font-weight:900;cursor:pointer;transition:all .2s;display:none;}
+.bnext:hover{transform:translateY(-2px);}
+.bhint{padding:7px 14px;background:transparent;border:2px solid var(--a4);border-radius:7px;color:var(--a4);font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s;position:relative;}
+.bhint:hover{background:rgba(155,93,229,.14);}
+.bback{padding:7px 14px;background:transparent;border:2px solid rgba(255,255,255,.15);border-radius:7px;color:var(--muted);font-size:.75rem;font-weight:700;cursor:pointer;margin-bottom:11px;}
+.bback:hover{border-color:var(--muted);color:var(--text);}
+.bstart{width:100%;padding:12px;background:linear-gradient(135deg,var(--a4),var(--a3));border:none;border-radius:var(--r);color:#fff;font-size:.92rem;font-weight:900;cursor:pointer;transition:all .2s;}
+.bstart:hover{transform:translateY(-2px);}
+.bhome{padding:12px 32px;background:linear-gradient(135deg,var(--a1),var(--a4));border:none;border-radius:var(--r);color:#fff;font-size:.92rem;font-weight:900;cursor:pointer;}
+.bhome:hover{transform:translateY(-2px);}
+/* hint cost badge */
+.hcost{position:absolute;top:-8px;right:-8px;background:var(--err);color:#fff;font-size:.55rem;font-weight:900;padding:1px 5px;border-radius:10px;}
+/* floating pts */
+.fp{position:fixed;font-size:1.6rem;font-weight:900;pointer-events:none;z-index:1000;animation:fup 1.2s ease forwards;}
+@keyframes fup{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-75px) scale(1.3)}}
+/* quiz */
+.qqbox{background:var(--surface);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:13px;box-shadow:var(--sh);}
+.qtmr{font-size:2rem;font-weight:900;color:var(--a1);margin:6px 0;}
+.qtmr.urg{color:var(--err);animation:pulse .5s ease infinite;}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
-.choices-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-.choice-btn{background:var(--surface);border:2px solid rgba(255,255,255,.1);border-radius:11px;padding:16px 8px;cursor:pointer;transition:all .2s;font-size:.9rem;font-weight:700;color:var(--text);}
-.choice-btn:hover{border-color:var(--accent3);background:rgba(91,192,235,.08);transform:scale(1.02);}
-.choice-btn.correct-choice{border-color:var(--correct);background:rgba(6,214,160,.16);color:var(--correct);}
-.choice-btn.wrong-choice{border-color:var(--wrong);background:rgba(239,35,60,.16);color:var(--wrong);}
-.choice-btn:disabled{cursor:default;}
-/* MATCH */
-.duell-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
-.duell-col h3{font-size:.72rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:7px;text-align:center;}
-.duell-items{display:flex;flex-direction:column;gap:6px;}
-.duell-item{background:var(--surface);border-radius:8px;padding:13px;text-align:center;cursor:pointer;border:2px solid rgba(255,255,255,.1);transition:all .2s;font-size:.95rem;font-weight:700;user-select:none;}
-.duell-item:hover{border-color:var(--accent3);}
-.duell-item.selected{border-color:var(--accent1);background:rgba(255,107,53,.16);}
-.duell-item.matched-ok{border-color:var(--correct);background:rgba(6,214,160,.11);color:var(--correct);cursor:default;}
-.duell-item.matched-err{border-color:var(--wrong);background:rgba(239,35,60,.11);animation:shake .4s ease;}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.cbtn{background:var(--surface);border:2px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 8px;cursor:pointer;transition:all .2s;font-size:.88rem;font-weight:700;color:var(--text);}
+.cbtn:hover{border-color:var(--a3);background:rgba(91,192,235,.08);}
+.cbtn.cok{border-color:var(--ok);background:rgba(6,214,160,.16);color:var(--ok);}
+.cbtn.cng{border-color:var(--err);background:rgba(239,35,60,.16);color:var(--err);}
+.cbtn:disabled{cursor:default;}
+/* match */
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:13px;}
+.dcol h3{font-size:.68rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:6px;text-align:center;}
+.ditems{display:flex;flex-direction:column;gap:5px;}
+.ditem{background:var(--surface);border-radius:8px;padding:12px;text-align:center;cursor:pointer;border:2px solid rgba(255,255,255,.1);transition:all .2s;font-size:.92rem;font-weight:700;user-select:none;}
+.ditem:hover{border-color:var(--a3);}
+.ditem.sel{border-color:var(--a1);background:rgba(255,107,53,.16);}
+.ditem.mok{border-color:var(--ok);background:rgba(6,214,160,.11);color:var(--ok);cursor:default;}
+.ditem.mng{border-color:var(--err);background:rgba(239,35,60,.11);animation:shake .4s ease;}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-/* RACE */
-.race-track{background:var(--surface);border-radius:var(--radius);padding:16px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:var(--shadow);}
-.race-bg-inner{position:absolute;inset:0;background:linear-gradient(90deg,#0a0a1a,#1a0a2e,#0a1a3a);}
-.race-line{position:relative;z-index:2;display:flex;align-items:center;gap:9px;margin-bottom:9px;}
-.race-label{width:52px;font-size:.7rem;color:var(--text-muted);flex-shrink:0;}
-.race-bar-wrap{flex:1;height:24px;background:rgba(255,255,255,.06);border-radius:12px;overflow:hidden;position:relative;}
-.race-bar{height:100%;border-radius:12px;background:linear-gradient(90deg,var(--bc1,var(--accent3)),var(--bc2,var(--accent4)));transition:width .5s cubic-bezier(.34,1.56,.64,1);min-width:22px;}
-.race-score-badge{position:absolute;right:7px;top:50%;transform:translateY(-50%);font-size:.72rem;font-weight:900;color:#fff;z-index:3;}
-.finish-flag{position:absolute;right:5px;top:50%;transform:translateY(-50%);font-size:1.2rem;z-index:3;}
-.race-question{background:var(--surface);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:12px;}
-.race-q-text{font-size:1rem;margin-bottom:10px;text-align:center;font-weight:900;}
-.race-phase{background:var(--surface2);border-radius:9px;padding:11px;margin-bottom:9px;text-align:center;}
-.race-input-row{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;}
-.race-submit{padding:10px 24px;background:linear-gradient(135deg,var(--accent5),var(--accent3));border:none;border-radius:8px;color:var(--bg);font-size:.9rem;font-weight:900;cursor:pointer;transition:all .2s;}
-.race-submit:hover{transform:scale(1.04);}
-.race-feedback{font-size:.9rem;font-weight:700;margin-top:7px;min-height:1.3em;text-align:center;}
-.race-feedback.ok{color:var(--correct);}
-.race-feedback.err{color:var(--wrong);}
-/* RESULTS */
-.results-screen{text-align:center;padding:28px 0;}
-.results-title{font-size:1.8rem;font-weight:900;margin-bottom:7px;}
-.results-stats{display:flex;justify-content:center;gap:26px;margin-bottom:24px;flex-wrap:wrap;}
-.results-stat-val{font-size:2rem;font-weight:900;color:var(--gold);}
-.results-stat-label{font-size:.72rem;color:var(--text-muted);}
-.medal{font-size:4rem;animation:bounce .6s ease;}
+/* race */
+.rtrack{background:var(--surface);border-radius:var(--r);padding:14px;margin-bottom:11px;position:relative;overflow:hidden;box-shadow:var(--sh);}
+.rbg{position:absolute;inset:0;background:linear-gradient(90deg,#0a0a1a,#1a0a2e,#0a1a3a);}
+.rline{position:relative;z-index:2;display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.rlbl{width:48px;font-size:.68rem;color:var(--muted);flex-shrink:0;}
+.rbwrap{flex:1;height:22px;background:rgba(255,255,255,.06);border-radius:11px;overflow:hidden;position:relative;}
+.rbar{height:100%;border-radius:11px;background:linear-gradient(90deg,var(--rc1,var(--a3)),var(--rc2,var(--a4)));transition:width .5s cubic-bezier(.34,1.56,.64,1);min-width:20px;}
+.rsb{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:.7rem;font-weight:900;color:#fff;z-index:3;}
+.rff{position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:1.1rem;z-index:3;}
+.rq{background:var(--surface);border-radius:var(--r);padding:16px;box-shadow:var(--sh);margin-bottom:11px;}
+.rqtxt{font-size:.97rem;margin-bottom:9px;text-align:center;font-weight:900;}
+.rph{background:var(--surface2);border-radius:8px;padding:10px;margin-bottom:8px;text-align:center;}
+.rinrow{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;}
+.rsub{padding:9px 22px;background:linear-gradient(135deg,var(--a5),var(--a3));border:none;border-radius:7px;color:var(--bg);font-size:.88rem;font-weight:900;cursor:pointer;}
+.rfb{font-size:.88rem;font-weight:700;margin-top:6px;min-height:1.3em;text-align:center;}
+.rfb.ok{color:var(--ok);}.rfb.ng{color:var(--err);}
+/* results */
+.rscreen{text-align:center;padding:26px 0;}
+.rstat{display:flex;justify-content:center;gap:24px;margin-bottom:22px;flex-wrap:wrap;}
+.rsval{font-size:1.9rem;font-weight:900;color:var(--gold);}
+.rslbl{font-size:.7rem;color:var(--muted);}
+.medal{font-size:3.8rem;animation:bounce .6s ease;}
 @keyframes bounce{0%{transform:scale(0) rotate(-30deg)}60%{transform:scale(1.2) rotate(10deg)}100%{transform:scale(1) rotate(0)}}
-.konfetti-piece{position:fixed;border-radius:2px;pointer-events:none;z-index:999;animation:konfettiFall linear forwards;}
-@keyframes konfettiFall{0%{opacity:1;transform:translateY(-20px) rotate(0)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
-@media(max-width:580px){.home-grid,.games-grid,.choices-grid,.duell-grid{grid-template-columns:1fr;}.score-bar{justify-content:space-around;}}
+/* konfetti */
+.kp{position:fixed;border-radius:2px;pointer-events:none;z-index:999;animation:kfall linear forwards;}
+@keyframes kfall{0%{opacity:1;transform:translateY(-20px) rotate(0)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
+/* TEILER-JAGD */
+.tjgrid{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0;}
+.tjbtn{min-width:52px;padding:12px 14px;background:var(--surface);border:2px solid rgba(255,255,255,.14);border-radius:10px;font-size:1.1rem;font-weight:900;color:var(--text);cursor:pointer;transition:all .2s;}
+.tjbtn:hover{border-color:var(--a3);transform:scale(1.06);}
+.tjbtn.tjok{border-color:var(--ok);background:rgba(6,214,160,.18);color:var(--ok);}
+.tjbtn.tjng{border-color:var(--err);background:rgba(239,35,60,.18);color:var(--err);animation:shake .3s ease;}
+.tjbtn:disabled{cursor:default;opacity:.7;}
+/* VIELFACHEN-WETTLAUF */
+.vwtrack{position:relative;height:80px;background:var(--surface2);border-radius:12px;overflow:hidden;margin:12px 0;}
+.vwnum{position:absolute;top:50%;transform:translateY(-50%);font-size:1.4rem;font-weight:900;background:var(--surface);border:2px solid rgba(255,255,255,.18);border-radius:9px;padding:6px 12px;cursor:pointer;transition:background .15s,border-color .15s;user-select:none;}
+.vwnum.vwok{border-color:var(--ok);background:rgba(6,214,160,.22);color:var(--ok);}
+.vwnum.vwng{border-color:var(--err);background:rgba(239,35,60,.22);color:var(--err);animation:shake .3s ease;}
+/* SORTIERMASCHINE */
+.smcontainer{display:flex;gap:10px;min-height:180px;margin:12px 0;}
+.smfall{flex:1;position:relative;background:var(--surface2);border-radius:12px;overflow:hidden;min-height:160px;}
+.smfrac{position:absolute;font-size:1rem;font-weight:900;background:var(--surface);border:2px solid rgba(255,255,255,.18);border-radius:9px;padding:5px 10px;cursor:pointer;user-select:none;transition:transform .1s;}
+.smfrac:hover{transform:scale(1.07);}
+.smbin{flex:0 0 90px;display:flex;flex-direction:column;gap:8px;}
+.smbinbox{flex:1;background:var(--surface2);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:2px dashed rgba(255,255,255,.15);font-size:.72rem;color:var(--muted);padding:6px;}
+.smbinbox.active{border-color:var(--a3);}
+.smresult{font-size:.78rem;font-weight:700;}
+@media(max-width:560px){.home-grid,.games-grid,.cgrid,.dgrid{grid-template-columns:1fr;}.score-bar{justify-content:space-around;}}
 </style>
 </head>
 <body>
@@ -167,929 +211,1278 @@ header{text-align:center;padding:20px 0 14px;}
 <div id="app">
 
 <div class="score-bar">
-  <div class="score-item"><div class="score-label">⭐ Punkte</div><div class="score-value" id="total-score">0</div></div>
-  <div class="score-item"><div class="score-label">🏆 Richtig</div><div class="score-value blue" id="total-correct">0</div></div>
-  <div class="score-item"><div class="score-label">🔥 Streak</div><div class="score-value purple" id="total-streak">0</div></div>
-  <div class="score-item"><div class="score-label">📚 Level</div><div class="score-value" id="player-level" style="color:var(--accent5)">1</div></div>
+  <div class="si"><div class="sl">⭐ Punkte</div><div class="sv" id="ts">0</div></div>
+  <div class="si"><div class="sl">🏆 Richtig</div><div class="sv b" id="tc">0</div></div>
+  <div class="si"><div class="sl">🔥 Streak</div><div class="sv p" id="tst">0</div></div>
+  <div class="si"><div class="sl">📚 Level</div><div class="sv" id="tlv" style="color:var(--a5)">1</div></div>
 </div>
 
+<!-- HOME -->
 <div id="screen-home" class="screen active">
-  <header>
-    <div class="logo">🧮 Brüche-Abenteuer</div>
-    <div class="tagline">Schritt für Schritt – mit allen Zwischenschritten!</div>
-  </header>
-  <div class="section-title">📖 Lernthemen</div>
+  <header><div class="logo">🧮 Brüche-Abenteuer</div><div class="tagline">Schritt für Schritt – mit allen Zwischenschritten!</div></header>
+  <div class="sec-title">📖 Lernthemen</div>
   <div class="home-grid">
-    <div class="topic-card" style="--card-color:#5bc0eb" onclick="startTopic('erweitern')"><span class="card-badge">Stufe 1</span><span class="card-emoji">🔭</span><div class="card-title">Brüche Erweitern</div><div class="card-desc">Zähler und Nenner mit derselben Zahl multiplizieren.</div></div>
-    <div class="topic-card" style="--card-color:#f7c59f" onclick="startTopic('kuerzen')"><span class="card-badge">Stufe 2</span><span class="card-emoji">✂️</span><div class="card-title">Brüche Kürzen</div><div class="card-desc">Zähler und Nenner durch denselben Teiler dividieren.</div></div>
-    <div class="topic-card" style="--card-color:#06d6a0" onclick="startTopic('gleich-add')"><span class="card-badge">Stufe 3</span><span class="card-emoji">➕</span><div class="card-title">Gleichnamige addieren</div><div class="card-desc">Brüche mit gleichem Nenner addieren.</div></div>
-    <div class="topic-card" style="--card-color:#ef233c" onclick="startTopic('gleich-sub')"><span class="card-badge">Stufe 3</span><span class="card-emoji">➖</span><div class="card-title">Gleichnamige subtrahieren</div><div class="card-desc">Brüche mit gleichem Nenner subtrahieren.</div></div>
-    <div class="topic-card" style="--card-color:#9b5de5" onclick="startTopic('ungleich-add')"><span class="card-badge">Stufe 4</span><span class="card-emoji">🔢</span><div class="card-title">Ungleichnamige addieren</div><div class="card-desc">kgV finden, erweitern, dann addieren – mit allen Schritten!</div></div>
-    <div class="topic-card" style="--card-color:#ff6b35" onclick="startTopic('ungleich-sub')"><span class="card-badge">Stufe 4</span><span class="card-emoji">🧩</span><div class="card-title">Ungleichnamige subtrahieren</div><div class="card-desc">kgV finden, erweitern, dann subtrahieren – mit allen Schritten!</div></div>
-    <div class="topic-card" style="--card-color:#00f5d4" onclick="startTopic('mal-ganz')"><span class="card-badge">Stufe 5</span><span class="card-emoji">✖️</span><div class="card-title">Bruch · ganze Zahl</div><div class="card-desc">Den Zähler multiplizieren, Nenner bleibt gleich.</div></div>
-    <div class="topic-card" style="--card-color:#ffd60a" onclick="startTopic('durch-ganz')"><span class="card-badge">Stufe 5</span><span class="card-emoji">➗</span><div class="card-title">Bruch ÷ ganze Zahl</div><div class="card-desc">Zähler dividieren oder Nenner multiplizieren!</div></div>
+    <div class="tc" style="--cc:#5bc0eb" onclick="startTopic('erweitern')"><span class="ba">Stufe 1</span><span class="em">🔭</span><div class="ti">Brüche Erweitern</div><div class="de">Zähler und Nenner mit derselben Zahl multiplizieren.</div></div>
+    <div class="tc" style="--cc:#f7c59f" onclick="startTopic('kuerzen')"><span class="ba">Stufe 2</span><span class="em">✂️</span><div class="ti">Brüche Kürzen</div><div class="de">Zähler und Nenner durch denselben Teiler dividieren.</div></div>
+    <div class="tc" style="--cc:#06d6a0" onclick="startTopic('gleich-add')"><span class="ba">Stufe 3</span><span class="em">➕</span><div class="ti">Gleichnamige addieren</div><div class="de">Brüche mit gleichem Nenner addieren.</div></div>
+    <div class="tc" style="--cc:#ef233c" onclick="startTopic('gleich-sub')"><span class="ba">Stufe 3</span><span class="em">➖</span><div class="ti">Gleichnamige subtrahieren</div><div class="de">Brüche mit gleichem Nenner subtrahieren.</div></div>
+    <div class="tc" style="--cc:#9b5de5" onclick="startTopic('ungleich-add')"><span class="ba">Stufe 4</span><span class="em">🔢</span><div class="ti">Ungleichnamige addieren</div><div class="de">kgV → erweitern → addieren, mit allen Schritten!</div></div>
+    <div class="tc" style="--cc:#ff6b35" onclick="startTopic('ungleich-sub')"><span class="ba">Stufe 4</span><span class="em">🧩</span><div class="ti">Ungleichnamige subtrahieren</div><div class="de">kgV → erweitern → subtrahieren, mit allen Schritten!</div></div>
+    <div class="tc" style="--cc:#00f5d4" onclick="startTopic('mal-ganz')"><span class="ba">Stufe 5</span><span class="em">✖️</span><div class="ti">Bruch · ganze Zahl</div><div class="de">Den Zähler multiplizieren, Nenner bleibt.</div></div>
+    <div class="tc" style="--cc:#ffd60a" onclick="startTopic('durch-ganz')"><span class="ba">Stufe 5</span><span class="em">➗</span><div class="ti">Bruch ÷ ganze Zahl</div><div class="de">Zähler dividieren oder Nenner multiplizieren!</div></div>
   </div>
-  <div class="section-title">🎮 Spiele &amp; Wettbewerb</div>
+  <div class="sec-title">🎮 Spiele &amp; Wettbewerb</div>
   <div class="games-grid">
-    <div class="game-card" style="--g1:#1a0a2e;--g2:#2d1a5e" onclick="startGame('quiz')"><span class="game-emoji">⚡</span><div class="game-name">Blitz-Quiz</div><div class="game-desc">15 Sekunden pro Frage! Gleichnamige Brüche – schnell und fair.</div></div>
-    <div class="game-card" style="--g1:#0a1a10;--g2:#0a2e20" onclick="startGame('zuordnung')"><span class="game-emoji">🃏</span><div class="game-name">Bruch-Match</div><div class="game-desc">Ordne gleichwertige Brüche einander zu!</div></div>
-    <div class="game-card" style="--g1:#1a0a0a;--g2:#2e1010" onclick="startGame('rennen')"><span class="game-emoji">🚀</span><div class="game-name">Raketenrennen</div><div class="game-desc">Zwischenschritte angezeigt – CPU +1 alle 9 Sekunden!</div></div>
+    <div class="gc" style="--g1:#1a0a2e;--g2:#2d1a5e" onclick="startGame('quiz')"><span class="em">⚡</span><div class="gn">Blitz-Quiz</div><div class="gd">15 Sek. pro Frage – gleichnamige Brüche!</div></div>
+    <div class="gc" style="--g1:#0a1a10;--g2:#0a2e20" onclick="startGame('match')"><span class="em">🃏</span><div class="gn">Bruch-Match</div><div class="gd">Ordne gleichwertige Brüche zu!</div></div>
+    <div class="gc" style="--g1:#1a0a0a;--g2:#2e1010" onclick="startGame('rennen')"><span class="em">🚀</span><div class="gn">Raketenrennen</div><div class="gd">Schrittweise gegen den Computer!</div></div>
+    <div class="gc" style="--g1:#0a1a2a;--g2:#0a2a1a" onclick="startGame('teiler')"><span class="em">🔍</span><div class="gn">Teiler-Jagd</div><div class="gd">Klicke alle gemeinsamen Teiler beider Zahlen!</div></div>
+    <div class="gc" style="--g1:#1a1a0a;--g2:#2a2a0a" onclick="startGame('vielfache')"><span class="em">💣</span><div class="gn">Vielfachen-Wettlauf</div><div class="gd">Klick gemeinsame Vielfache bevor sie verschwinden!</div></div>
+    <div class="gc" style="--g1:#2a0a1a;--g2:#1a0a2a" onclick="startGame('sortier')"><span class="em">🗂️</span><div class="gn">Bruch-Sortiermaschine</div><div class="gd">Sortiere Brüche in die richtigen Körbe!</div></div>
   </div>
 </div>
 
 <div id="screen-tutorial" class="screen">
-  <button class="btn-back" onclick="showScreen('home')">← Zurück</button>
+  <button class="bback" onclick="showScreen('home')">← Zurück</button>
   <div id="tutorial-content"></div>
-  <button class="btn-start-topic" onclick="startExercises()">🚀 Aufgaben starten!</button>
+  <button class="bstart" onclick="startExercises()">🚀 Aufgaben starten!</button>
 </div>
 <div id="screen-exercise" class="screen">
-  <button class="btn-back" onclick="showScreen('home')">← Zurück zum Menü</button>
-  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="ex-progress" style="width:0%"></div></div>
-  <div id="exercise-content"></div>
+  <button class="bback" onclick="showScreen('home')">← Zurück</button>
+  <div class="pbwrap"><div class="pbfill" id="pb" style="width:0%"></div></div>
+  <div id="ex-content"></div>
 </div>
-<div id="screen-quiz" class="screen">
-  <button class="btn-back" onclick="showScreen('home')">← Zurück</button>
-  <div id="quiz-content"></div>
-</div>
-<div id="screen-zuordnung" class="screen">
-  <button class="btn-back" onclick="showScreen('home')">← Zurück</button>
-  <div id="zuordnung-content"></div>
-</div>
-<div id="screen-rennen" class="screen">
-  <button class="btn-back" onclick="showScreen('home');clearInterval(raceState.cpuInterval);">← Zurück</button>
-  <div id="rennen-content"></div>
-</div>
-<div id="screen-results" class="screen">
-  <div class="results-screen" id="results-content"></div>
-</div>
+<div id="screen-quiz" class="screen"><button class="bback" onclick="showScreen('home')">← Zurück</button><div id="quiz-content"></div></div>
+<div id="screen-match" class="screen"><button class="bback" onclick="showScreen('home')">← Zurück</button><div id="match-content"></div></div>
+<div id="screen-rennen" class="screen"><button class="bback" onclick="showScreen('home');clearInterval(rSt.ti);">← Zurück</button><div id="rennen-content"></div></div>
+<div id="screen-teiler" class="screen"><button class="bback" onclick="showScreen('home')">← Zurück</button><div id="teiler-content"></div></div>
+<div id="screen-vielfache" class="screen"><button class="bback" onclick="showScreen('home');clearInterval(vSt.ti);">← Zurück</button><div id="vielfache-content"></div></div>
+<div id="screen-sortier" class="screen"><button class="bback" onclick="showScreen('home')">← Zurück</button><div id="sortier-content"></div></div>
+<div id="screen-results" class="screen"><div class="rscreen" id="res-content"></div></div>
 </div>
 
 <script>
-// ── GLOBALS ──
-let state={score:0,correct:0,streak:0,level:1,currentTopic:'',exercises:[],exIndex:0,sessionCorrect:0,sessionWrong:0,hintsUsed:0};
-let raceState={};
+// ═══════════════════════════════════════════════
+// GLOBALS
+// ═══════════════════════════════════════════════
+let S={score:0,correct:0,streak:0,level:1,topic:'',exercises:[],exIdx:0,sOk:0,sNg:0};
+let rSt={},vSt={},sortSt={},tjSt={},matchSt={},qSt={};
+// Per-exercise state for ungleich step tracking
+let ungleichState={step1OK:false,confirmedLcm:0};
+const HINT_COST=3;
 
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');window.scrollTo(0,0);}
-function updateScoreBar(){document.getElementById('total-score').textContent=state.score;document.getElementById('total-correct').textContent=state.correct;document.getElementById('total-streak').textContent=state.streak;state.level=Math.floor(state.score/60)+1;document.getElementById('player-level').textContent=state.level;}
-function addScore(pts,elem){state.score+=pts;state.correct++;state.streak++;updateScoreBar();if(elem)showFloat('+'+pts,elem);if(state.streak%5===0&&state.streak>0)launchKonfetti();}
-function resetStreak(){state.streak=0;updateScoreBar();}
-function showFloat(txt,ref){const d=document.createElement('div');d.className='floating-point';d.textContent=txt;const r=ref.getBoundingClientRect();d.style.left=(r.left+r.width/2-24)+'px';d.style.top=(r.top-10)+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1300);}
-function launchKonfetti(){const cols=['#ff6b35','#ffd60a','#06d6a0','#9b5de5','#5bc0eb','#f7c59f'];for(let i=0;i<34;i++){const k=document.createElement('div');k.className='konfetti-piece';k.style.left=Math.random()*100+'vw';k.style.background=cols[Math.floor(Math.random()*cols.length)];k.style.animationDuration=(1.5+Math.random()*2)+'s';k.style.animationDelay=(Math.random()*.5)+'s';const sz=(5+Math.random()*8)+'px';k.style.width=sz;k.style.height=sz;document.body.appendChild(k);setTimeout(()=>k.remove(),4000);}}
+function updBar(){document.getElementById('ts').textContent=S.score;document.getElementById('tc').textContent=S.correct;document.getElementById('tst').textContent=S.streak;S.level=Math.floor(S.score/60)+1;document.getElementById('tlv').textContent=S.level;}
+function addScore(pts,el,col='var(--gold)'){S.score+=pts;S.correct++;S.streak++;updBar();if(el)fp('+'+pts,el,col);if(S.streak%5===0&&S.streak>0)konfetti();}
+function subScore(pts,el){S.score=Math.max(0,S.score-pts);updBar();if(el)fp('-'+pts,el,'var(--err)');}
+function resetStreak(){S.streak=0;updBar();}
+function fp(txt,ref,col='var(--gold)'){const d=document.createElement('div');d.className='fp';d.textContent=txt;d.style.color=col;const r=ref.getBoundingClientRect();d.style.left=(r.left+r.width/2-20)+'px';d.style.top=(r.top-8)+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1300);}
+function konfetti(){const cols=['#ff6b35','#ffd60a','#06d6a0','#9b5de5','#5bc0eb','#f7c59f'];for(let i=0;i<32;i++){const k=document.createElement('div');k.className='kp';k.style.left=Math.random()*100+'vw';k.style.background=cols[Math.floor(Math.random()*cols.length)];k.style.animationDuration=(1.5+Math.random()*2)+'s';k.style.animationDelay=(Math.random()*.5)+'s';const z=(5+Math.random()*8)+'px';k.style.width=z;k.style.height=z;document.body.appendChild(k);setTimeout(()=>k.remove(),4000);}}
 
-// ── MATH ──
+// ═══════════════════════════════════════════════
+// MATH
+// ═══════════════════════════════════════════════
 function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){let t=b;b=a%b;a=t;}return a;}
 function lcm(a,b){return Math.abs(a*b)/gcd(a,b);}
-function isReduced(n,d){return gcd(Math.abs(n),d)===1;}
+function isRed(n,d){return gcd(Math.abs(n),d)===1;}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
 
-// ── FRACTION HTML ──
-function F(n,d,sz){return `<span class="frac ${sz||'med'}"><span class="fn">${n}</span><span class="fl"></span><span class="fd">${d}</span></span>`;}
-// Book-style: show n·f / d·f on common bar
-function Fbook_mul(n,d,f){
-  return `<span class="frac big"><span class="fn">${n} <span style="color:var(--accent3);font-size:1.05rem">· ${f}</span></span><span class="fl"></span><span class="fd">${d} <span style="color:var(--accent3);font-size:1.05rem">· ${f}</span></span></span>`;
+// ═══════════════════════════════════════════════
+// HTML HELPERS
+// ═══════════════════════════════════════════════
+function F(n,d,sz='med'){return `<span class="frac ${sz}"><span class="fn">${n}</span><span class="fl"></span><span class="fd">${d}</span></span>`;}
+function FdenHi(n,d,sz='big'){return `<span class="frac ${sz}"><span class="fn">${n}</span><span class="fl"></span><span class="fd den-hi">${d}</span></span>`;}
+function FmulBook(n,d,f){return `<span class="frac big"><span class="fn">${n} <span style="color:var(--a3);font-size:.95rem">· ${f}</span></span><span class="fl"></span><span class="fd">${d} <span style="color:var(--a3);font-size:.95rem">· ${f}</span></span></span>`;}
+function FdivBook(n,d,f){return `<span class="frac big"><span class="fn">${n} <span style="color:var(--a2);font-size:.95rem">: ${f}</span></span><span class="fl"></span><span class="fd">${d} <span style="color:var(--a2);font-size:.95rem">: ${f}</span></span></span>`;}
+function FI(ni,di){return `<span class="fi"><input type="number" id="${ni}" min="1" placeholder="?" onkeydown="if(event.key==='Enter')checkAnswer()"><span class="fil"></span><input type="number" id="${di}" min="1" placeholder="?" onkeydown="if(event.key==='Enter')checkAnswer()"></span>`;}
+function NI(id,w=64){return `<input type="number" class="ni" id="${id}" min="1" placeholder="?" style="width:${w}px" onkeydown="if(event.key==='Enter')checkAnswer()">`;}
+function g(id){const e=document.getElementById(id);return e?parseInt(e.value):NaN;}
+function LvBadge(lv){
+  const stars='⭐'.repeat(lv);
+  const labels=['','⭐ Stufe 1 – Einfach','⭐⭐ Stufe 2 – Mittelschwer','⭐⭐⭐ Stufe 3 – Schwer'];
+  const cls=['','','lv2','lv3'];
+  return `<div class="lvbadge ${cls[lv]}">${stars} ${labels[lv]}</div>`;
 }
-function Fbook_div(n,d,f){
-  return `<span class="frac big"><span class="fn">${n} <span style="color:var(--accent2);font-size:1.05rem">: ${f}</span></span><span class="fl"></span><span class="fd">${d} <span style="color:var(--accent2);font-size:1.05rem">: ${f}</span></span></span>`;
-}
-// Input helpers
-function fracInp(nid,did){return `<span class="frac-input"><input type="number" id="${nid}" min="1" placeholder="?" onkeydown="if(event.key==='Enter')checkAnswer()"><span class="fi-line"></span><input type="number" id="${did}" min="1" placeholder="?" onkeydown="if(event.key==='Enter')checkAnswer()"></span>`;}
-function numInp(id){return `<input type="number" class="single-inp" id="${id}" min="1" placeholder="?" onkeydown="if(event.key==='Enter')checkAnswer()">`;}
 
-// ── TASK GENERATORS ──
-// Each topic: tasks get a 'scaffoldLevel' property (1,2,3) added by buildTasks
+// ═══════════════════════════════════════════════
+// TASK GENERATORS
+// ═══════════════════════════════════════════════
 function buildTasks(topic){
-  let raw=[];
+  let L1=[],L2=[],L3=[];
+
   if(topic==='erweitern'){
-    // 30 tasks ordered easy→hard
-    [[1,2,2],[1,2,3],[1,3,2],[1,4,2],[2,3,2],  // L1: 1-5
-     [1,2,4],[3,4,2],[1,5,2],[2,5,2],[1,3,3],  // L2: 6-10
-     [1,4,3],[4,5,2],[1,6,3],[5,6,2],[3,4,3],  // L3: 11-15
-     [1,2,5],[2,3,4],[1,8,3],[5,8,2],[3,7,2],
-     [2,9,3],[4,7,3],[1,10,3],[7,10,2],[3,8,4],
-     [5,9,2],[1,3,5],[2,5,3],[3,11,2],[1,7,4]
-    ].forEach(([n,d,f],i)=>raw.push({type:'erweitern',n,d,factor:f,rn:n*f,rd:d*f,
-      scaffoldLevel: i<5?1 : i<10?2 : 3}));
+    const d1=[[1,2,2],[1,2,3],[1,3,2],[1,4,2],[2,3,2]];
+    const d2=[[1,2,4],[3,4,2],[1,5,2],[2,5,2],[1,3,3],[1,4,3],[4,5,2],[1,6,3],[5,6,2],[3,4,3]];
+    const d3=[[1,2,5],[2,3,4],[1,8,3],[5,8,2],[3,7,2],[2,9,3],[4,7,3],[1,10,3],[7,10,2],[3,8,4]];
+    shuffle(d1).forEach(([n,d,f])=>L1.push({type:'erweitern',n,d,factor:f,rn:n*f,rd:d*f,lv:1}));
+    shuffle(d2).forEach(([n,d,f])=>L2.push({type:'erweitern',n,d,factor:f,rn:n*f,rd:d*f,lv:2}));
+    shuffle(d3).forEach(([n,d,f])=>L3.push({type:'erweitern',n,d,factor:f,rn:n*f,rd:d*f,lv:3}));
   }
   if(topic==='kuerzen'){
-    // First 5 get a given divisor, rest must find it themselves
-    [[2,4,2],[3,6,3],[4,8,4],[6,9,3],[4,6,2],  // L1: given factor
-     [6,8,2],[8,12,4],[6,10,2],[9,12,3],[10,15,5],
-     [6,12,6],[8,16,8],[12,18,6],[10,20,10],[15,20,5],
-     [12,16,4],[9,15,3],[14,21,7],[16,24,8],[20,30,10],
-     [18,24,6],[15,25,5],[21,28,7],[16,20,4],[12,20,4],
-     [24,36,12],[18,30,6],[14,28,14],[20,24,4],[15,45,15]
-    ].forEach(([n,d,g],i)=>raw.push({type:'kuerzen',n,d,gcd_val:g,rn:n/g,rd:d/g,
-      scaffoldLevel: i<5?1:2}));
+    const d1=[[2,4,2],[3,6,3],[4,8,4],[6,9,3],[4,6,2]];
+    const d2=[[6,8,2],[8,12,4],[6,10,2],[9,12,3],[10,15,5],[6,12,6],[8,16,8],[12,18,6],[10,20,10],[15,20,5]];
+    const d3=[[24,36,12],[18,30,6],[21,28,7],[20,30,10],[16,24,8],[15,45,15],[36,48,12],[40,60,20],[28,42,14],[24,40,8]];
+    shuffle(d1).forEach(([n,d,g2])=>L1.push({type:'kuerzen',n,d,gv:g2,rn:n/g2,rd:d/g2,lv:1}));
+    shuffle(d2).forEach(([n,d,g2])=>L2.push({type:'kuerzen',n,d,gv:g2,rn:n/g2,rd:d/g2,lv:2}));
+    shuffle(d3).forEach(([n,d,g2])=>L3.push({type:'kuerzen',n,d,gv:g2,rn:n/g2,rd:d/g2,lv:3}));
   }
   if(topic==='gleich-add'){
-    // L1 (1-5): no reduction needed, L2 (6-15): reduction needed, shown step by step
-    [[1,4,1],[1,5,2],[2,7,3],[1,8,3],[1,9,2],   // sum not reducible → L1
-     [1,3,1],[3,10,4],[1,6,2],[3,8,3],[2,9,4],  // some reducible → L2
-     [1,12,5],[4,7,2],[5,9,3],[7,12,2],[3,11,5],
-     [1,15,7],[6,13,4],[5,16,7],[3,20,9],[4,25,11]
-    ].forEach(([n1,d,n2],i)=>{const s=n1+n2,g=gcd(s,d);
-      raw.push({type:'add-gleich',n1,n2,den:d,rn:s,rd:d,rrn:s/g,rrd:d/g,reduced:g>1,
-        scaffoldLevel:i<5?1:2});});
+    const d1=[[1,4,1],[1,5,2],[2,7,3],[1,8,3],[1,9,2]];
+    const d2=[[1,3,1],[3,10,4],[1,6,2],[3,8,3],[2,9,4],[4,7,2],[5,9,3],[7,12,2],[3,11,5],[1,12,5]];
+    const d3=[[7,15,3],[5,18,4],[8,21,7],[11,24,7],[9,20,6],[13,30,7],[6,25,4],[11,28,6],[13,35,7],[17,40,3]];
+    shuffle(d1).forEach(([n1,d,n2])=>{const s=n1+n2;L1.push({type:'add-gleich',n1,n2,den:d,rn:s,rd:d,rrn:s,rrd:d,red:false,lv:1});});
+    shuffle(d2).forEach(([n1,d,n2])=>{const s=n1+n2,g2=gcd(s,d);L2.push({type:'add-gleich',n1,n2,den:d,rn:s,rd:d,rrn:s/g2,rrd:d/g2,red:g2>1,lv:2});});
+    shuffle(d3).forEach(([n1,d,n2])=>{const s=n1+n2,g2=gcd(s,d);L3.push({type:'add-gleich',n1,n2,den:d,rn:s,rd:d,rrn:s/g2,rrd:d/g2,red:g2>1,lv:3});});
   }
   if(topic==='gleich-sub'){
-    [[3,4,1],[4,5,1],[5,7,2],[7,9,4],[5,6,1],   // L1: result not reducible
-     [7,10,3],[6,7,3],[7,8,3],[8,9,4],[11,12,5],  // L2: may reduce
-     [6,7,4],[8,9,5],[11,12,7],[9,11,4],[13,15,7],
-     [11,13,5],[13,16,5],[17,20,9],[21,25,11],[23,30,11]
-    ].forEach(([n1,d,n2],i)=>{const s=n1-n2,g=gcd(s,d);
-      raw.push({type:'sub-gleich',n1,n2,den:d,rn:s,rd:d,rrn:s/g,rrd:d/g,reduced:g>1,
-        scaffoldLevel:i<5?1:2});});
+    const d1=[[3,4,1],[4,5,1],[5,7,2],[7,9,4],[5,6,1]];
+    const d2=[[7,10,3],[6,7,3],[7,8,3],[8,9,4],[11,12,5],[6,7,4],[8,9,5],[11,12,7],[9,11,4],[13,15,7]];
+    const d3=[[17,20,7],[21,25,11],[19,30,7],[17,24,5],[23,35,8],[27,40,7],[29,45,9],[31,50,11],[13,21,4],[19,28,5]];
+    shuffle(d1).forEach(([n1,d,n2])=>{const s=n1-n2;L1.push({type:'sub-gleich',n1,n2,den:d,rn:s,rd:d,rrn:s,rrd:d,red:false,lv:1});});
+    shuffle(d2).forEach(([n1,d,n2])=>{const s=n1-n2,g2=gcd(s,d);L2.push({type:'sub-gleich',n1,n2,den:d,rn:s,rd:d,rrn:s/g2,rrd:d/g2,red:g2>1,lv:2});});
+    shuffle(d3).forEach(([n1,d,n2])=>{const s=n1-n2,g2=gcd(s,d);L3.push({type:'sub-gleich',n1,n2,den:d,rn:s,rd:d,rrn:s/g2,rrd:d/g2,red:g2>1,lv:3});});
   }
   if(topic==='ungleich-add'){
-    [[1,2,1,4],[1,3,1,6],[1,4,1,8],[1,2,1,3],[1,3,1,4],
-     [2,3,1,4],[1,4,1,6],[1,2,1,5],[3,4,1,8],[2,3,1,6],
-     [1,5,1,10],[1,3,1,9],[2,5,1,10],[3,8,1,4],[1,6,1,4],
-     [5,6,1,4],[2,5,3,10],[1,3,2,9],[3,4,1,6],[5,12,1,4]
-    ].forEach(([n1,d1,n2,d2],i)=>{const l=lcm(d1,d2),f1=l/d1,f2=l/d2,fn1=n1*f1,fn2=n2*f2,s=fn1+fn2,g=gcd(s,l);
-      raw.push({type:'add-ungleich',n1,d1,n2,d2,lcm:l,f1,f2,fn1,fn2,rn:s,rd:l,rrn:s/g,rrd:l/g,reduced:g>1,
-        scaffoldLevel:i<5?1:2});});
+    const d1=[[1,2,1,4],[1,3,1,6],[1,4,1,8],[1,2,1,3],[1,3,1,4]];
+    const d2=[[2,3,1,4],[1,4,1,6],[1,2,1,5],[3,4,1,8],[2,3,1,6],[1,5,1,10],[1,3,1,9],[2,5,1,10],[3,8,1,4],[5,6,1,4]];
+    const d3=[[5,6,1,4],[2,5,3,10],[1,3,2,9],[3,4,1,6],[5,12,1,4],[7,8,1,6],[5,9,1,6],[4,15,1,5],[7,12,2,9],[5,8,3,16]];
+    const mk=(arr,lv)=>shuffle(arr).forEach(([n1,d1,n2,d2])=>{
+      const l=lcm(d1,d2),f1=l/d1,f2=l/d2,fn1=n1*f1,fn2=n2*f2,s=fn1+fn2,g2=gcd(s,l);
+      (lv===1?L1:lv===2?L2:L3).push({type:'add-ungleich',n1,d1,n2,d2,lcm:l,f1,f2,fn1,fn2,rn:s,rd:l,rrn:s/g2,rrd:l/g2,red:g2>1,lv});
+    });
+    mk(d1,1);mk(d2,2);mk(d3,3);
   }
   if(topic==='ungleich-sub'){
-    [[3,4,1,2],[5,6,1,3],[7,8,1,4],[2,3,1,4],[3,4,1,3],
-     [3,4,1,6],[5,6,1,4],[4,5,1,2],[7,8,3,4],[5,6,2,3],
-     [9,10,2,5],[8,9,2,3],[7,10,1,5],[5,6,3,4],[11,12,3,4],
-     [7,10,1,2],[7,9,1,3],[11,12,1,4],[7,12,1,4],[7,8,1,4]
-    ].forEach(([n1,d1,n2,d2],i)=>{const l=lcm(d1,d2),f1=l/d1,f2=l/d2,fn1=n1*f1,fn2=n2*f2;
-      if(fn1<=fn2)return;const s=fn1-fn2,g=gcd(s,l);
-      raw.push({type:'sub-ungleich',n1,d1,n2,d2,lcm:l,f1,f2,fn1,fn2,rn:s,rd:l,rrn:s/g,rrd:l/g,reduced:g>1,
-        scaffoldLevel:i<5?1:2});});
+    const d1=[[3,4,1,2],[5,6,1,3],[7,8,1,4],[2,3,1,4],[3,4,1,3]];
+    const d2=[[3,4,1,6],[5,6,1,4],[4,5,1,2],[7,8,3,4],[5,6,2,3],[9,10,2,5],[8,9,2,3],[7,10,1,5],[11,12,3,4],[7,10,1,2]];
+    const d3=[[7,9,1,3],[11,12,1,4],[7,12,1,4],[11,15,2,5],[13,18,1,6],[17,20,3,8],[11,14,2,7],[13,16,3,8],[19,24,5,12],[17,30,7,15]];
+    const mk=(arr,lv)=>shuffle(arr).forEach(([n1,d1,n2,d2])=>{
+      const l=lcm(d1,d2),f1=l/d1,f2=l/d2,fn1=n1*f1,fn2=n2*f2;
+      if(fn1<=fn2)return;
+      const s=fn1-fn2,g2=gcd(s,l);
+      (lv===1?L1:lv===2?L2:L3).push({type:'sub-ungleich',n1,d1,n2,d2,lcm:l,f1,f2,fn1,fn2,rn:s,rd:l,rrn:s/g2,rrd:l/g2,red:g2>1,lv});
+    });
+    mk(d1,1);mk(d2,2);mk(d3,3);
   }
   if(topic==='mal-ganz'){
-    // L1 (1-5): only result; L2 (6-10): result + factor in middle; L3 (11+): result + factor + original fraction
-    [[1,2,3],[1,3,4],[2,3,3],[1,4,2],[3,4,4],  // L1
-     [1,5,3],[2,5,4],[1,6,5],[5,6,2],[1,8,3],  // L2
-     [3,8,4],[1,7,5],[2,7,3],[1,9,4],[4,9,3],  // L3
-     [1,10,7],[3,10,4],[5,12,2],[7,12,3],[1,3,7]
-    ].forEach(([n,d,z],i)=>{const rn=n*z,g=gcd(rn,d);
-      raw.push({type:'mal-ganz',n,d,z,rn,rd:d,rrn:rn/g,rrd:d/g,reduced:g>1,
-        scaffoldLevel:i<5?1:i<10?2:3});});
+    const d1=[[1,2,3],[1,3,4],[2,3,3],[1,4,2],[3,4,4]];
+    const d2=[[1,5,3],[2,5,4],[1,6,5],[5,6,2],[1,8,3],[3,8,4],[1,7,5],[2,7,3],[1,9,4],[4,9,3]];
+    const d3=[[1,10,7],[3,10,4],[5,12,2],[7,12,3],[1,3,7],[3,11,4],[5,14,3],[4,15,5],[7,18,4],[5,21,3]];
+    shuffle(d1).forEach(([n,d,z])=>{const rn=n*z,g2=gcd(rn,d);L1.push({type:'mal-ganz',n,d,z,rn,rd:d,rrn:rn/g2,rrd:d/g2,red:g2>1,lv:1});});
+    shuffle(d2).forEach(([n,d,z])=>{const rn=n*z,g2=gcd(rn,d);L2.push({type:'mal-ganz',n,d,z,rn,rd:d,rrn:rn/g2,rrd:d/g2,red:g2>1,lv:2});});
+    shuffle(d3).forEach(([n,d,z])=>{const rn=n*z,g2=gcd(rn,d);L3.push({type:'mal-ganz',n,d,z,rn,rd:d,rrn:rn/g2,rrd:d/g2,red:g2>1,lv:3});});
   }
   if(topic==='durch-ganz'){
-    // Mix of: Zähler divisible (way='zähler') and not (way='nenner')
-    // L1 (1-5), L2 (6-10), L3 (11+)
-    // Ensure mix of both ways throughout
-    const data=[
-      [4,5,2,'zähler'],[6,7,3,'zähler'],[2,3,2,'zähler'],[8,9,4,'zähler'],[3,4,3,'zähler'],  // L1
-      [4,5,4,'zähler'],[6,7,2,'zähler'],[3,5,3,'zähler'],[9,10,3,'zähler'],[4,7,2,'zähler'],  // L2
-      [1,3,2,'nenner'],[2,5,3,'nenner'],[3,7,2,'nenner'],[1,4,3,'nenner'],[5,8,3,'nenner'],     // L3 nenner
-      [6,7,6,'zähler'],[8,15,4,'zähler'],[6,11,2,'zähler'],[3,8,3,'zähler'],[4,11,2,'nenner']
-    ];
-    data.forEach(([n,d,z,way],i)=>{
-      let rn,rd,rrn,rrd,reduced;
-      if(way==='zähler'){rn=n/z;rd=d;const g=gcd(rn,d);rrn=rn/g;rrd=d/g;reduced=g>1;}
-      else{rn=n;rd=d*z;const g=gcd(n,rd);rrn=n/g;rrd=rd/g;reduced=g>1;}
-      raw.push({type:'durch-ganz',n,d,z,way,rn,rd,rrn,rrd,reduced,scaffoldLevel:i<5?1:i<10?2:3});
+    const d1=[[4,5,2,'z'],[6,7,3,'z'],[2,3,2,'z'],[8,9,4,'z'],[3,4,3,'z']];
+    const d2=[[4,5,4,'z'],[6,7,2,'z'],[3,5,3,'z'],[9,10,3,'z'],[4,7,2,'z'],[1,3,2,'n'],[2,5,3,'n'],[3,7,2,'n'],[1,4,3,'n'],[5,8,3,'n']];
+    const d3=[[6,7,6,'z'],[8,15,4,'z'],[6,11,2,'z'],[4,11,2,'n'],[7,9,3,'n'],[5,11,4,'n'],[3,13,2,'n'],[7,15,3,'n'],[5,17,2,'n'],[9,13,3,'n']];
+    const mk=(arr,lv)=>shuffle(arr).forEach(([n,d,z,w])=>{
+      let rn,rd,rrn,rrd,red;
+      if(w==='z'){rn=n/z;rd=d;const g2=gcd(rn,d);rrn=rn/g2;rrd=d/g2;red=g2>1;}
+      else{rn=n;rd=d*z;const g2=gcd(n,rd);rrn=n/g2;rrd=rd/g2;red=g2>1;}
+      (lv===1?L1:lv===2?L2:L3).push({type:'durch-ganz',n,d,z,way:w,rn,rd,rrn,rrd,red,lv});
     });
+    mk(d1,1);mk(d2,2);mk(d3,3);
   }
-  // Shuffle within each scaffold level group so order stays roughly graded
-  return raw.slice(0,22);
+
+  const take=(arr,n)=>arr.slice(0,n);
+  const T1=take(L1,5),T2=take(L2,7),T3=take(L3,7);
+  return [...T1,...T2,...T3];
 }
 
-// ── TUTORIALS ──
-const tutorials={
-erweitern:`<div class="tutorial-box">
-<h2>🔭 Brüche Erweitern – So geht's!</h2>
-<ul class="tutorial-steps">
-<li class="tut-step"><span class="step-num">1</span><div class="step-text"><strong>Was bedeutet Erweitern?</strong><br>
-Du multiplizierst Zähler und Nenner mit <strong>derselben Zahl</strong>. Der Wert des Bruchs bleibt gleich!</div></li>
-<li class="tut-step"><span class="step-num">2</span><div class="step-text"><strong>Zwischenschritt auf gemeinsamem Bruchstrich:</strong><br><br>
-<div style="text-align:center;line-height:2.8;margin:8px 0">
-${F(3,4,'big')} <span class="op-sym">=</span> ${Fbook_mul(3,4,3)} <span class="op-sym">=</span> ${F(9,12,'big')}
-</div>
-Zähler 3·3=9 und Nenner 4·3=12 stehen zusammen auf einem Bruchstrich!</div></li>
-<li class="tut-step"><span class="step-num">3</span><div class="step-text"><strong>Aufgaben werden schrittweise schwerer:</strong><br>
-Zuerst trägst du nur das Ergebnis ein, dann auch die Erweiterungszahl, dann auch den Ausgangsbruch.</div></li>
-</ul>
-<div class="tip-box"><strong>💡 Tipp – kgV (Gemeinsame Vielfache) finden:</strong><br>
-Schreibe die Vielfachen des Nenners auf, bis du den Zielnenner findest:<br>
-Nenner 4: 4, 8, <strong>12</strong>, 16 … → Faktor = 12 ÷ 4 = <strong>3</strong></div>
-</div>`,
+// ═══════════════════════════════════════════════
+// TUTORIALS
+// ═══════════════════════════════════════════════
+const TUT={
+erweitern:`<div class="tbox"><h2>🔭 Brüche Erweitern</h2><ul class="tsteps">
+<li class="tstep"><span class="snum">1</span><div class="stxt"><strong>Was bedeutet Erweitern?</strong><br>Zähler und Nenner mit <strong>derselben Zahl</strong> multiplizieren – der Wert bleibt gleich!</div></li>
+<li class="tstep"><span class="snum">2</span><div class="stxt"><strong>Zwischenschritt auf dem gemeinsamen Bruchstrich:</strong><br>
+<div style="text-align:center;line-height:2.6;margin:8px 0">${F(3,4,'big')} <span class="eq">=</span> ${FmulBook(3,4,3)} <span class="eq">=</span> ${F(9,12,'big')}</div>
+Zähler 3·3=9, Nenner 4·3=12 – beide auf einem Bruchstrich!</div></li>
+<li class="tstep"><span class="snum">3</span><div class="stxt"><strong>Stufen:</strong> ⭐ Nur Ergebnis | ⭐⭐ Erweiterungszahl + Ergebnis | ⭐⭐⭐ Ausgangsbruch + Erweiterungszahl + Ergebnis</div></li>
+</ul><div class="tipbox"><strong>💡 kgV finden:</strong> Vielfache des Nenners aufschreiben: 4, 8, <strong>12</strong>, 16… → Faktor = 12÷4 = 3</div></div>`,
 
-kuerzen:`<div class="tutorial-box">
-<h2>✂️ Brüche Kürzen – So geht's!</h2>
-<ul class="tutorial-steps">
-<li class="tut-step"><span class="step-num">1</span><div class="step-text"><strong>Was bedeutet Kürzen?</strong><br>
-Du dividierst Zähler und Nenner durch <strong>denselben Teiler</strong>. Der Wert bleibt gleich.</div></li>
-<li class="tut-step"><span class="step-num">2</span><div class="step-text"><strong>Zwischenschritt auf gemeinsamem Bruchstrich:</strong><br><br>
-<div style="text-align:center;line-height:2.8;margin:8px 0">
-${F(9,12,'big')} <span class="op-sym">=</span> ${Fbook_div(9,12,3)} <span class="op-sym">=</span> ${F(3,4,'big')}
-</div>
-Zähler und Nenner werden durch <strong>dieselbe Zahl</strong> dividiert.</div></li>
-<li class="tut-step"><span class="step-num">3</span><div class="step-text"><strong>Vollständig kürzen!</strong><br>
-Immer so weit kürzen, bis kein gemeinsamer Teiler außer 1 mehr übrig ist.</div></li>
-</ul>
-<div class="tip-box"><strong>💡 Tipp – ggT (Gemeinsamen Teiler) finden:</strong><br>
-Teiler von 12: 1, 2, 3, 4, <strong>6</strong>, 12<br>
-Teiler von 18: 1, 2, 3, <strong>6</strong>, 9, 18 → ggT = <strong>6</strong></div>
-</div>`,
+kuerzen:`<div class="tbox"><h2>✂️ Brüche Kürzen</h2><ul class="tsteps">
+<li class="tstep"><span class="snum">1</span><div class="stxt"><strong>Was bedeutet Kürzen?</strong><br>Zähler und Nenner durch <strong>denselben Teiler</strong> dividieren – Gegenteil vom Erweitern!</div></li>
+<li class="tstep"><span class="snum">2</span><div class="stxt"><strong>Auf dem gemeinsamen Bruchstrich:</strong><br>
+<div style="text-align:center;line-height:2.6;margin:8px 0">${F(9,12,'big')} <span class="eq">=</span> ${FdivBook(9,12,3)} <span class="eq">=</span> ${F(3,4,'big')}</div></div></li>
+<li class="tstep"><span class="snum">3</span><div class="stxt"><strong>Immer so weit kürzen wie möglich!</strong> Stufe 1: Kürzungszahl ist gegeben. Stufe 2: selbst finden. Stufe 3: größere Zahlen, selbst finden.</div></li>
+</ul><div class="tipbox"><strong>💡 ggT finden:</strong> Teiler von 12: 1,2,3,4,<strong>6</strong>,12 | Teiler von 18: 1,2,3,<strong>6</strong>,9,18 → ggT=6</div></div>`,
 
-'gleich-add':`<div class="tutorial-box">
-<h2>➕ Gleichnamige Brüche addieren</h2>
-<ul class="tutorial-steps">
-<li class="tut-step"><span class="step-num">1</span><div class="step-text"><strong>Gleicher Nenner?</strong> Nur die Zähler addieren!<br><br>
-<div style="text-align:center;line-height:2.8;margin:8px 0">
-${F(5,8,'big')} <span class="op-sym">+</span> ${F(2,8,'big')} <span class="op-sym">=</span>
-<span class="frac big"><span class="fn">5 + 2</span><span class="fl"></span><span class="fd">8</span></span>
-<span class="op-sym">=</span> ${F(7,8,'big')}
-</div></div></li>
-<li class="tut-step"><span class="step-num">2</span><div class="step-text"><strong>Wenn das Ergebnis kürzbar ist:</strong> Erst das Ergebnis aufschreiben, dann kürzen.<br>
-${F(2,4,'big')} <span class="op-sym">:</span> <span style="font-size:1.5rem;font-weight:900;vertical-align:middle">2</span> <span class="op-sym">=</span> ${F(1,2,'big')}</div></li>
-</ul>
-</div>`,
+'gleich-add':`<div class="tbox"><h2>➕ Gleichnamige Brüche addieren</h2><ul class="tsteps">
+<li class="tstep"><span class="snum">1</span><div class="stxt"><strong>Gleicher Nenner?</strong> Nur Zähler addieren!<br>
+<div style="text-align:center;line-height:2.6;margin:8px 0">${F(5,8,'big')} <span class="op">+</span> ${F(2,8,'big')} <span class="eq">=</span> <span class="frac big"><span class="fn">5+2</span><span class="fl"></span><span class="fd">8</span></span> <span class="eq">=</span> ${F(7,8,'big')}</div></div></li>
+<li class="tstep"><span class="snum">2</span><div class="stxt"><strong>Kürzen nicht vergessen!</strong> Stufe 2+: erst Ergebnis eintragen, dann kürzen.</div></li>
+</ul></div>`,
 
-'gleich-sub':`<div class="tutorial-box">
-<h2>➖ Gleichnamige Brüche subtrahieren</h2>
-<ul class="tutorial-steps">
-<li class="tut-step"><span class="step-num">1</span><div class="step-text"><strong>Gleicher Nenner?</strong> Nur die Zähler subtrahieren!<br><br>
-<div style="text-align:center;line-height:2.8;margin:8px 0">
-${F(7,10,'big')} <span class="op-sym">−</span> ${F(3,10,'big')} <span class="op-sym">=</span>
-<span class="frac big"><span class="fn">7 − 3</span><span class="fl"></span><span class="fd">10</span></span>
-<span class="op-sym">=</span> ${F(4,10,'big')} <span class="op-sym">=</span> ${F(2,5,'big')}
-</div></div></li>
-</ul>
-</div>`,
+'gleich-sub':`<div class="tbox"><h2>➖ Gleichnamige Brüche subtrahieren</h2><ul class="tsteps">
+<li class="tstep"><span class="snum">1</span><div class="stxt"><strong>Gleicher Nenner?</strong> Nur Zähler subtrahieren!<br>
+<div style="text-align:center;line-height:2.6;margin:8px 0">${F(7,10,'big')} <span class="op">−</span> ${F(3,10,'big')} <span class="eq">=</span> <span class="frac big"><span class="fn">7−3</span><span class="fl"></span><span class="fd">10</span></span> <span class="eq">=</span> ${F(4,10,'big')} <span class="eq">=</span> ${F(2,5,'big')}</div></div></li>
+</ul></div>`,
 
-'ungleich-add':`<div class="tutorial-box">
-<h2>🔢 Ungleichnamige Brüche addieren</h2>
-<ul class="tutorial-steps">
-<li class="tut-step"><span class="step-num">1</span><div class="step-text"><strong>Schritt 1 – kgV finden:</strong><br>
-${F(2,5,'med')} + ${F(1,2,'med')}: kgV(5,2) = <strong>10</strong></div></li>
-<li class="tut-step"><span class="step-num">2</span><div class="step-text"><strong>Schritt 2 – Erweitern:</strong><br>
-<div style="text-align:center;line-height:2.8;margin:8px 0">
-${Fbook_mul(2,5,2)} <span class="op-sym">=</span> ${F(4,10,'big')}
-&nbsp;&nbsp;&nbsp;
-${Fbook_mul(1,2,5)} <span class="op-sym">=</span> ${F(5,10,'big')}
-</div></div></li>
-<li class="tut-step"><span class="step-num">3</span><div class="step-text"><strong>Schritt 3 – Addieren:</strong><br>
-<div style="text-align:center;line-height:2.8;margin:8px 0">
-${F(4,10,'big')} <span class="op-sym">+</span> ${F(5,10,'big')} <span class="op-sym">=</span> ${F(9,10,'big')}
-</div></div></li>
-</ul>
-<div class="tip-box"><strong>💡 kgV finden:</strong><br>
-Vielfache von 5: 5, <strong>10</strong>, 15 … | Vielfache von 2: 2, 4, 6, 8, <strong>10</strong> … → kgV = 10</div>
-</div>`,
+'ungleich-add':`<div class="tbox"><h2>🔢 Ungleichnamige Brüche addieren</h2><ul class="tsteps">
+<li class="tstep"><span class="snum">1</span><div class="stxt"><strong>kgV finden:</strong> ${F(2,5,'med')} + ${F(1,2,'med')}: kgV(5,2)=<strong>10</strong></div></li>
+<li class="tstep"><span class="snum">2</span><div class="stxt"><strong>Erweitern:</strong><br>
+<div style="text-align:center;line-height:2.6;margin:8px 0">${FmulBook(2,5,2)} <span class="eq">=</span> ${F(4,10,'big')} &nbsp;&nbsp;&nbsp; ${FmulBook(1,2,5)} <span class="eq">=</span> ${F(5,10,'big')}</div></div></li>
+<li class="tstep"><span class="snum">3</span><div class="stxt"><strong>Addieren:</strong><br>
+<div style="text-align:center;line-height:2.6;margin:8px 0">${F(4,10,'big')} <span class="op">+</span> ${F(5,10,'big')} <span class="eq">=</span> ${F(9,10,'big')}</div></div></li>
+</ul><div class="tipbox"><strong>💡 kgV:</strong> 5: 5,<strong>10</strong>,15… | 2: 2,4,6,8,<strong>10</strong>… → kgV=10</div></div>`,
 
-'ungleich-sub':`<div class="tutorial-box">
-<h2>🧩 Ungleichnamige Brüche subtrahieren</h2>
-<ul class="tutorial-steps">
-<li class="tut-step"><span class="step-num">1</span><div class="step-text"><strong>Schritt 1 – kgV finden:</strong><br>
-${F(3,4,'med')} − ${F(1,3,'med')}: kgV(4,3) = <strong>12</strong></div></li>
-<li class="tut-step"><span class="step-num">2</span><div class="step-text"><strong>Schritt 2 – Erweitern:</strong><br>
-<div style="text-align:center;line-height:2.8;margin:8px 0">
-${Fbook_mul(3,4,3)} <span class="op-sym">=</span> ${F(9,12,'big')}
-&nbsp;&nbsp;&nbsp;
-${Fbook_mul(1,3,4)} <span class="op-sym">=</span> ${F(4,12,'big')}
-</div></div></li>
-<li class="tut-step"><span class="step-num">3</span><div class="step-text"><strong>Schritt 3 – Subtrahieren:</strong><br>
-<div style="text-align:center;line-height:2.8;margin:8px 0">
-${F(9,12,'big')} <span class="op-sym">−</span> ${F(4,12,'big')} <span class="op-sym">=</span> ${F(5,12,'big')}
-</div></div></li>
-</ul>
-</div>`,
+'ungleich-sub':`<div class="tbox"><h2>🧩 Ungleichnamige Brüche subtrahieren</h2><ul class="tsteps">
+<li class="tstep"><span class="snum">1</span><div class="stxt"><strong>kgV finden:</strong> ${F(3,4,'med')} − ${F(1,3,'med')}: kgV(4,3)=<strong>12</strong></div></li>
+<li class="tstep"><span class="snum">2</span><div class="stxt"><strong>Erweitern & Subtrahieren:</strong><br>
+<div style="text-align:center;line-height:2.6;margin:8px 0">${FmulBook(3,4,3)} <span class="eq">=</span> ${F(9,12,'big')} &nbsp;&nbsp; ${FmulBook(1,3,4)} <span class="eq">=</span> ${F(4,12,'big')}</div>
+<div style="text-align:center;line-height:2.6;margin:4px 0">${F(9,12,'big')} <span class="op">−</span> ${F(4,12,'big')} <span class="eq">=</span> ${F(5,12,'big')}</div></div></li>
+</ul></div>`,
 
-'mal-ganz':`<div class="tutorial-box">
-<h2>✖️ Bruch mit ganzer Zahl multiplizieren</h2>
-<ul class="tutorial-steps">
-<li class="tut-step"><span class="step-num">1</span><div class="step-text"><strong>Regel:</strong> Den <strong>Zähler</strong> multiplizieren – Nenner bleibt!<br><br>
-<div style="text-align:center;line-height:2.8;margin:8px 0">
-${F(2,7,'big')} <span class="op-sym">·</span> <span style="font-size:1.7rem;font-weight:900;vertical-align:middle">3</span>
-<span class="op-sym">=</span>
-<span class="frac big" style="color:var(--accent5)"><span class="fn">2 · 3</span><span class="fl"></span><span class="fd">7</span></span>
-<span class="op-sym">=</span> ${F(6,7,'big')}
-</div></div></li>
-<li class="tut-step"><span class="step-num">2</span><div class="step-text"><strong>Aufgaben werden schrittweise schwerer:</strong><br>
-Zuerst nur Ergebnis, dann auch die Multiplikationszahl, dann auch den Ausgangsbruch eingeben.</div></li>
-</ul>
-</div>`,
+'mal-ganz':`<div class="tbox"><h2>✖️ Bruch · ganze Zahl</h2><ul class="tsteps">
+<li class="tstep"><span class="snum">1</span><div class="stxt"><strong>Zähler multiplizieren – Nenner bleibt!</strong><br>
+<div style="text-align:center;line-height:2.6;margin:8px 0">${F(2,7,'big')} <span class="op">·</span> <span style="font-size:1.6rem;font-weight:900;vertical-align:middle">3</span> <span class="eq">=</span> <span class="frac big" style="color:var(--a5)"><span class="fn">2·3</span><span class="fl"></span><span class="fd">7</span></span> <span class="eq">=</span> ${F(6,7,'big')}</div></div></li>
+</ul></div>`,
 
-'durch-ganz':`<div class="tutorial-box">
-<h2>➗ Bruch durch ganze Zahl dividieren</h2>
-<ul class="tutorial-steps">
-<li class="tut-step"><span class="step-num">1</span><div class="step-text"><strong>Weg 1 – Zähler dividieren</strong> (wenn teilbar):<br>
-<div style="text-align:center;line-height:2.8;margin:8px 0">
-${F(4,5,'big')} <span class="op-sym">÷</span> <span style="font-size:1.7rem;font-weight:900;vertical-align:middle">2</span>
-<span class="op-sym">=</span>
-<span class="frac big" style="color:var(--accent3)"><span class="fn">4 : 2</span><span class="fl"></span><span class="fd">5</span></span>
-<span class="op-sym">=</span> ${F(2,5,'big')}
-</div></div></li>
-<li class="tut-step"><span class="step-num">2</span><div class="step-text"><strong>Weg 2 – Nenner multiplizieren</strong> (wenn Zähler nicht teilbar ist):<br>
-<div style="text-align:center;line-height:2.8;margin:8px 0">
-${F(3,5,'big')} <span class="op-sym">÷</span> <span style="font-size:1.7rem;font-weight:900;vertical-align:middle">2</span>
-<span class="op-sym">=</span>
-<span class="frac big" style="color:var(--accent2)"><span class="fn">3</span><span class="fl"></span><span class="fd">5 · 2</span></span>
-<span class="op-sym">=</span> ${F(3,10,'big')}
-</div></div></li>
-<li class="tut-step"><span class="step-num">3</span><div class="step-text"><strong>Aufgaben werden schrittweise schwerer –</strong> beide Wege kommen vor!</div></li>
-</ul>
-</div>`,
+'durch-ganz':`<div class="tbox"><h2>➗ Bruch ÷ ganze Zahl</h2><ul class="tsteps">
+<li class="tstep"><span class="snum">1</span><div class="stxt"><strong>Weg 1 – Zähler dividieren</strong> (wenn teilbar):<br>
+<div style="text-align:center;line-height:2.6;margin:8px 0">${F(4,5,'big')} <span class="op">÷</span> <span style="font-size:1.6rem;font-weight:900;vertical-align:middle">2</span> <span class="eq">=</span> <span class="frac big" style="color:var(--a3)"><span class="fn">4:2</span><span class="fl"></span><span class="fd">5</span></span> <span class="eq">=</span> ${F(2,5,'big')}</div></div></li>
+<li class="tstep"><span class="snum">2</span><div class="stxt"><strong>Weg 2 – Nenner multiplizieren</strong> (wenn nicht teilbar):<br>
+<div style="text-align:center;line-height:2.6;margin:8px 0">${F(3,5,'big')} <span class="op">÷</span> <span style="font-size:1.6rem;font-weight:900;vertical-align:middle">2</span> <span class="eq">=</span> <span class="frac big" style="color:var(--a2)"><span class="fn">3</span><span class="fl"></span><span class="fd">5·2</span></span> <span class="eq">=</span> ${F(3,10,'big')}</div></div></li>
+</ul></div>`,
 };
 
-function startTopic(t){state.currentTopic=t;document.getElementById('tutorial-content').innerHTML=tutorials[t]||'<p>Kein Tutorial.</p>';showScreen('tutorial');}
-function startExercises(){state.exercises=buildTasks(state.currentTopic);state.exIndex=0;state.sessionCorrect=0;state.sessionWrong=0;state.hintsUsed=0;showScreen('exercise');renderExercise();}
+function startTopic(t){S.topic=t;document.getElementById('tutorial-content').innerHTML=TUT[t]||'';showScreen('tutorial');}
+function startExercises(){S.exercises=buildTasks(S.topic);S.exIdx=0;S.sOk=0;S.sNg=0;showScreen('exercise');renderEx();}
 
-// ── EXERCISE RENDERING ──
-function renderExercise(){
-  const ex=state.exercises[state.exIndex];
+// ═══════════════════════════════════════════════
+// EXERCISE RENDERING
+// ═══════════════════════════════════════════════
+function renderEx(){
+  const ex=S.exercises[S.exIdx];
   if(!ex){showResults();return;}
-  document.getElementById('ex-progress').style.width=(state.exIndex/state.exercises.length*100)+'%';
+  document.getElementById('pb').style.width=(S.exIdx/S.exercises.length*100)+'%';
+  // Reset ungleich step state per exercise
+  ungleichState={step1OK:false,confirmedLcm:0};
   let inner='';
-  if(ex.type==='erweitern')inner=renderErweitern(ex,state.exIndex);
-  else if(ex.type==='kuerzen')inner=renderKuerzen(ex,state.exIndex);
-  else if(ex.type==='add-gleich')inner=renderGleich(ex,'+',state.exIndex);
-  else if(ex.type==='sub-gleich')inner=renderGleich(ex,'−',state.exIndex);
-  else if(ex.type==='add-ungleich')inner=renderUngleich(ex,'+');
-  else if(ex.type==='sub-ungleich')inner=renderUngleich(ex,'−');
-  else if(ex.type==='mal-ganz')inner=renderMalGanz(ex,state.exIndex);
-  else if(ex.type==='durch-ganz')inner=renderDurchGanz(ex,state.exIndex);
-  document.getElementById('exercise-content').innerHTML=`<div class="exercise-card">
-  <div class="exercise-label">Aufgabe ${state.exIndex+1} / ${state.exercises.length}</div>
-  ${inner}
-  <div class="feedback-box" id="feedback"></div>
-  <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-    <button class="btn-check" id="btn-check" onclick="checkAnswer()">✓ Prüfen</button>
-    <button class="btn-next" id="btn-next" onclick="nextExercise()">Weiter →</button>
-    <button class="btn-hint" onclick="showHint()">💡 Tipp</button>
-  </div></div>`;
-  const fi=document.querySelector('#exercise-content input');if(fi)fi.focus();
+  if(ex.type==='erweitern')inner=renderErweitern(ex);
+  else if(ex.type==='kuerzen')inner=renderKuerzen(ex);
+  else if(ex.type==='add-gleich'||ex.type==='sub-gleich')inner=renderGleich(ex);
+  else if(ex.type==='add-ungleich'||ex.type==='sub-ungleich')inner=renderUngleich(ex);
+  else if(ex.type==='mal-ganz')inner=renderMalGanz(ex);
+  else if(ex.type==='durch-ganz')inner=renderDurchGanz(ex);
+  document.getElementById('ex-content').innerHTML=`<div class="excard">
+    <div class="exlbl">Aufgabe ${S.exIdx+1} / ${S.exercises.length}</div>
+    ${inner}
+    <div class="fbbox" id="fb"></div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center">
+      <button class="bcheck" id="bcheck" onclick="checkAnswer()">✓ Prüfen</button>
+      <button class="bnext" id="bnext" onclick="nextEx()">Weiter →</button>
+      <button class="bhint" onclick="doHint()">💡 Tipp <span class="hcost">−${HINT_COST}P</span></button>
+    </div></div>`;
+  document.querySelector('#ex-content input')?.focus();
 }
 
-// ──────────────────────────────────────────────
-// ERWEITERN: 3 scaffold levels
-// L1 (0-4): show original + book-style middle, enter result only
-// L2 (5-9): show original, enter factor + result
-// L3 (10+): enter original fraction + factor + result
-// ──────────────────────────────────────────────
-function renderErweitern(ex,idx){
-  const lv=ex.scaffoldLevel;
-  let badge='';
-  if(lv===1)badge='<div class="level-badge">📘 Stufe 1 – Ergebnis eintragen</div>';
-  if(lv===2)badge='<div class="level-badge">📗 Stufe 2 – Erweiterungszahl + Ergebnis eintragen</div>';
-  if(lv===3)badge='<div class="level-badge">📕 Stufe 3 – Bruch + Erweiterungszahl + Ergebnis eintragen</div>';
-
-  let middle='',question='';
-
+// ── ERWEITERN ──
+function renderErweitern(ex){
+  const {lv,n,d,factor,rn,rd}=ex;
+  let body='';
   if(lv===1){
-    // Show everything except the result
-    middle=`${Fbook_mul(ex.n,ex.d,ex.factor)} <span class="op-sym">=</span> ${fracInp('ans-rn','ans-rd')}`;
-    question=`Erweitere ${F(ex.n,ex.d,'big')} mit <strong style="font-size:1.3rem;color:var(--accent3)">${ex.factor}</strong>:`;
+    body=`<div class="exq">Erweitere ${F(n,d,'big')} mit <strong style="font-size:1.3rem;color:var(--a3)">${factor}</strong>:</div>
+    <div class="qctr">${F(n,d,'big')} <span class="eq">=</span> ${FmulBook(n,d,factor)} <span class="eq">=</span> ${FI('rn','rd')}</div>
+    <div class="fhint">💡 ${n}·${factor}=<strong>${rn}</strong> und ${d}·${factor}=<strong>${rd}</strong></div>`;
   } else if(lv===2){
-    // Show original, ask factor + result
-    middle=`${Fbook_mul(ex.n,ex.d,'?')}
-      <span style="font-size:.85rem;color:var(--text-muted);margin:0 4px">← Erweiterungszahl eintragen:</span>
-      <span class="frac big"><span class="fn">${ex.n} · ${numInp('ans-factor')}</span><span class="fl"></span><span class="fd">${ex.d} · <span id="factor-echo" style="color:var(--accent3)">?</span></span></span>
-      <span class="op-sym">=</span> ${fracInp('ans-rn','ans-rd')}`;
-    question=`Erweitere ${F(ex.n,ex.d,'big')} mit ${ex.factor}:`;
+    body=`<div class="exq">Erweitere ${F(n,d,'big')} mit ${factor}:<br><small style="color:var(--muted)">Trage die Erweiterungszahl oben UND unten ein, dann das Ergebnis.</small></div>
+    <div class="qctr">
+      ${F(n,d,'big')} <span class="eq">=</span>
+      <span class="frac big"><span class="fn">${n} · ${NI('fn',52)}</span><span class="fl"></span><span class="fd">${d} · ${NI('fd',52)}</span></span>
+      <span class="eq">=</span> ${FI('rn','rd')}
+    </div>
+    <div class="fhint">💡 Die Erweiterungszahl ist ${factor}. ${n}·${factor}=${rn}, ${d}·${factor}=${rd}</div>`;
   } else {
-    // Ask original fraction, factor, result
-    middle=`${fracInp('ans-on','ans-od')}
-      <span class="op-sym">=</span>
-      <span class="frac big"><span class="fn"><span id="on-echo" style="color:var(--accent3)">?</span> · ${numInp('ans-factor')}</span><span class="fl"></span><span class="fd"><span id="od-echo" style="color:var(--accent3)">?</span> · <span id="factor-echo" style="color:var(--accent3)">?</span></span></span>
-      <span class="op-sym">=</span> ${fracInp('ans-rn','ans-rd')}`;
-    question=`Erweitere ${F(ex.n,ex.d,'big')} mit ${ex.factor}:<br><span style="font-size:.82rem;color:var(--text-muted)">Trage erst den Ausgangsbruch ein, dann die Erweiterungszahl, dann das Ergebnis.</span>`;
+    // Stufe 3: Ausgangsbruch im Bruchstrich eintragen (Inputs statt ?-Spans),
+    // Erweiterungszahl oben & unten, dann Ergebnis
+    body=`<div class="exq">Erweitere ${F(n,d,'big')} mit ${factor}:<br><small style="color:var(--muted)">Trage zuerst den Ausgangsbruch im ersten Feld ein, dann die Erweiterungszahl (oben &amp; unten), dann das Ergebnis.</small></div>
+    <div class="qctr">
+      ${FI('on','od')}
+      <span class="eq">=</span>
+      <span class="frac big">
+        <span class="fn">${NI('on_bar',48)} <span style="color:var(--a3);font-size:.95rem">· ${NI('fn',48)}</span></span>
+        <span class="fl"></span>
+        <span class="fd">${NI('od_bar',48)} <span style="color:var(--a3);font-size:.95rem">· ${NI('fd',48)}</span></span>
+      </span>
+      <span class="eq">=</span> ${FI('rn','rd')}
+    </div>
+    <div class="fhint">💡 Ausgangsbruch: ${n}/${d} | Erweiterungszahl: ${factor} | Ergebnis: ${rn}/${rd}</div>`;
   }
-
-  return `${badge}<div class="ex-q">${question}</div>
-  <div class="q-center">${lv===1?`${F(ex.n,ex.d,'big')} <span class="op-sym">=</span> `:''}${middle}</div>
-  <div class="factor-hint">💡 <strong>Tipp:</strong> ${ex.n}·${ex.factor}=<strong>${ex.rn}</strong> und ${ex.d}·${ex.factor}=<strong>${ex.rd}</strong></div>`;
+  return LvBadge(lv)+body;
 }
 
-// ──────────────────────────────────────────────
-// KÜRZEN: L1 (0-4): divisor given; L2+: find it yourself
-// ──────────────────────────────────────────────
-function renderKuerzen(ex,idx){
-  const lv=ex.scaffoldLevel;
-  let badge='',q='',middle='';
+// ── KÜRZEN ──
+function renderKuerzen(ex){
+  const {lv,n,d,gv,rn,rd}=ex;
+  let body='';
   if(lv===1){
-    badge='<div class="level-badge">📘 Stufe 1 – Kürzungszahl ist gegeben</div>';
-    q=`Kürze den Bruch durch <strong style="font-size:1.3rem;color:var(--accent2)">${ex.gcd_val}</strong>:`;
-    middle=`${F(ex.n,ex.d,'big')} <span class="op-sym">=</span> ${Fbook_div(ex.n,ex.d,ex.gcd_val)} <span class="op-sym">=</span> ${fracInp('ans-rn','ans-rd')}`;
+    body=`<div class="exq">Kürze durch <strong style="font-size:1.3rem;color:var(--a2)">${gv}</strong>:</div>
+    <div class="qctr">${F(n,d,'big')} <span class="eq">=</span> ${FdivBook(n,d,gv)} <span class="eq">=</span> ${FI('rn','rd')}</div>
+    <div class="fhint">💡 ${n}:${gv}=${rn} und ${d}:${gv}=${rd}</div>`;
   } else {
-    badge='<div class="level-badge">📗 Stufe 2 – Finde selbst den größten gemeinsamen Teiler!</div>';
-    q='Kürze den Bruch so weit wie möglich:';
-    middle=`${F(ex.n,ex.d,'big')} <span class="op-sym">=</span> ${Fbook_div(ex.n,ex.d,'?')} <span class="op-sym">=</span> ${fracInp('ans-rn','ans-rd')}`;
+    body=`<div class="exq">Kürze so weit wie möglich:<br><small style="color:var(--muted)">Trage die Kürzungszahl oben UND unten ein, dann das Ergebnis. Du kannst auch schrittweise kürzen!</small></div>
+    <div class="qctr">
+      ${F(n,d,'big')} <span class="eq">=</span>
+      <span class="frac big"><span class="fn" id="kn-top">${n} : ${NI('fn',52)}</span><span class="fl"></span><span class="fd" id="kn-bot">${d} : ${NI('fd',52)}</span></span>
+      <span class="eq">=</span> ${FI('rn','rd')}
+    </div>
+    <div class="fhint">💡 Drücke "Tipp" um den ggT zu sehen (kostet ${HINT_COST} Punkte).</div>`;
   }
-  return `${badge}<div class="ex-q">${q}</div>
-  <div class="q-center">${middle}</div>
-  <div class="factor-hint">💡 <strong>Tipp – ggT finden:</strong> Welche Zahl teilt sowohl <strong>${ex.n}</strong> als auch <strong>${ex.d}</strong>? ggT = <strong>${ex.gcd_val}</strong></div>`;
+  return LvBadge(lv)+body;
 }
 
-// ──────────────────────────────────────────────
-// GLEICHNAMIGE ADD/SUB:
-// L1 (0-4): result not reducible → just enter result
-// L2 (5+): result reducible → enter raw sum first, then reduced
-// ──────────────────────────────────────────────
-function renderGleich(ex,op,idx){
-  const lv=ex.scaffoldLevel;
-  const clr=op==='+'?'var(--correct)':'var(--wrong)';
-  let badge='',body='';
+// ── GLEICHNAMIGE ADD/SUB ──
+function renderGleich(ex){
+  const {lv,n1,n2,den,rn,rd,rrn,rrd,red}=ex;
+  const op=ex.type==='add-gleich'?'+':'−';
+  const clr=op==='+'?'var(--ok)':'var(--err)';
+  const g2=red?gcd(rn,den):1;
+  let body='';
 
-  if(lv===1||!ex.reduced){
-    badge='<div class="level-badge">📘 Stufe 1 – Ergebnis eintragen</div>';
-    body=`<div class="q-center">
-      ${F(ex.n1,ex.den,'big')} <span class="op-sym">${op}</span> ${F(ex.n2,ex.den,'big')}
-      <span class="op-sym">=</span>
-      <span class="frac big"><span class="fn">${ex.n1} ${op} ${ex.n2}</span><span class="fl" style="background:${clr}"></span><span class="fd">${ex.den}</span></span>
-      <span class="op-sym">=</span>
-      ${fracInp('ans-rn','ans-rd')}
+  if(lv===1){
+    body=`<div class="exq">Berechne:</div>
+    <div class="qctr">
+      ${F(n1,den,'big')} <span class="op">${op}</span> ${F(n2,den,'big')} <span class="eq">=</span>
+      <span class="frac big"><span class="fn">${n1} ${op} ${n2}</span><span class="fl" style="background:${clr}"></span><span class="fd">${den}</span></span>
+      <span class="eq">=</span> ${FI('rn','rd')}
     </div>
-    <div class="factor-hint">💡 Nenner bleibt <strong>${ex.den}</strong>. ${op==='+'?'Addiere':'Subtrahiere'} nur die Zähler: ${ex.n1} ${op} ${ex.n2} = <strong>${ex.rn}</strong></div>`;
+    <div class="fhint">💡 Nenner bleibt <strong>${den}</strong>. ${n1} ${op} ${n2} = ?</div>`;
   } else {
-    badge='<div class="level-badge">📗 Stufe 2 – Erst Ergebnis, dann kürzen!</div>';
-    body=`<div class="phase-box">
-      <div class="phase-lbl">Schritt 1: Zähler ${op==='+'?'addieren':'subtrahieren'} (Nenner bleibt ${ex.den}):</div>
-      <div class="phase-row">
-        ${F(ex.n1,ex.den,'big')} <span class="op-sym">${op}</span> ${F(ex.n2,ex.den,'big')}
-        <span class="op-sym">=</span>
-        <span class="frac big"><span class="fn">${ex.n1} ${op} ${ex.n2}</span><span class="fl" style="background:${clr}"></span><span class="fd">${ex.den}</span></span>
-        <span class="op-sym">=</span>
-        ${fracInp('ans-raw-n','ans-raw-d')}
+    // Stufe 2+3: Kürzungsvorschau zeigt nur Kürzungszahl, NICHT das Ergebnis
+    body=`<div class="exq">Berechne:</div>
+    <div class="pbox">
+      <div class="plbl">Schritt 1: ${op==='+'?'Zähler addieren':'Zähler subtrahieren'} (Nenner bleibt ${den}):</div>
+      <div class="prow">
+        ${F(n1,den,'big')} <span class="op">${op}</span> ${F(n2,den,'big')} <span class="eq">=</span>
+        <span class="frac big"><span class="fn">${NI('rawzn',52)} ${op} ${NI('rawzn2',52)}</span><span class="fl" style="background:${clr}"></span><span class="fd">${NI('rawnd',52)}</span></span>
+        <span class="eq">=</span> ${FI('raw-n','raw-d')}
       </div>
-      <div class="phase-lbl" style="margin-top:12px">Schritt 2: Ergebnis kürzen (durch ${gcd(ex.rn,ex.den)}):</div>
-      <div class="phase-row">
-        <span id="raw-preview" style="color:var(--text-muted);font-size:.9rem">⬆ Erst Schritt 1 eintragen …</span>
-      </div>
-      <div class="phase-row">Vollständig gekürzt: ${fracInp('ans-rn','ans-rd')}</div>
+      <div class="plbl" style="margin-top:11px">Schritt 2: Ergebnis kürzen, wenn möglich, oder nochmal eintragen wenn nicht:<br><small style="color:var(--muted);font-weight:normal">${red?`Kürze durch ${g2}`:'Dieser Bruch kann nicht weiter gekürzt werden – trage ihn nochmal ein.'}</small></div>
+      <div class="prow" id="raw-preview" style="color:var(--muted);font-size:.88rem">⬆ Erst Schritt 1 ausfüllen…</div>
+      <div class="prow">${FI('rn','rd')}</div>
     </div>
-    <div class="factor-hint">💡 ${ex.n1} ${op} ${ex.n2} = ${ex.rn} → dann durch ${gcd(ex.rn,ex.den)} kürzen</div>`;
+    <div class="fhint">💡 ${n1} ${op} ${n2} = <strong>${rn}</strong>, Nenner = ${den}${red?`. Dann :${g2} kürzen = ${rrn}/${rrd}`:'. Nicht kürzbar.'}</div>`;
   }
-  return `${badge}<div class="ex-q">Berechne:</div>${body}`;
+  return LvBadge(lv)+body;
 }
 
-// ──────────────────────────────────────────────
-// UNGLEICHNAMIGE: ALL levels always show all steps
-// Step 0: enter kgV; Step 1: extend both; Step 2: raw sum; Step 3: reduced result
-// ──────────────────────────────────────────────
-function renderUngleich(ex,op){
-  const needsReduce=ex.reduced;
-  return `<div class="ex-q">Berechne ${F(ex.n1,ex.d1,'med')} ${op} ${F(ex.n2,ex.d2,'med')}</div>
-  <div class="phase-box">
-    <div class="phase-lbl">Schritt 1: Finde das kgV (kleinste gemeinsame Vielfache) von ${ex.d1} und ${ex.d2}:</div>
-    <div class="phase-row">kgV = ${numInp('ans-lcm')}</div>
-    <div class="phase-lbl" style="margin-top:12px">Schritt 2: Erweitere beide Brüche auf den gemeinsamen Nenner:</div>
-    <div class="phase-row">
-      ${Fbook_mul(ex.n1,ex.d1,ex.f1)} <span class="op-sym">=</span> ${fracInp('ans-fn1','ans-fd1')}
-      &nbsp;&nbsp;&nbsp;
-      ${Fbook_mul(ex.n2,ex.d2,ex.f2)} <span class="op-sym">=</span> ${fracInp('ans-fn2','ans-fd2')}
+// ── UNGLEICHNAMIGE (ADD + SUB) – neue Darstellung aus test-ungleich-add ──
+function buildUngleichStep2_L1(ex,op){
+  return `
+  <div class="prow" style="gap:20px;flex-wrap:wrap;align-items:center">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+      <span style="font-size:.64rem;color:var(--muted)">Ursprungsbruch</span>
+      ${FdenHi(ex.n1,ex.d1)}
     </div>
-    <div class="phase-lbl" style="margin-top:12px">Schritt 3: Gleichnamige Brüche ${op==='+'?'addieren':'subtrahieren'}:</div>
-    <div class="phase-row" id="preview-sum" style="color:var(--text-muted);font-size:.9rem">⬆ Erst Schritte 1 &amp; 2 ausfüllen …</div>
-    <div class="phase-row">${fracInp('ans-raw-n','ans-raw-d')}</div>
-    ${needsReduce?`<div class="phase-lbl" style="margin-top:12px">Schritt 4: Ergebnis kürzen:</div>
-    <div class="phase-row">Vollständig gekürzt: ${fracInp('ans-rn','ans-rd')}</div>`
-    :`<div class="phase-lbl" style="margin-top:12px">Fertig! Ist das Ergebnis schon vollständig gekürzt?<br>→ Falls ja: Ergebnis nochmals unten eintragen:</div>
-    <div class="phase-row">${fracInp('ans-rn','ans-rd')}</div>`}
+    <span class="ext-frac">
+      <span class="ef-top">
+        <span style="color:var(--text)">${ex.n1}</span>
+        <span style="color:var(--a3);font-size:1rem">·</span>
+        <span id="f1-top" style="color:var(--a3);font-weight:900;font-size:1.1rem">?</span>
+      </span>
+      <div class="ef-bar"></div>
+      <span class="ef-bot">
+        <span style="color:var(--text)">${ex.d1}</span>
+        <span style="color:var(--a3);font-size:1rem">·</span>
+        <span id="f1-bot" style="color:var(--a3);font-weight:900;font-size:1.1rem">?</span>
+      </span>
+    </span>
+    <span class="eq">=</span>
+    <span class="fi">
+      <input type="number" id="fn1" min="1" placeholder="?">
+      <span class="fil fil-den"></span>
+      <span class="fixed-den" id="fd1-label">?</span>
+    </span>
+
+    <span class="op">${op}</span>
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+      <span style="font-size:.64rem;color:var(--muted)">Ursprungsbruch</span>
+      ${FdenHi(ex.n2,ex.d2)}
+    </div>
+    <span class="ext-frac">
+      <span class="ef-top">
+        <span>${ex.n2}</span>
+        <span style="color:var(--a3);font-size:1rem">·</span>
+        <span id="f2-top" style="color:var(--a3);font-weight:900;font-size:1.1rem">?</span>
+      </span>
+      <div class="ef-bar"></div>
+      <span class="ef-bot">
+        <span>${ex.d2}</span>
+        <span style="color:var(--a3);font-size:1rem">·</span>
+        <span id="f2-bot" style="color:var(--a3);font-weight:900;font-size:1.1rem">?</span>
+      </span>
+    </span>
+    <span class="eq">=</span>
+    <span class="fi">
+      <input type="number" id="fn2" min="1" placeholder="?">
+      <span class="fil fil-den"></span>
+      <span class="fixed-den" id="fd2-label">?</span>
+    </span>
+  </div>`;
+}
+
+function buildUngleichStep2_L2(ex,op){
+  return `
+  <div class="prow" style="gap:16px;flex-wrap:wrap;align-items:center">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+      <span style="font-size:.64rem;color:var(--muted)">Ursprungsbruch</span>
+      ${FdenHi(ex.n1,ex.d1)}
+    </div>
+    <span class="eq">·</span>
+    <span class="fbook">
+      <span class="fb-top">
+        <span>${ex.n1}</span>
+        <span style="color:var(--a3);font-size:.9rem">·</span>
+        ${NI('ef1n',48)}
+      </span>
+      <div class="fb-bar"></div>
+      <span class="fb-bot">
+        <span>${ex.d1}</span>
+        <span style="color:var(--a3);font-size:.9rem">·</span>
+        ${NI('ef1d',48)}
+      </span>
+    </span>
+    <span class="eq">=</span>
+    <span class="fi">
+      <input type="number" id="fn1" min="1" placeholder="?">
+      <span class="fil fil-den"></span>
+      <span class="fixed-den" id="fd1-label">?</span>
+    </span>
+
+    <span class="op">${op}</span>
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+      <span style="font-size:.64rem;color:var(--muted)">Ursprungsbruch</span>
+      ${FdenHi(ex.n2,ex.d2)}
+    </div>
+    <span class="eq">·</span>
+    <span class="fbook">
+      <span class="fb-top">
+        <span>${ex.n2}</span>
+        <span style="color:var(--a3);font-size:.9rem">·</span>
+        ${NI('ef2n',48)}
+      </span>
+      <div class="fb-bar"></div>
+      <span class="fb-bot">
+        <span>${ex.d2}</span>
+        <span style="color:var(--a3);font-size:.9rem">·</span>
+        ${NI('ef2d',48)}
+      </span>
+    </span>
+    <span class="eq">=</span>
+    <span class="fi">
+      <input type="number" id="fn2" min="1" placeholder="?">
+      <span class="fil fil-den"></span>
+      <span class="fixed-den" id="fd2-label">?</span>
+    </span>
+  </div>`;
+}
+
+function buildUngleichStep2_L3(ex,op){
+  return `
+  <div class="prow" style="gap:14px;flex-wrap:wrap;align-items:center">
+    <span class="fbook">
+      <span class="fb-top">
+        ${NI('on1',46)}
+        <span style="color:var(--a3);font-size:.9rem">·</span>
+        ${NI('ef1n',46)}
+      </span>
+      <div class="fb-bar"></div>
+      <span class="fb-bot">
+        ${NI('od1',46)}
+        <span style="color:var(--a3);font-size:.9rem">·</span>
+        ${NI('ef1d',46)}
+      </span>
+    </span>
+    <span class="eq">=</span>
+    ${FI('fn1','fd1')}
+
+    <span class="op">${op}</span>
+
+    <span class="fbook">
+      <span class="fb-top">
+        ${NI('on2',46)}
+        <span style="color:var(--a3);font-size:.9rem">·</span>
+        ${NI('ef2n',46)}
+      </span>
+      <div class="fb-bar"></div>
+      <span class="fb-bot">
+        ${NI('od2',46)}
+        <span style="color:var(--a3);font-size:.9rem">·</span>
+        ${NI('ef2d',46)}
+      </span>
+    </span>
+    <span class="eq">=</span>
+    ${FI('fn2','fd2')}
+  </div>`;
+}
+
+function renderUngleich(ex){
+  const {lv,n1,d1,n2,d2,lcm:L,f1,f2,fn1,fn2,rn,rd,rrn,rrd,red}=ex;
+  const op=ex.type==='add-ungleich'?'+':'−';
+  const opWord=op==='+'?'addieren':'subtrahieren';
+  const g2=red?gcd(rn,L):1;
+
+  let step2inner='';
+  if(lv===1) step2inner=buildUngleichStep2_L1(ex,op);
+  else if(lv===2) step2inner=buildUngleichStep2_L2(ex,op);
+  else step2inner=buildUngleichStep2_L3(ex,op);
+
+  const step4html=red
+    ?`<div class="plbl" style="margin-top:12px">Schritt 4: Kürze das Ergebnis aus Schritt 3 (wenn möglich):</div>
+      <div class="prow">${FI('rrn','rrd')}</div>`
+    :`<div class="plbl" style="margin-top:12px">Das Ergebnis ist nicht kürzbar – trage es zur Bestätigung nochmal ein:</div>
+      <div class="prow">${FI('rrn','rrd')}</div>`;
+
+  return LvBadge(lv)+`<div class="exq">Berechne ${FdenHi(n1,d1,'med')} <span class="op">${op}</span> ${FdenHi(n2,d2,'med')}</div>
+  <div class="pbox">
+    <div class="plbl">Schritt 1: Finde das kgV von <span class="den-hi">${d1}</span> und <span class="den-hi">${d2}</span>:</div>
+    <div class="prow">kgV = ${NI('kcm',74)}</div>
+    <div style="text-align:center;margin:8px 0">
+      <button class="bcheck" style="font-size:.76rem;padding:6px 16px" onclick="checkUngleichStep1()">✓ Schritt 1 prüfen</button>
+    </div>
+    <div id="step1-fb" class="fbbox"></div>
+
+    <div id="step2-wrap" class="step2-hidden">
+      <div class="plbl" style="margin-top:14px">Schritt 2: Erweitere beide Brüche:<br>
+        <small style="font-weight:normal;color:var(--muted)">
+          ${lv===1?'Trage den neuen Zähler ein. Der Nenner und die Erweiterungszahl werden automatisch angezeigt.':''}
+          ${lv===2?'Trage die Erweiterungszahl oben UND unten ein, dann den Ergebnisbruch.':''}
+          ${lv===3?'Trage den Ausgangsbruch und die Erweiterungszahl (oben &amp; unten) ein, dann das Ergebnis.':''}
+        </small>
+      </div>
+      ${step2inner}
+      <div style="text-align:center;margin:8px 0">
+        <button class="bcheck" style="font-size:.76rem;padding:6px 16px" onclick="checkAnswer()">✓ Schritt 2 prüfen</button>
+      </div>
+
+      <div class="plbl" style="margin-top:12px">Schritt 3: Gleichnamige Brüche ${opWord}:</div>
+      <div class="prow" id="preview-sum" style="color:var(--muted);font-size:.88rem">⬆ Erst Schritt 2 ausfüllen…</div>
+      <div class="prow">${FI('raw-n','raw-d')}</div>
+      ${step4html}
+    </div>
   </div>
-  <div class="factor-hint">💡 <strong>Tipp:</strong> kgV(${ex.d1},${ex.d2})=<strong>${ex.lcm}</strong>. Erster ·${ex.f1}, zweiter ·${ex.f2}. Dann ${ex.fn1} ${op==='+'?'+':'-'} ${ex.fn2} = ${ex.rn}</div>`;
+  <div class="fhint">💡 kgV(${d1},${d2})=<strong>${L}</strong>. Erster ·${f1}→${fn1}/${L}, zweiter ·${f2}→${fn2}/${L}. ${fn1}${op==='+'?'+':'-'}${fn2}=${rn}</div>`;
 }
 
-// ──────────────────────────────────────────────
-// MAL-GANZ: 3 scaffold levels (same logic as erweitern)
-// L1: show fraction·z = n·z/d = [?]
-// L2: show fraction·[?] = n·[?]/d = [result]
-// L3: show [?]·[?] = [?]·[?]/[?] = [result]  (enter fraction + factor + result)
-// ──────────────────────────────────────────────
-function renderMalGanz(ex,idx){
-  const lv=ex.scaffoldLevel;
-  let badge='',body='';
+// ── MAL-GANZ (neue Version aus test-mal-durch-ganz) ──
+function renderMalGanz(ex){
+  const {lv,n,d,z,rn,rd,rrn,rrd,red}=ex;
+  let body='';
   if(lv===1){
-    badge='<div class="level-badge">📘 Stufe 1 – Ergebnis eintragen</div>';
-    body=`<div class="q-center">
-      ${F(ex.n,ex.d,'big')} <span class="op-sym">·</span> <span style="font-size:1.7rem;font-weight:900;vertical-align:middle">${ex.z}</span>
-      <span class="op-sym">=</span>
-      <span class="frac big" style="color:var(--accent5)"><span class="fn">${ex.n} · ${ex.z}</span><span class="fl"></span><span class="fd">${ex.d}</span></span>
-      <span class="op-sym">=</span>
-      ${fracInp('ans-rn','ans-rd')}
-    </div>
-    <div class="factor-hint">💡 Zähler: ${ex.n}·${ex.z}=<strong>${ex.rn}</strong>. Nenner bleibt <strong>${ex.d}</strong>.${ex.reduced?' Danach kürzen!':''}</div>`;
+    body=`<div class="exq">Berechne:</div>
+    <div class="qctr">${F(n,d,'big')} <span class="op">·</span> <span style="font-size:1.7rem;font-weight:900;vertical-align:middle">${z}</span>
+    <span class="eq">=</span>
+    <span class="frac big" style="color:var(--a5)"><span class="fn">${n}·${z}</span><span class="fl"></span><span class="fd">${d}</span></span>
+    <span class="eq">=</span> ${FI('rn','rd')}</div>
+    ${red?`<div class="prow" style="margin-top:8px"><span style="font-size:.78rem;color:var(--muted);font-weight:700">Das Ergebnis lässt sich noch kürzen – trage den vollständig gekürzten Bruch ein:</span></div><div class="prow">${FI('rrn','rrd')}</div>`:''}
+    <div class="fhint">💡 ${n}·${z}=<strong>${rn}</strong>. Nenner bleibt ${d}.${red?' Dann kürzen!':''}</div>`;
   } else if(lv===2){
-    badge='<div class="level-badge">📗 Stufe 2 – Multiplikationszahl + Ergebnis eintragen</div>';
-    body=`<div class="q-center">
-      ${F(ex.n,ex.d,'big')} <span class="op-sym">·</span> ${numInp('ans-factor')}
-      <span class="op-sym">=</span>
-      <span class="frac big" style="color:var(--accent5)"><span class="fn">${ex.n} · <span id="factor-echo2" style="color:var(--accent3)">?</span></span><span class="fl"></span><span class="fd">${ex.d}</span></span>
-      <span class="op-sym">=</span>
-      ${fracInp('ans-rn','ans-rd')}
-    </div>
-    <div class="factor-hint">💡 Multipliziere ${ex.n} mit <strong>${ex.z}</strong>. Dann kannst du das Ergebnis ausrechnen.${ex.reduced?' Danach kürzen!':''}</div>`;
+    body=`<div class="exq">Berechne:<br><small style="color:var(--muted)">Trage die Multiplikationszahl in das Feld im Bruch ein, dann das Ergebnis.</small></div>
+    <div class="qctr">${F(n,d,'big')} <span class="op">·</span> <span style="font-size:1.6rem;font-weight:900;vertical-align:middle;color:var(--a5)">${z}</span>
+    <span class="eq">=</span>
+    <span class="frac big" style="color:var(--a5)"><span class="fn">${n} · ${NI('mf',52)}</span><span class="fl"></span><span class="fd">${d}</span></span>
+    <span class="eq">=</span> ${FI('rn','rd')}</div>
+    ${red?`<div class="prow" style="margin-top:8px"><span style="font-size:.78rem;color:var(--muted);font-weight:700">Das Ergebnis lässt sich noch kürzen:</span></div><div class="prow">${FI('rrn','rrd')}</div>`:''}
+    <div class="fhint">💡 Trage ${z} ein. ${n}·${z}=${rn}.${red?' Dann kürzen!':''}</div>`;
   } else {
-    badge='<div class="level-badge">📕 Stufe 3 – Bruch + Multiplikator + Ergebnis eintragen</div>';
-    body=`<div class="q-center">
-      ${fracInp('ans-on','ans-od')} <span class="op-sym">·</span> ${numInp('ans-factor')}
-      <span class="op-sym">=</span>
-      <span class="frac big" style="color:var(--accent5)">
-        <span class="fn"><span id="on-echo2" style="color:var(--accent3)">?</span> · <span id="factor-echo2" style="color:var(--accent3)">?</span></span>
+    body=`<div class="exq">Berechne:<br><small style="color:var(--muted)">Trage den Ausgangsbruch (Zähler und Nenner) und die Multiplikationszahl ein, dann das Ergebnis.</small></div>
+    <div style="text-align:center;margin:10px 0;line-height:2.8">
+      <div style="font-size:.75rem;color:var(--muted);margin-bottom:8px">Trage den Ausgangsbruch ${F(n,d,'med')} und die Multiplikationszahl <strong style="color:var(--a5)">${z}</strong> ein:</div>
+      <span class="frac big" style="color:var(--a5)">
+        <span class="fn">${NI('on',52)} · ${NI('mf',52)}</span>
         <span class="fl"></span>
-        <span class="fd"><span id="od-echo2" style="color:var(--accent3)">?</span></span>
+        <span class="fd">${NI('od',52)}</span>
       </span>
-      <span class="op-sym">=</span>
-      ${fracInp('ans-rn','ans-rd')}
+      <span class="eq">=</span>
+      ${FI('rn','rd')}
     </div>
-    <div class="factor-hint">💡 Trage den Bruch ${ex.n}/${ex.d} und die Zahl ${ex.z} ein. Dann: ${ex.n}·${ex.z}=<strong>${ex.rn}</strong>, Nenner bleibt ${ex.d}.${ex.reduced?' Danach kürzen!':''}</div>`;
+    ${red?`<div class="prow" style="margin-top:8px"><span style="font-size:.78rem;color:var(--muted);font-weight:700">Das Ergebnis lässt sich noch kürzen:</span></div><div class="prow">${FI('rrn','rrd')}</div>`:''}
+    <div class="fhint">💡 Bruch: ${n}/${d}, Multiplikator: ${z}, Ergebnis: ${rrn}/${rrd}</div>`;
   }
-  return `${badge}<div class="ex-q">Berechne:</div>${body}`;
+  return LvBadge(lv)+body;
 }
 
-// ──────────────────────────────────────────────
-// DURCH-GANZ: same 3 scaffold levels; both ways ('zähler' & 'nenner') appear
-// ──────────────────────────────────────────────
-function renderDurchGanz(ex,idx){
-  const lv=ex.scaffoldLevel;
-  const isZ=ex.way==='zähler';
-  const clr=isZ?'var(--accent3)':'var(--accent2)';
-  const wayLabel=isZ?`Zähler ÷ ${ex.z}`:`Nenner · ${ex.z}`;
-  const showTop=isZ?`${ex.n} : ${ex.z}`:ex.n;
-  const showBot=isZ?ex.d:`${ex.d} · ${ex.z}`;
-  let badge='',body='';
-
+// ── DURCH-GANZ (neue Version aus test-mal-durch-ganz) ──
+function renderDurchGanz(ex){
+  const {lv,n,d,z,way,rn,rd,rrn,rrd,red}=ex;
+  const isZ=way==='z';
+  const clr=isZ?'var(--a3)':'var(--a2)';
+  const showTop=isZ?`${n}:${z}`:n;
+  const showBot=isZ?d:`${d}·${z}`;
+  let body='';
   if(lv===1){
-    badge='<div class="level-badge">📘 Stufe 1 – Ergebnis eintragen</div>';
-    body=`<div class="q-center">
-      ${F(ex.n,ex.d,'big')} <span class="op-sym">÷</span> <span style="font-size:1.7rem;font-weight:900;vertical-align:middle">${ex.z}</span>
-      <span class="op-sym">=</span>
-      <span class="frac big" style="color:${clr}"><span class="fn">${showTop}</span><span class="fl"></span><span class="fd">${showBot}</span></span>
-      <span class="op-sym">=</span>
-      ${fracInp('ans-rn','ans-rd')}
-    </div>
-    <div class="factor-hint">💡 ${isZ?`Zähler: ${ex.n}÷${ex.z}=<strong>${ex.rn}</strong>, Nenner bleibt ${ex.d}`:`Nenner: ${ex.d}·${ex.z}=<strong>${ex.rd}</strong>, Zähler bleibt ${ex.n}`}${ex.reduced?' | Danach kürzen!':''}</div>`;
+    body=`<div class="exq">Berechne:</div>
+    <div class="qctr">${F(n,d,'big')} <span class="op">÷</span> <span style="font-size:1.7rem;font-weight:900;vertical-align:middle">${z}</span>
+    <span class="eq">=</span>
+    <span class="frac big" style="color:${clr}"><span class="fn">${showTop}</span><span class="fl"></span><span class="fd">${showBot}</span></span>
+    <span class="eq">=</span> ${FI('rn','rd')}</div>
+    ${red?`<div class="prow" style="margin-top:8px"><span style="font-size:.78rem;color:var(--muted);font-weight:700">Das Ergebnis lässt sich noch kürzen:</span></div><div class="prow">${FI('rrn','rrd')}</div>`:''}
+    <div class="fhint">💡 ${isZ?`${n}÷${z}=${rn}, Nenner bleibt ${d}`:`${d}·${z}=${rd}, Zähler bleibt ${n}`}${red?' | Kürzen!':''}</div>`;
   } else if(lv===2){
-    badge=`<div class="level-badge">📗 Stufe 2 – Divisor eintragen + Ergebnis (${isZ?'Zähler wird geteilt':'Nenner wird multipliziert'})</div>`;
-    body=`<div class="q-center">
-      ${F(ex.n,ex.d,'big')} <span class="op-sym">÷</span> ${numInp('ans-factor')}
-      <span class="op-sym">=</span>
-      <span class="frac big" style="color:${clr}">
-        <span class="fn">${isZ?`${ex.n} : <span id="factor-echo3" style="color:${clr}">?</span>`:ex.n}</span>
-        <span class="fl"></span>
-        <span class="fd">${isZ?ex.d:`${ex.d} · <span id="factor-echo3" style="color:${clr}">?</span>`}</span>
-      </span>
-      <span class="op-sym">=</span>
-      ${fracInp('ans-rn','ans-rd')}
-    </div>
-    <div class="factor-hint">💡 Divisor ist <strong>${ex.z}</strong>. ${isZ?`${ex.n}÷${ex.z}=${ex.rn}`:`${ex.d}·${ex.z}=${ex.rd}`}${ex.reduced?' | Danach kürzen!':''}</div>`;
+    const topF=isZ?`${n} : ${NI('df',52)}`:n;
+    const botF=isZ?d:`${d} · ${NI('df',52)}`;
+    body=`<div class="exq">Berechne:<br><small style="color:var(--muted)">Trage die Zahl in das Feld im Bruch ein, dann das Ergebnis. (${isZ?'Zähler wird geteilt':'Nenner wird multipliziert'})</small></div>
+    <div class="qctr">${F(n,d,'big')} <span class="op">÷</span> <span style="font-size:1.6rem;font-weight:900;vertical-align:middle;color:${clr}">${z}</span>
+    <span class="eq">=</span>
+    <span class="frac big" style="color:${clr}"><span class="fn">${topF}</span><span class="fl"></span><span class="fd">${botF}</span></span>
+    <span class="eq">=</span> ${FI('rn','rd')}</div>
+    ${red?`<div class="prow" style="margin-top:8px"><span style="font-size:.78rem;color:var(--muted);font-weight:700">Das Ergebnis lässt sich noch kürzen:</span></div><div class="prow">${FI('rrn','rrd')}</div>`:''}
+    <div class="fhint">💡 ${z} eintragen. ${isZ?`${n}÷${z}=${rn}`:`${d}·${z}=${rd}`}${red?' | Kürzen!':''}</div>`;
   } else {
-    badge=`<div class="level-badge">📕 Stufe 3 – Bruch + Divisor + Ergebnis (${isZ?'Zähler':'Nenner'})</div>`;
-    body=`<div class="q-center">
-      ${fracInp('ans-on','ans-od')} <span class="op-sym">÷</span> ${numInp('ans-factor')}
-      <span class="op-sym">=</span>
+    const topF3=isZ?`${NI('on',50)} : ${NI('df',50)}`:NI('on',50);
+    const botF3=isZ?NI('od',50):`${NI('od',50)} · ${NI('df',50)}`;
+    body=`<div class="exq">Berechne:<br><small style="color:var(--muted)">Trage den Ausgangsbruch und die Divisionszahl ein, dann das Ergebnis.</small></div>
+    <div style="text-align:center;margin:10px 0;line-height:2.8">
+      <div style="font-size:.75rem;color:var(--muted);margin-bottom:8px">Trage den Ausgangsbruch ${F(n,d,'med')} und die Divisionszahl <strong style="color:${clr}">${z}</strong> ein (${isZ?'Zähler wird geteilt':'Nenner wird multipliziert'}):</div>
       <span class="frac big" style="color:${clr}">
-        <span class="fn">${isZ?'<span id="on-echo3" style="color:var(--accent3)">?</span> : <span id="factor-echo3" style="color:var(--accent3)">?</span>':ex.n}</span>
+        <span class="fn">${topF3}</span>
         <span class="fl"></span>
-        <span class="fd">${isZ?ex.d:'<span id="od-echo3" style="color:var(--accent2)">?</span> · <span id="factor-echo3b" style="color:var(--accent2)">?</span>'}</span>
+        <span class="fd">${botF3}</span>
       </span>
-      <span class="op-sym">=</span>
-      ${fracInp('ans-rn','ans-rd')}
+      <span class="eq">=</span>
+      ${FI('rn','rd')}
     </div>
-    <div class="factor-hint">💡 Trage ${ex.n}/${ex.d} und ${ex.z} ein. ${isZ?`${ex.n}÷${ex.z}=${ex.rn}`:`${ex.d}·${ex.z}=${ex.rd}`}. Ergebnis: ${ex.rrn}/${ex.rrd}</div>`;
+    ${red?`<div class="prow" style="margin-top:8px"><span style="font-size:.78rem;color:var(--muted);font-weight:700">Das Ergebnis lässt sich noch kürzen:</span></div><div class="prow">${FI('rrn','rrd')}</div>`:''}
+    <div class="fhint">💡 Bruch: ${n}/${d}, Divisor: ${z}, Ergebnis: ${rrn}/${rrd}</div>`;
   }
-  return `${badge}<div class="ex-q">Berechne:</div>${body}`;
+  return LvBadge(lv)+body;
 }
 
-// ── CHECK ANSWER ──
-function g(id){const el=document.getElementById(id);return el?parseInt(el.value):NaN;}
+// ═══════════════════════════════════════════════
+// UNGLEICH STEP 1 CHECK (separate function)
+// ═══════════════════════════════════════════════
+function checkUngleichStep1(){
+  const ex=S.exercises[S.exIdx];
+  const {d1,d2,lcm:L,f1,f2}=ex;
+  const fb1=document.getElementById('step1-fb');
+  const kcmVal=g('kcm');
+  if(isNaN(kcmVal)||kcmVal<=0){fb1.className='fbbox hi';fb1.textContent=`⚠️ Trage das kgV von ${d1} und ${d2} ein!`;return;}
+  if(kcmVal%d1!==0||kcmVal%d2!==0){fb1.className='fbbox ng';fb1.innerHTML=`❌ ${kcmVal} ist kein gemeinsames Vielfaches von ${d1} und ${d2}!`;return;}
+  ungleichState.confirmedLcm=kcmVal;
+  const usedF1=kcmVal/d1,usedF2=kcmVal/d2;
+  if(kcmVal!==L){
+    fb1.className='fbbox pt';
+    fb1.textContent=`Das ist zwar nicht das kleinste gemeinsame Vielfache, aber das geht auch! Das kgV wäre ${L}.`;
+  } else {
+    fb1.className='fbbox ok';
+    fb1.textContent=`✅ Richtig! kgV(${d1},${d2}) = ${kcmVal}`;
+  }
+  ungleichState.step1OK=true;
+  const wrap=document.getElementById('step2-wrap');
+  if(wrap) wrap.classList.remove('step2-hidden');
+  const lv=ex.lv;
+  if(lv===1){
+    const el_f1t=document.getElementById('f1-top');
+    const el_f1b=document.getElementById('f1-bot');
+    const el_f2t=document.getElementById('f2-top');
+    const el_f2b=document.getElementById('f2-bot');
+    if(el_f1t)el_f1t.textContent=usedF1;if(el_f1b)el_f1b.textContent=usedF1;
+    if(el_f2t)el_f2t.textContent=usedF2;if(el_f2b)el_f2b.textContent=usedF2;
+    const el_d1=document.getElementById('fd1-label');
+    const el_d2=document.getElementById('fd2-label');
+    if(el_d1)el_d1.textContent=kcmVal;if(el_d2)el_d2.textContent=kcmVal;
+  }
+  if(lv===2){
+    const el_d1=document.getElementById('fd1-label');
+    const el_d2=document.getElementById('fd2-label');
+    if(el_d1)el_d1.textContent=kcmVal;if(el_d2)el_d2.textContent=kcmVal;
+  }
+}
 
+// ═══════════════════════════════════════════════
+// CHECK ANSWER
+// ═══════════════════════════════════════════════
 function checkAnswer(){
-  const ex=state.exercises[state.exIndex];
-  const fb=document.getElementById('feedback');
-  const btnCheck=document.getElementById('btn-check');
-  const btnNext=document.getElementById('btn-next');
-  let correct=false,msg='';
+  const ex=S.exercises[S.exIdx];
+  const fb=document.getElementById('fb');
+  const bc=document.getElementById('bcheck');
+  const bn=document.getElementById('bnext');
+  let ok=false,msg='';
 
-  // ── ERWEITERN ──
   if(ex.type==='erweitern'){
-    const lv=ex.scaffoldLevel;
-    const rn=g('ans-rn'),rd=g('ans-rd');
-    if(isNaN(rn)||isNaN(rd)){fb.className='feedback-box hint';fb.textContent='⚠️ Bitte das Ergebnis (Bruch) ausfüllen!';return;}
-    if(lv>=2){const fac=g('ans-factor');if(isNaN(fac)||fac!==ex.factor){fb.className='feedback-box wrong';fb.innerHTML=`❌ Erweiterungszahl falsch! Die Erweiterungszahl ist <strong>${ex.factor}</strong>.`;return;}}
-    if(lv>=3){const on=g('ans-on'),od=g('ans-od');if(isNaN(on)||isNaN(od)||on!==ex.n||od!==ex.d){fb.className='feedback-box wrong';fb.innerHTML=`❌ Ausgangsbruch falsch! Der Bruch ist <strong>${ex.n}/${ex.d}</strong>.`;return;}}
-    if(rn===ex.rn&&rd===ex.rd){correct=true;msg=`✅ Super! ${ex.n}·${ex.factor}=${ex.rn} und ${ex.d}·${ex.factor}=${ex.rd}`;}
-    else{msg=`❌ Ergebnis falsch! ${ex.n}·${ex.factor}=${ex.rn} und ${ex.d}·${ex.factor}=${ex.rd}`;}
+    const {lv,n,d,factor,rn,rd}=ex;
+    if(lv===3){
+      const on=g('on'),od=g('od');
+      if(isNaN(on)||isNaN(od)){fb.className='fbbox hi';fb.textContent='⚠️ Bitte den Ausgangsbruch links eintragen!';return;}
+      if(on!==n||od!==d){fb.className='fbbox ng';fb.innerHTML=`❌ Ausgangsbruch falsch! Der Bruch ist <strong>${n}/${d}</strong>.`;return;}
+      const on_bar=g('on_bar'),od_bar=g('od_bar');
+      if(isNaN(on_bar)||isNaN(od_bar)){fb.className='fbbox hi';fb.textContent='⚠️ Bitte auch den Ausgangsbruch im Bruchstrich eintragen!';return;}
+      if(on_bar!==n||od_bar!==d){fb.className='fbbox ng';fb.innerHTML=`❌ Ausgangsbruch im Bruchstrich falsch! Es ist <strong>${n}/${d}</strong>.`;return;}
+      const fn=g('fn'),fd=g('fd');
+      if(isNaN(fn)||isNaN(fd)){fb.className='fbbox hi';fb.textContent='⚠️ Erweiterungszahl oben UND unten eintragen!';return;}
+      if(fn!==factor){fb.className='fbbox ng';fb.textContent=`❌ Erweiterungszahl oben falsch! Richtig: ${factor}`;return;}
+      if(fd!==factor){fb.className='fbbox ng';fb.textContent=`❌ Erweiterungszahl unten falsch! Richtig: ${factor}`;return;}
+    } else if(lv===2){
+      const fn=g('fn'),fd=g('fd');
+      if(isNaN(fn)||isNaN(fd)){fb.className='fbbox hi';fb.textContent='⚠️ Erweiterungszahl in Zähler UND Nenner eintragen!';return;}
+      if(fn!==factor){fb.className='fbbox ng';fb.textContent=`❌ Erweiterungszahl im Zähler falsch! Richtig: ${factor}`;return;}
+      if(fd!==factor){fb.className='fbbox ng';fb.textContent=`❌ Erweiterungszahl im Nenner falsch! Richtig: ${factor}`;return;}
+    }
+    const arn=g('rn'),ard=g('rd');
+    if(isNaN(arn)||isNaN(ard)){fb.className='fbbox hi';fb.textContent='⚠️ Bitte das Ergebnis eintragen!';return;}
+    if(arn===rn&&ard===rd){ok=true;msg=`✅ Super! ${n}·${factor}=${rn} und ${d}·${factor}=${rd}`;}
+    else msg=`❌ Falsch! ${n}·${factor}=${rn} und ${d}·${factor}=${rd}`;
   }
 
-  // ── KÜRZEN ──
   else if(ex.type==='kuerzen'){
-    const rn=g('ans-rn'),rd=g('ans-rd');
-    if(isNaN(rn)||isNaN(rd)){fb.className='feedback-box hint';fb.textContent='⚠️ Bitte beide Felder ausfüllen!';return;}
-    if(rn>0&&rd>0&&rn*ex.d===rd*ex.n){
-      if(!isReduced(rn,rd)){fb.className='feedback-box partial';fb.innerHTML=`⚠️ Fast! ${rn}/${rd} ist noch nicht vollständig gekürzt. Teile nochmal durch ${gcd(rn,rd)}!`;return;}
-      correct=true;msg=`✅ Perfekt! ${ex.n}:${ex.gcd_val}=${ex.rn} und ${ex.d}:${ex.gcd_val}=${ex.rd}`;
-    } else {msg=`❌ Falsch! Teile durch ${ex.gcd_val}: ${ex.n}:${ex.gcd_val}=${ex.rn}, ${ex.d}:${ex.gcd_val}=${ex.rd}`;}
+    const {lv,n,d,gv,rn,rd}=ex;
+    if(lv>=2){
+      const fn=g('fn'),fd=g('fd');
+      if(isNaN(fn)||isNaN(fd)){fb.className='fbbox hi';fb.textContent='⚠️ Kürzungszahl in Zähler UND Nenner eintragen!';return;}
+      if(fn!==fd){fb.className='fbbox ng';fb.textContent=`❌ Zähler (${fn}) und Nenner (${fd}) müssen dieselbe Kürzungszahl haben!`;return;}
+      const div=fn;
+      if(n%div!==0||d%div!==0){fb.className='fbbox ng';fb.innerHTML=`❌ ${div} teilt nicht beide Zahlen ohne Rest!`;return;}
+    }
+    const arn=g('rn'),ard=g('rd');
+    if(isNaN(arn)||isNaN(ard)){fb.className='fbbox hi';fb.textContent='⚠️ Bitte das Ergebnis eintragen!';return;}
+    if(arn>0&&ard>0&&arn*d===ard*n){
+      if(!isRed(arn,ard)){
+        const rest=gcd(arn,ard);
+        ['fn','fd','rn','rd'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('blink');});
+        fb.className='fbbox pt';
+        fb.innerHTML=`⚠️ Richtige Richtung! <strong>${arn}/${ard}</strong> ist aber noch nicht vollständig gekürzt. Es gibt noch eine größere Zahl zum Teilen! Drücke Tipp, wenn du nicht weiterkommst.`;
+        setTimeout(()=>['fn','fd','rn','rd'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('blink');}),3000);
+        return;
+      }
+      ok=true;msg=`✅ Perfekt! ${n}:${gv}=${rn} und ${d}:${gv}=${rd}`;
+    } else msg=`❌ Falsch! Ergebnis: ${rn}/${rd}`;
   }
 
-  // ── GLEICH ADD/SUB ──
   else if(ex.type==='add-gleich'||ex.type==='sub-gleich'){
-    const lv=ex.scaffoldLevel;
+    const {lv,n1,n2,den,rn,rd,rrn,rrd,red}=ex;
     const op=ex.type==='add-gleich'?'+':'−';
-
-    if(lv>=2&&ex.reduced){
-      // Must fill in raw result first, then reduced
-      const rawN=g('ans-raw-n'),rawD=g('ans-raw-d');
-      if(isNaN(rawN)||isNaN(rawD)){fb.className='feedback-box hint';fb.textContent='⚠️ Bitte erst Schritt 1 (das ungekürzte Ergebnis) eintragen!';return;}
-      if(rawN!==ex.rn||rawD!==ex.rd){fb.className='feedback-box wrong';fb.innerHTML=`❌ Schritt 1 falsch! ${ex.n1} ${op} ${ex.n2} = <strong>${ex.rn}</strong>, Nenner bleibt <strong>${ex.den}</strong>.`;return;}
-      // Show preview
-      const pv=document.getElementById('raw-preview');
-      if(pv)pv.innerHTML=`${F(ex.rn,ex.rd,'med')} <span class="op-sym">:</span> <span style="font-size:1.2rem;font-weight:900;vertical-align:middle">${gcd(ex.rn,ex.den)}</span> <span class="op-sym">=</span> ${F(ex.rrn,ex.rrd,'med')}`;
-      const rn=g('ans-rn'),rd=g('ans-rd');
-      if(isNaN(rn)||isNaN(rd)){fb.className='feedback-box hint';fb.textContent='✅ Schritt 1 richtig! Jetzt kürzen und eintragen.';return;}
-      if(rn===ex.rrn&&rd===ex.rrd){correct=true;msg=`✅ Perfekt! Alle Schritte richtig. Ergebnis: ${ex.rrn}/${ex.rrd}`;}
-      else{msg=`❌ Schritt 2 falsch! ${ex.rn}/${ex.den} : ${gcd(ex.rn,ex.den)} = ${ex.rrn}/${ex.rrd}`;}
+    const g2=red?gcd(rn,den):1;
+    if(lv===1){
+      const arn=g('rn'),ard=g('rd');
+      if(isNaN(arn)||isNaN(ard)){fb.className='fbbox hi';fb.textContent='⚠️ Ergebnis eintragen!';return;}
+      if(arn===rn&&ard===rd){ok=true;msg=`✅ Richtig! ${n1}${op}${n2}=${rn}, Nenner ${den}`;}
+      else msg=`❌ Falsch! ${n1}${op}${n2}=${rn}, Nenner bleibt ${den}`;
     } else {
-      const rn=g('ans-rn'),rd=g('ans-rd');
-      if(isNaN(rn)||isNaN(rd)){fb.className='feedback-box hint';fb.textContent='⚠️ Bitte beide Felder ausfüllen!';return;}
-      if(rn===ex.rrn&&rd===ex.rrd){correct=true;msg=`✅ Richtig! Ergebnis: ${ex.rrn}/${ex.rrd}`;}
-      else{msg=`❌ Falsch! ${ex.n1}${ex.type==='add-gleich'?'+':'−'}${ex.n2}=${ex.rn}, Nenner bleibt ${ex.den}. Ergebnis: ${ex.rrn}/${ex.rrd}`;}
+      const zn=g('rawzn'),zn2=g('rawzn2'),nd=g('rawnd');
+      if(isNaN(zn)||isNaN(zn2)||isNaN(nd)){fb.className='fbbox hi';fb.textContent='⚠️ Erst Schritt 1 ausfüllen (beide Zählerteile und Nenner)!';return;}
+      if(zn!==n1){fb.className='fbbox ng';fb.innerHTML=`❌ Erster Zähler falsch! Es ist <strong>${n1}</strong>.`;return;}
+      if(zn2!==n2){fb.className='fbbox ng';fb.innerHTML=`❌ Zweiter Zähler falsch! Es ist <strong>${n2}</strong>.`;return;}
+      if(nd!==den){fb.className='fbbox ng';fb.innerHTML=`❌ Nenner falsch! Bleibt <strong>${den}</strong>.`;return;}
+      const rawN=g('raw-n'),rawD=g('raw-d');
+      if(isNaN(rawN)||isNaN(rawD)){fb.className='fbbox hi';fb.textContent='✅ Schritt 1 OK! Jetzt das Ergebnis des Bruchs eintragen.';return;}
+      if(rawN!==rn||rawD!==rd){fb.className='fbbox ng';fb.innerHTML=`❌ Ergebnis falsch! ${n1}${op}${n2}=${rn}, Nenner ${den}`;return;}
+      // Vorschau: nur Kürzungszahl anzeigen, NICHT das Ergebnis
+      const pv=document.getElementById('raw-preview');
+      if(pv){
+        if(red) pv.innerHTML=`${F(rn,rd,'med')} <span class="eq">÷</span> <span style="font-size:1.1rem;font-weight:900;vertical-align:middle;color:var(--a2)">${g2}</span> <span class="eq">=</span> <span style="color:var(--muted)">?</span>`;
+        else pv.innerHTML=`${F(rn,rd,'med')} <span style="color:var(--ok);font-size:.85rem">(nicht kürzbar – nochmal eintragen)</span>`;
+      }
+      const arn=g('rn'),ard=g('rd');
+      if(isNaN(arn)||isNaN(ard)){fb.className='fbbox hi';fb.textContent=red?'✅ Schritt 1 OK! Jetzt kürzen.':'✅ Schritt 1 OK! Trage das Ergebnis nochmal ein.';return;}
+      if(arn>0&&ard>0&&arn*rrd===ard*rrn){
+        if(!isRed(arn,ard)){fb.className='fbbox pt';fb.innerHTML=`⚠️ Fast! ${arn}/${ard} kann noch durch ${gcd(arn,ard)} gekürzt werden!`;return;}
+        ok=true;msg=`✅ Perfekt! Ergebnis: ${rrn}/${rrd}`;
+      } else msg=`❌ Schritt 2 falsch! Ergebnis: ${rrn}/${rrd}`;
     }
   }
 
-  // ── UNGLEICH ADD/SUB ──
   else if(ex.type==='add-ungleich'||ex.type==='sub-ungleich'){
+    const {lv,n1,d1,n2,d2,lcm:L,f1,f2,fn1,fn2,rn,rd,rrn,rrd,red}=ex;
     const op=ex.type==='add-ungleich'?'+':'−';
+    const g2=red?gcd(rn,L):1;
 
-    // Step 1: kgV
-    const lcmIn=g('ans-lcm');
-    if(isNaN(lcmIn)||lcmIn!==ex.lcm){
-      if(isNaN(lcmIn)){fb.className='feedback-box hint';fb.textContent=`⚠️ Trage zuerst das kgV von ${ex.d1} und ${ex.d2} ein!`;return;}
-      fb.className='feedback-box wrong';fb.innerHTML=`❌ kgV falsch! kgV(${ex.d1}, ${ex.d2}) = <strong>${ex.lcm}</strong>`;return;
+    if(!ungleichState.step1OK){checkUngleichStep1();return;}
+    const usedLcm=ungleichState.confirmedLcm;
+    const expFn1=n1*(usedLcm/d1),expFn2=n2*(usedLcm/d2);
+    const finalG=gcd(Math.abs(expFn1+(op==='+'?expFn2:-expFn2)),usedLcm);
+    const expectedRaw=op==='+'?expFn1+expFn2:expFn1-expFn2;
+    const corrN=Math.abs(expectedRaw)/finalG,corrD=usedLcm/finalG;
+
+    // Step 2 verification
+    if(lv===1){
+      const afn1=g('fn1'),afn2=g('fn2');
+      if(isNaN(afn1)||isNaN(afn2)){fb.className='fbbox hi';fb.textContent='⚠️ Trage die neuen Zähler beider Brüche ein!';return;}
+      if(afn1!==expFn1){fb.className='fbbox ng';fb.innerHTML=`❌ Erster Zähler falsch! ${n1}×${usedLcm/d1}=${expFn1}`;return;}
+      if(afn2!==expFn2){fb.className='fbbox ng';fb.innerHTML=`❌ Zweiter Zähler falsch! ${n2}×${usedLcm/d2}=${expFn2}`;return;}
+    } else if(lv===2){
+      const ef1n=g('ef1n'),ef1d=g('ef1d'),ef2n=g('ef2n'),ef2d=g('ef2d');
+      const afn1=g('fn1'),afn2=g('fn2');
+      const ef1=usedLcm/d1,ef2=usedLcm/d2;
+      if(isNaN(ef1n)||isNaN(ef1d)){fb.className='fbbox hi';fb.textContent='⚠️ Erweiterungszahl für den 1. Bruch oben UND unten eintragen!';return;}
+      if(ef1n!==ef1){fb.className='fbbox ng';fb.innerHTML=`❌ Erweiterungszahl oben (1. Bruch) falsch! Richtig: ${ef1}`;return;}
+      if(ef1d!==ef1){fb.className='fbbox ng';fb.innerHTML=`❌ Erweiterungszahl unten (1. Bruch) falsch! Richtig: ${ef1}`;return;}
+      if(isNaN(ef2n)||isNaN(ef2d)){fb.className='fbbox hi';fb.textContent='✅ Erweiterungszahl 1 OK! Jetzt für den 2. Bruch.';return;}
+      if(ef2n!==ef2){fb.className='fbbox ng';fb.innerHTML=`❌ Erweiterungszahl oben (2. Bruch) falsch! Richtig: ${ef2}`;return;}
+      if(ef2d!==ef2){fb.className='fbbox ng';fb.innerHTML=`❌ Erweiterungszahl unten (2. Bruch) falsch! Richtig: ${ef2}`;return;}
+      if(isNaN(afn1)){fb.className='fbbox hi';fb.textContent='✅ Erweiterungszahlen OK! Jetzt den Zähler des 1. erweiterten Bruchs eintragen.';return;}
+      if(afn1!==expFn1){fb.className='fbbox ng';fb.innerHTML=`❌ Zähler des 1. erweiterten Bruchs falsch! ${n1}×${ef1}=${expFn1}`;return;}
+      if(isNaN(afn2)){fb.className='fbbox hi';fb.textContent='✅ Erster erweiterter Bruch OK! Jetzt den 2. Bruch.';return;}
+      if(afn2!==expFn2){fb.className='fbbox ng';fb.innerHTML=`❌ Zähler des 2. erweiterten Bruchs falsch! ${n2}×${ef2}=${expFn2}`;return;}
+    } else {
+      const on1=g('on1'),od1=g('od1'),ef1n=g('ef1n'),ef1d=g('ef1d');
+      const on2=g('on2'),od2=g('od2'),ef2n=g('ef2n'),ef2d=g('ef2d');
+      const afn1=g('fn1'),afd1=g('fd1'),afn2=g('fn2'),afd2=g('fd2');
+      const ef1=usedLcm/d1,ef2=usedLcm/d2;
+      if(isNaN(on1)||isNaN(od1)){fb.className='fbbox hi';fb.textContent='⚠️ Trage den 1. Ausgangsbruch (Zähler und Nenner) ein!';return;}
+      if(on1!==n1||od1!==d1){fb.className='fbbox ng';fb.innerHTML=`❌ 1. Ausgangsbruch falsch! Richtig: ${n1}/${d1}`;return;}
+      if(isNaN(ef1n)||isNaN(ef1d)){fb.className='fbbox hi';fb.textContent='✅ 1. Ausgangsbruch OK! Erweiterungszahl oben UND unten eintragen.';return;}
+      if(ef1n!==ef1){fb.className='fbbox ng';fb.innerHTML=`❌ Erweiterungszahl oben (1. Bruch) falsch! Richtig: ${ef1}`;return;}
+      if(ef1d!==ef1){fb.className='fbbox ng';fb.innerHTML=`❌ Erweiterungszahl unten (1. Bruch) falsch! Richtig: ${ef1}`;return;}
+      if(isNaN(afn1)||isNaN(afd1)){fb.className='fbbox hi';fb.textContent='✅ Jetzt das Ergebnis des 1. erweiterten Bruchs eintragen.';return;}
+      if(afn1!==expFn1||afd1!==usedLcm){fb.className='fbbox ng';fb.innerHTML=`❌ 1. erweiterter Bruch falsch! ${n1}×${ef1}=${expFn1}, Nenner=${usedLcm}`;return;}
+      if(isNaN(on2)||isNaN(od2)){fb.className='fbbox hi';fb.textContent='✅ Erster Bruch komplett! Jetzt den 2. Ausgangsbruch eintragen.';return;}
+      if(on2!==n2||od2!==d2){fb.className='fbbox ng';fb.innerHTML=`❌ 2. Ausgangsbruch falsch! Richtig: ${n2}/${d2}`;return;}
+      if(isNaN(ef2n)||isNaN(ef2d)){fb.className='fbbox hi';fb.textContent='✅ 2. Ausgangsbruch OK! Erweiterungszahl oben UND unten.';return;}
+      if(ef2n!==ef2){fb.className='fbbox ng';fb.innerHTML=`❌ Erweiterungszahl oben (2. Bruch) falsch! Richtig: ${ef2}`;return;}
+      if(ef2d!==ef2){fb.className='fbbox ng';fb.innerHTML=`❌ Erweiterungszahl unten (2. Bruch) falsch! Richtig: ${ef2}`;return;}
+      if(isNaN(afn2)||isNaN(afd2)){fb.className='fbbox hi';fb.textContent='✅ Jetzt das Ergebnis des 2. erweiterten Bruchs.';return;}
+      if(afn2!==expFn2||afd2!==usedLcm){fb.className='fbbox ng';fb.innerHTML=`❌ 2. erweiterter Bruch falsch! ${n2}×${ef2}=${expFn2}, Nenner=${usedLcm}`;return;}
     }
-    // Step 2: extended fractions
-    const fn1=g('ans-fn1'),fd1=g('ans-fd1'),fn2=g('ans-fn2'),fd2=g('ans-fd2');
-    if(isNaN(fn1)||isNaN(fd1)||isNaN(fn2)||isNaN(fd2)){fb.className='feedback-box hint';fb.textContent='✅ kgV richtig! Jetzt Schritt 2 ausfüllen.';return;}
-    if(fn1!==ex.fn1||fd1!==ex.lcm){fb.className='feedback-box wrong';fb.innerHTML=`❌ Erster Bruch falsch! ${ex.n1}·${ex.f1}=${ex.fn1} und ${ex.d1}·${ex.f1}=${ex.lcm}`;return;}
-    if(fn2!==ex.fn2||fd2!==ex.lcm){fb.className='feedback-box wrong';fb.innerHTML=`❌ Zweiter Bruch falsch! ${ex.n2}·${ex.f2}=${ex.fn2} und ${ex.d2}·${ex.f2}=${ex.lcm}`;return;}
-    // Show Schritt 3 preview
+
+    // Show step 3 preview WITHOUT answer
     const pv=document.getElementById('preview-sum');
-    if(pv)pv.innerHTML=`${F(ex.fn1,ex.lcm,'med')} <span class="op-sym">${op}</span> ${F(ex.fn2,ex.lcm,'med')} <span class="op-sym">=</span> ${F(ex.rn,ex.rd,'med')}`;
-    // Step 3: raw sum
-    const rawN=g('ans-raw-n'),rawD=g('ans-raw-d');
-    if(isNaN(rawN)||isNaN(rawD)){fb.className='feedback-box hint';fb.textContent='✅ Schritt 2 richtig! Jetzt addieren/subtrahieren.';return;}
-    if(rawN!==ex.rn||rawD!==ex.rd){fb.className='feedback-box wrong';fb.innerHTML=`❌ Schritt 3 falsch! ${ex.fn1} ${op} ${ex.fn2} = <strong>${ex.rn}</strong>, Nenner bleibt ${ex.lcm}`;return;}
-    // Step 4: reduced (or same if not reducible)
-    const rn=g('ans-rn'),rd=g('ans-rd');
-    if(isNaN(rn)||isNaN(rd)){
-      fb.className='feedback-box hint';
-      if(ex.reduced)fb.textContent='✅ Schritt 3 richtig! Jetzt noch kürzen.';
-      else fb.textContent='✅ Schritt 3 richtig! Das Ergebnis kann nicht weiter gekürzt werden – trage es unten nochmals ein.';
+    if(pv){
+      function Fs(n,d){return `<span class="frac med"><span class="fn">${n}</span><span class="fl"></span><span class="fd">${d}</span></span>`;}
+      pv.innerHTML=`${Fs(expFn1,usedLcm)} <span class="op" style="font-size:1.2rem">${op}</span> ${Fs(expFn2,usedLcm)} <span class="eq" style="font-size:1.2rem">=</span> <span style="color:var(--muted);font-size:1.2rem">?</span>`;
+    }
+
+    // Step 3: raw result
+    const rawN=g('raw-n'),rawD=g('raw-d');
+    if(isNaN(rawN)||isNaN(rawD)){fb.className='fbbox hi';fb.textContent=`✅ Schritt 2 richtig! Jetzt ${op==='+'?'addieren':'subtrahieren'} (Schritt 3).`;return;}
+    if(rawN!==Math.abs(expectedRaw)||rawD!==usedLcm){fb.className='fbbox ng';fb.innerHTML=`❌ Schritt 3 falsch! ${expFn1}${op==='+'?'+':'-'}${expFn2}=${Math.abs(expectedRaw)}, Nenner=${usedLcm}`;return;}
+
+    // Step 4: reduced result
+    const kn=g('rrn'),kd=g('rrd');
+    if(isNaN(kn)||isNaN(kd)){
+      fb.className='fbbox hi';
+      fb.textContent=finalG>1?'✅ Schritt 3 richtig! Kürze jetzt (Schritt 4).':'✅ Schritt 3 richtig! Trage das Ergebnis zur Bestätigung ein.';
       return;
     }
-    if(rn>0&&rd>0&&rn*ex.rrd===rd*ex.rrn){
-      if(!isReduced(rn,rd)){fb.className='feedback-box partial';fb.innerHTML=`⚠️ Fast! Kürze noch: ${rn}/${rd} durch ${gcd(rn,rd)}!`;return;}
-      correct=true;msg=`✅ Alle Schritte richtig! Ergebnis: ${ex.rrn}/${ex.rrd}`;
-    } else {msg=`❌ Letzter Schritt falsch! Ergebnis: ${ex.rrn}/${ex.rrd}`;}
+    if(kn>0&&kd>0&&kn*corrD===kd*corrN){
+      if(!isRed(kn,kd)){fb.className='fbbox pt';fb.textContent=`⚠️ Fast! ${kn}/${kd} kann noch durch ${gcd(kn,kd)} gekürzt werden!`;return;}
+      ok=true;msg=`✅ Perfekt! Ergebnis: ${corrN}/${corrD}`;
+    } else msg=`❌ Schritt 4 falsch! Ergebnis: ${corrN}/${corrD}`;
   }
 
-  // ── MAL-GANZ ──
   else if(ex.type==='mal-ganz'){
-    const lv=ex.scaffoldLevel;
-    const rn=g('ans-rn'),rd=g('ans-rd');
-    if(isNaN(rn)||isNaN(rd)){fb.className='feedback-box hint';fb.textContent='⚠️ Bitte das Ergebnis eintragen!';return;}
-    if(lv>=2){const fac=g('ans-factor');if(isNaN(fac)||fac!==ex.z){fb.className='feedback-box wrong';fb.innerHTML=`❌ Multiplikationszahl falsch! Es soll mit <strong>${ex.z}</strong> multipliziert werden.`;return;}}
-    if(lv>=3){const on=g('ans-on'),od=g('ans-od');if(isNaN(on)||isNaN(od)||on!==ex.n||od!==ex.d){fb.className='feedback-box wrong';fb.innerHTML=`❌ Ausgangsbruch falsch! Der Bruch ist <strong>${ex.n}/${ex.d}</strong>.`;return;}}
-    if(rn>0&&rd>0&&rn*ex.rrd===rd*ex.rrn){
-      if(!isReduced(rn,rd)){fb.className='feedback-box partial';fb.innerHTML=`⚠️ Fast! Kürze noch: ${rn}/${rd} durch ${gcd(rn,rd)}!`;return;}
-      correct=true;msg=`✅ Richtig! ${ex.n}·${ex.z}=${ex.rn}. Ergebnis: ${ex.rrn}/${ex.rrd}`;
-    } else {msg=`❌ Falsch! Zähler: ${ex.n}·${ex.z}=${ex.rn}, Nenner bleibt ${ex.d}. Ergebnis: ${ex.rrn}/${ex.rrd}`;}
+    const {lv,n,d,z,rn,rd,rrn,rrd,red}=ex;
+    if(lv===3){
+      const on=g('on'),od=g('od');
+      if(isNaN(on)||isNaN(od)){fb.className='fbbox hi';fb.textContent='⚠️ Trage den Ausgangsbruch (Zähler und Nenner) ein!';return;}
+      if(on!==n||od!==d){fb.className='fbbox ng';fb.innerHTML=`❌ Ausgangsbruch falsch! Richtig: ${n}/${d}`;return;}
+      const mf=g('mf');
+      if(isNaN(mf)){fb.className='fbbox hi';fb.textContent='✅ Ausgangsbruch richtig! Trage die Multiplikationszahl ein.';return;}
+      if(mf!==z){fb.className='fbbox ng';fb.innerHTML=`❌ Multiplikationszahl falsch! Richtig: ${z}`;return;}
+    } else if(lv===2){
+      const mf=g('mf');
+      if(isNaN(mf)){fb.className='fbbox hi';fb.textContent='⚠️ Trage die Multiplikationszahl in das Feld im Bruch ein!';return;}
+      if(mf!==z){fb.className='fbbox ng';fb.innerHTML=`❌ Multiplikationszahl falsch! Richtig: ${z}`;return;}
+    }
+    const arn=g('rn'),ard=g('rd');
+    if(isNaN(arn)||isNaN(ard)){fb.className='fbbox hi';fb.textContent='⚠️ Ergebnis eintragen!';return;}
+    if(arn!==rn||ard!==rd){fb.className='fbbox ng';fb.innerHTML=`❌ Ergebnis falsch! ${n}·${z}=${rn}, Nenner bleibt ${d}`;return;}
+    if(red){
+      const kn=g('rrn'),kd=g('rrd');
+      if(isNaN(kn)||isNaN(kd)){fb.className='fbbox hi';fb.textContent='✅ Richtig! Trage jetzt den vollständig gekürzten Bruch ein.';return;}
+      if(!isRed(kn,kd)){fb.className='fbbox pt';fb.textContent=`⚠️ Fast! ${kn}/${kd} kann noch weiter gekürzt werden!`;return;}
+      if(kn===rrn&&kd===rrd){ok=true;msg=`✅ Richtig! ${n}·${z}=${rn}, Ergebnis: ${rrn}/${rrd}`;}
+      else{fb.className='fbbox ng';fb.innerHTML=`❌ Kürzen falsch! Ergebnis: ${rrn}/${rrd}`;return;}
+    } else {ok=true;msg=`✅ Richtig! ${n}·${z}=${rn}, Nenner bleibt ${d}`;}
   }
 
-  // ── DURCH-GANZ ──
   else if(ex.type==='durch-ganz'){
-    const lv=ex.scaffoldLevel;
-    const rn=g('ans-rn'),rd=g('ans-rd');
-    if(isNaN(rn)||isNaN(rd)){fb.className='feedback-box hint';fb.textContent='⚠️ Bitte das Ergebnis eintragen!';return;}
-    if(lv>=2){const fac=g('ans-factor');if(isNaN(fac)||fac!==ex.z){fb.className='feedback-box wrong';fb.innerHTML=`❌ Divisor falsch! Es wird durch <strong>${ex.z}</strong> dividiert.`;return;}}
-    if(lv>=3){const on=g('ans-on'),od=g('ans-od');if(!isNaN(on)&&!isNaN(od)&&(on!==ex.n||od!==ex.d)){fb.className='feedback-box wrong';fb.innerHTML=`❌ Ausgangsbruch falsch! Der Bruch ist <strong>${ex.n}/${ex.d}</strong>.`;return;}}
-    if(rn>0&&rd>0&&rn*ex.rrd===rd*ex.rrn){
-      if(!isReduced(rn,rd)){fb.className='feedback-box partial';fb.innerHTML=`⚠️ Fast! Kürze noch durch ${gcd(rn,rd)}!`;return;}
-      correct=true;msg=`✅ Richtig! (${ex.way==='zähler'?`${ex.n}÷${ex.z}=${ex.rn}`:`${ex.d}·${ex.z}=${ex.rd}`}) Ergebnis: ${ex.rrn}/${ex.rrd}`;
-    } else {msg=`❌ Falsch! ${ex.way==='zähler'?`Zähler ${ex.n}÷${ex.z}=${ex.rn}, Nenner bleibt ${ex.d}`:`Nenner ${ex.d}·${ex.z}=${ex.rd}, Zähler bleibt ${ex.n}`}. Ergebnis: ${ex.rrn}/${ex.rrd}`;}
+    const {lv,n,d,z,way,rn,rd,rrn,rrd,red}=ex;const isZ=way==='z';
+    if(lv===3){
+      const on=g('on'),od=g('od');
+      if(isNaN(on)||isNaN(od)){fb.className='fbbox hi';fb.textContent='⚠️ Trage den Ausgangsbruch (Zähler und Nenner) ein!';return;}
+      if(on!==n||od!==d){fb.className='fbbox ng';fb.innerHTML=`❌ Ausgangsbruch falsch! Richtig: ${n}/${d}`;return;}
+      const df=g('df');
+      if(isNaN(df)){fb.className='fbbox hi';fb.textContent='✅ Ausgangsbruch richtig! Trage die Divisionszahl ein.';return;}
+      if(df!==z){fb.className='fbbox ng';fb.innerHTML=`❌ Divisionszahl falsch! Richtig: ${z}`;return;}
+    } else if(lv===2){
+      const df=g('df');
+      if(isNaN(df)){fb.className='fbbox hi';fb.textContent='⚠️ Trage die Divisionszahl ein!';return;}
+      if(df!==z){fb.className='fbbox ng';fb.innerHTML=`❌ Divisionszahl falsch! Richtig: ${z}`;return;}
+    }
+    const arn=g('rn'),ard=g('rd');
+    if(isNaN(arn)||isNaN(ard)){fb.className='fbbox hi';fb.textContent='⚠️ Ergebnis eintragen!';return;}
+    if(arn!==rn||ard!==rd){fb.className='fbbox ng';fb.innerHTML=`❌ Ergebnis falsch! ${isZ?`${n}÷${z}=${rn}`:`${d}·${z}=${rd}`}`;return;}
+    if(red){
+      const kn=g('rrn'),kd=g('rrd');
+      if(isNaN(kn)||isNaN(kd)){fb.className='fbbox hi';fb.textContent='✅ Richtig! Trage jetzt den vollständig gekürzten Bruch ein.';return;}
+      if(!isRed(kn,kd)){fb.className='fbbox pt';fb.textContent=`⚠️ Fast! ${kn}/${kd} kann noch weiter gekürzt werden!`;return;}
+      if(kn===rrn&&kd===rrd){ok=true;msg=`✅ Richtig! ${isZ?`${n}÷${z}=${rn}`:`${d}·${z}=${rd}`}, Ergebnis: ${rrn}/${rrd}`;}
+      else{fb.className='fbbox ng';fb.innerHTML=`❌ Kürzen falsch! Ergebnis: ${rrn}/${rrd}`;return;}
+    } else {ok=true;msg=`✅ Richtig! ${isZ?`${n}÷${z}=${rn}`:`${d}·${z}=${rd}`}`;}
   }
 
-  if(correct){
-    fb.className='feedback-box correct';fb.textContent=msg;
-    addScore(10+(state.streak>=4?5:0),btnCheck);
-    state.sessionCorrect++;
-    btnCheck.style.display='none';btnNext.style.display='inline-block';
-    document.querySelectorAll('#exercise-content input').forEach(i=>i.disabled=true);
+  if(ok){
+    fb.className='fbbox ok';fb.textContent=msg;
+    addScore(10+(S.streak>=4?5:0),bc);S.sOk++;
+    bc.style.display='none';bn.style.display='inline-block';
+    document.querySelectorAll('#ex-content input').forEach(i=>i.disabled=true);
   } else {
-    fb.className='feedback-box wrong';fb.textContent=msg;resetStreak();state.sessionWrong++;
+    fb.className='fbbox ng';fb.textContent=msg;resetStreak();S.sNg++;
   }
 }
 
-function showHint(){
-  const ex=state.exercises[state.exIndex];
-  const fb=document.getElementById('feedback');state.hintsUsed++;fb.className='feedback-box hint';
-  if(ex.type==='erweitern')fb.textContent=`💡 Faktor=${ex.factor}. ${ex.n}·${ex.factor}=${ex.rn} und ${ex.d}·${ex.factor}=${ex.rd}`;
-  else if(ex.type==='kuerzen')fb.textContent=`💡 ggT(${ex.n},${ex.d})=${ex.gcd_val}. Kürze durch ${ex.gcd_val}!`;
-  else if(ex.type==='add-gleich'||ex.type==='sub-gleich'){const op=ex.type==='add-gleich'?'+':'−';fb.textContent=`💡 ${ex.n1}${op}${ex.n2}=${ex.rn}, Nenner bleibt ${ex.den}. Ergebnis: ${ex.rrn}/${ex.rrd}`;}
-  else if(ex.type==='add-ungleich'||ex.type==='sub-ungleich')fb.textContent=`💡 kgV(${ex.d1},${ex.d2})=${ex.lcm}. Erster ·${ex.f1}→${ex.fn1}/${ex.lcm}, zweiter ·${ex.f2}→${ex.fn2}/${ex.lcm}. Ergebnis: ${ex.rrn}/${ex.rrd}`;
-  else if(ex.type==='mal-ganz')fb.textContent=`💡 ${ex.n}·${ex.z}=${ex.rn}, Nenner bleibt ${ex.d}. Ergebnis: ${ex.rrn}/${ex.rrd}`;
-  else if(ex.type==='durch-ganz')fb.textContent=ex.way==='zähler'?`💡 ${ex.n}÷${ex.z}=${ex.rn}, Nenner bleibt ${ex.d}. Ergebnis: ${ex.rrn}/${ex.rrd}`:`💡 Nenner ${ex.d}·${ex.z}=${ex.rd}, Zähler bleibt ${ex.n}. Ergebnis: ${ex.rrn}/${ex.rrd}`;
+function doHint(){
+  const ex=S.exercises[S.exIdx];
+  const fb=document.getElementById('fb');
+  const hb=document.querySelector('.bhint');
+  subScore(HINT_COST,hb);fb.className='fbbox hi';
+  if(ex.type==='erweitern')fb.textContent=`💡 Faktor=${ex.factor}. ${ex.n}·${ex.factor}=${ex.rn}, ${ex.d}·${ex.factor}=${ex.rd}`;
+  else if(ex.type==='kuerzen')fb.innerHTML=`💡 ggT(${ex.n},${ex.d})=<strong>${ex.gv}</strong>. Teile durch ${ex.gv}!`;
+  else if(ex.type==='add-gleich'||ex.type==='sub-gleich'){const op=ex.type==='add-gleich'?'+':'−';fb.textContent=`💡 ${ex.n1}${op}${ex.n2}=${ex.rn}, Nenner ${ex.den}. Ergebnis: ${ex.rrn}/${ex.rrd}`;}
+  else if(ex.type==='add-ungleich'||ex.type==='sub-ungleich')fb.textContent=`💡 kgV=${ex.lcm}. Erster ·${ex.f1}→${ex.fn1}/${ex.lcm}, zweiter ·${ex.f2}→${ex.fn2}/${ex.lcm}. Ergebnis: ${ex.rrn}/${ex.rrd}`;
+  else if(ex.type==='mal-ganz')fb.textContent=`💡 ${ex.n}·${ex.z}=${ex.rn}, Nenner ${ex.d}. Ergebnis: ${ex.rrn}/${ex.rrd}`;
+  else if(ex.type==='durch-ganz')fb.textContent=ex.way==='z'?`💡 ${ex.n}÷${ex.z}=${ex.rn}, Nenner ${ex.d}. Ergebnis: ${ex.rrn}/${ex.rrd}`:`💡 Nenner ${ex.d}·${ex.z}=${ex.rd}. Ergebnis: ${ex.rrn}/${ex.rrd}`;
 }
 
-function nextExercise(){state.exIndex++;renderExercise();}
+function nextEx(){S.exIdx++;renderEx();}
 
 function showResults(){
-  const total=state.sessionCorrect+state.sessionWrong;
-  const pct=total>0?Math.round(state.sessionCorrect/total*100):0;
-  const medal=pct>=90?'🥇':pct>=70?'🥈':'🥉';
-  const stars=pct>=90?'⭐⭐⭐':pct>=70?'⭐⭐':'⭐';
-  document.getElementById('results-content').innerHTML=`<div class="medal">${medal}</div>
-  <div class="results-title" style="color:${pct>=90?'var(--gold)':pct>=70?'#c0c0c0':'var(--text-muted)'}">${pct>=90?'Ausgezeichnet!':pct>=70?'Sehr gut!':'Weiter üben!'}</div>
-  <div style="font-size:2.4rem;margin-bottom:16px">${stars}</div>
-  <div class="results-stats">
-    <div class="results-stat"><div class="results-stat-val">${state.sessionCorrect}</div><div class="results-stat-label">Richtig</div></div>
-    <div class="results-stat"><div class="results-stat-val" style="color:var(--wrong)">${state.sessionWrong}</div><div class="results-stat-label">Falsch</div></div>
-    <div class="results-stat"><div class="results-stat-val">${pct}%</div><div class="results-stat-label">Quote</div></div>
+  const tot=S.sOk+S.sNg,pct=tot>0?Math.round(S.sOk/tot*100):0;
+  const med=pct>=90?'🥇':pct>=70?'🥈':'🥉';
+  document.getElementById('res-content').innerHTML=`<div class="medal">${med}</div>
+  <div style="font-size:1.7rem;font-weight:900;margin:8px 0;color:${pct>=90?'var(--gold)':pct>=70?'#c0c0c0':'var(--muted)'}}">${pct>=90?'Ausgezeichnet!':pct>=70?'Sehr gut!':'Weiter üben!'}</div>
+  <div style="font-size:2.2rem;margin-bottom:14px">${pct>=90?'⭐⭐⭐':pct>=70?'⭐⭐':'⭐'}</div>
+  <div class="rstat">
+    <div><div class="rsval">${S.sOk}</div><div class="rslbl">Richtig</div></div>
+    <div><div class="rsval" style="color:var(--err)">${S.sNg}</div><div class="rslbl">Falsch</div></div>
+    <div><div class="rsval">${pct}%</div><div class="rslbl">Quote</div></div>
   </div>
-  <button class="btn-home" onclick="showScreen('home')">🏠 Zurück zum Menü</button>`;
-  if(pct>=70)launchKonfetti();showScreen('results');
+  <button class="bhome" onclick="showScreen('home')">🏠 Menü</button>`;
+  if(pct>=70)konfetti();showScreen('results');
 }
 
-// ── GAME 1: BLITZ-QUIZ ──
-let quizState={};
-function shuffleArr(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+// ═══════════════════════════════════════════════
+// GAME DISPATCHER
+// ═══════════════════════════════════════════════
+function startGame(t){
+  if(t==='quiz')startQuiz();
+  else if(t==='match')startMatch();
+  else if(t==='rennen')startRennen();
+  else if(t==='teiler')startTeiler();
+  else if(t==='vielfache')startVielfache();
+  else if(t==='sortier')startSortier();
+}
 
+// ═══════════════════════════════════════════════
+// GAME 1: BLITZ-QUIZ
+// ═══════════════════════════════════════════════
 function buildQuizQs(){
   const qs=[];
-  // Gleichnamige add – ungekürzt im Spiel (mental einfacher)
-  [[1,4,2],[1,5,2],[2,7,3],[3,8,2],[1,6,4],[4,9,3],[1,10,6],[3,11,4],[5,12,6],[2,13,5]].forEach(([n1,d,n2])=>{
+  shuffle([[1,4,2],[1,5,2],[2,7,3],[3,8,2],[1,6,4],[4,9,3],[1,10,6],[3,11,4],[5,12,6],[2,13,5]]).forEach(([n1,d,n2])=>{
     const s=n1+n2;const c=`${s}/${d}`;
-    qs.push({q:`${n1}/${d} + ${n2}/${d} = ?`,correct:c,choices:shuffleArr([c,`${s+1}/${d}`,`${s}/${d+1}`,`${n1+n2}/${d+d}`])});
+    qs.push({q:`${n1}/${d} + ${n2}/${d} = ?`,correct:c,choices:shuffle([c,`${s+1}/${d}`,`${s}/${d+1}`,`${n1+n2}/${d+d}`])});
   });
-  // Gleichnamige sub – ungekürzt
-  [[3,4,2],[5,6,1],[7,8,4],[5,7,2],[9,10,2],[7,9,2],[11,12,4],[8,11,3],[7,10,4]].forEach(([n1,d,n2])=>{
+  shuffle([[3,4,2],[5,6,1],[7,8,4],[5,7,2],[9,10,2],[7,9,2],[11,12,4],[8,11,3],[7,10,4]]).forEach(([n1,d,n2])=>{
     const s=n1-n2;const c=`${s}/${d}`;
-    qs.push({q:`${n1}/${d} − ${n2}/${d} = ?`,correct:c,choices:shuffleArr([c,`${s+1}/${d}`,`${s}/${d+1}`,`${Math.abs(n1-n2)+1}/${d}`])});
+    qs.push({q:`${n1}/${d} − ${n2}/${d} = ?`,correct:c,choices:shuffle([c,`${s+1}/${d}`,`${s}/${d+1}`,`${Math.abs(n1-n2)+1}/${d}`])});
   });
-  // Kürzen
-  [[2,4],[3,6],[4,8],[6,9],[6,8],[8,12],[9,12],[10,15],[4,6],[6,10]].forEach(([n,d])=>{
+  shuffle([[2,4],[3,6],[4,8],[6,9],[6,8],[8,12],[9,12],[10,15],[4,6],[6,10]]).forEach(([n,d])=>{
     const g2=gcd(n,d),rn=n/g2,rd=d/g2;const c=`${rn}/${rd}`;
-    qs.push({q:`${n}/${d} kürzen = ?`,correct:c,choices:shuffleArr([c,`${rn+1}/${rd}`,`${rn}/${rd+1}`,`${n}/${d}`])});
+    qs.push({q:`${n}/${d} kürzen = ?`,correct:c,choices:shuffle([c,`${rn+1}/${rd}`,`${rn}/${rd+1}`,`${n}/${d}`])});
   });
-  return shuffleArr(qs).slice(0,15);
+  return shuffle(qs).slice(0,15);
 }
 
-function startGame(t){if(t==='quiz')startQuiz();else if(t==='zuordnung')startZuordnung();else if(t==='rennen')startRennen();}
-function startQuiz(){quizState={questions:buildQuizQs(),index:0,score:0,correct:0,timer:null,timeLeft:0};showScreen('quiz');renderQuizQ();}
+function startQuiz(){qSt={qs:buildQuizQs(),idx:0,score:0,ok:0,ti:null,tl:0};showScreen('quiz');renderQuizQ();}
 function renderQuizQ(){
-  const q=quizState.questions[quizState.index];if(!q){endQuiz();return;}
-  quizState.timeLeft=15;clearInterval(quizState.timer);
+  const q=qSt.qs[qSt.idx];if(!q){endQuiz();return;}
+  qSt.tl=15;clearInterval(qSt.ti);
   document.getElementById('quiz-content').innerHTML=`
-  <div class="quiz-q-box">
-    <div class="exercise-label">Frage ${quizState.index+1}/${quizState.questions.length} — Punkte: <strong>${quizState.score}</strong></div>
-    <div class="quiz-timer" id="q-timer">15</div>
-    <div style="font-size:1.4rem;font-weight:900;margin:6px 0">${q.q}</div>
+  <div class="qqbox">
+    <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted)">Frage ${qSt.idx+1}/${qSt.qs.length} — Punkte: ${qSt.score}</div>
+    <div class="qtmr" id="qtmr">15</div>
+    <div style="font-size:1.3rem;font-weight:900;margin:5px 0">${q.q}</div>
   </div>
-  <div class="choices-grid">${q.choices.map((c,i)=>`<button class="choice-btn" id="choice-${i}" onclick="selectChoice(${i},'${q.correct}')">${c}</button>`).join('')}</div>`;
-  quizState.timer=setInterval(()=>{
-    quizState.timeLeft--;const te=document.getElementById('q-timer');if(!te){clearInterval(quizState.timer);return;}
-    te.textContent=quizState.timeLeft;if(quizState.timeLeft<=4)te.className='quiz-timer urgent';
-    if(quizState.timeLeft<=0){clearInterval(quizState.timer);timeOutQuiz(q.correct);}
+  <div class="cgrid">${q.choices.map((c,i)=>`<button class="cbtn" id="cb${i}" onclick="selChoice(${i},'${q.correct}')">${c}</button>`).join('')}</div>`;
+  qSt.ti=setInterval(()=>{
+    qSt.tl--;const te=document.getElementById('qtmr');if(!te){clearInterval(qSt.ti);return;}
+    te.textContent=qSt.tl;if(qSt.tl<=4)te.className='qtmr urg';
+    if(qSt.tl<=0){clearInterval(qSt.ti);quizTimeout(q.correct);}
   },1000);
 }
-function selectChoice(i,correct){
-  clearInterval(quizState.timer);const q=quizState.questions[quizState.index];
-  document.querySelectorAll('.choice-btn').forEach(b=>b.disabled=true);
-  const ci=q.choices.indexOf(correct);if(ci>=0)document.getElementById('choice-'+ci).classList.add('correct-choice');
-  if(q.choices[i]===correct){document.getElementById('choice-'+i).classList.add('correct-choice');const pts=10+quizState.timeLeft*2;quizState.score+=pts;quizState.correct++;addScore(pts,document.getElementById('choice-'+i));}
-  else{document.getElementById('choice-'+i).classList.add('wrong-choice');resetStreak();}
-  setTimeout(()=>{quizState.index++;renderQuizQ();},1400);
+function selChoice(i,correct){
+  clearInterval(qSt.ti);const q=qSt.qs[qSt.idx];
+  document.querySelectorAll('.cbtn').forEach(b=>b.disabled=true);
+  const ci=q.choices.indexOf(correct);if(ci>=0)document.getElementById('cb'+ci).classList.add('cok');
+  if(q.choices[i]===correct){document.getElementById('cb'+i).classList.add('cok');const pts=10+qSt.tl*2;qSt.score+=pts;qSt.ok++;addScore(pts,document.getElementById('cb'+i));}
+  else{document.getElementById('cb'+i).classList.add('cng');resetStreak();}
+  setTimeout(()=>{qSt.idx++;renderQuizQ();},1400);
 }
-function timeOutQuiz(correct){document.querySelectorAll('.choice-btn').forEach(b=>b.disabled=true);const q=quizState.questions[quizState.index];const ci=q.choices.indexOf(correct);if(ci>=0)document.getElementById('choice-'+ci).classList.add('correct-choice');setTimeout(()=>{quizState.index++;renderQuizQ();},1400);}
-function endQuiz(){const pct=Math.round(quizState.correct/quizState.questions.length*100);document.getElementById('quiz-content').innerHTML=`<div style="text-align:center;padding:36px 0"><div style="font-size:3.5rem">${pct>=90?'🥇':pct>=70?'🥈':'🥉'}</div><div style="font-size:1.7rem;font-weight:900;margin:8px 0">Quiz beendet!</div><div style="color:var(--text-muted);margin-bottom:18px">${quizState.correct}/${quizState.questions.length} richtig — ${quizState.score} Punkte</div><button class="btn-home" onclick="showScreen('home')">🏠 Menü</button><button class="btn-check" style="margin-left:10px" onclick="startQuiz()">🔄 Nochmal</button></div>`;if(pct>=70)launchKonfetti();}
+function quizTimeout(correct){
+  document.querySelectorAll('.cbtn').forEach(b=>b.disabled=true);
+  const q=qSt.qs[qSt.idx];const ci=q.choices.indexOf(correct);if(ci>=0)document.getElementById('cb'+ci).classList.add('cok');
+  setTimeout(()=>{qSt.idx++;renderQuizQ();},1400);
+}
+function endQuiz(){
+  const pct=Math.round(qSt.ok/qSt.qs.length*100);
+  document.getElementById('quiz-content').innerHTML=`<div style="text-align:center;padding:32px 0"><div style="font-size:3.5rem">${pct>=90?'🥇':pct>=70?'🥈':'🥉'}</div><div style="font-size:1.6rem;font-weight:900;margin:8px 0">Quiz beendet!</div><div style="color:var(--muted);margin-bottom:16px">${qSt.ok}/${qSt.qs.length} — ${qSt.score} Pkt</div><button class="bhome" onclick="showScreen('home')">🏠 Menü</button><button class="bcheck" style="margin-left:9px" onclick="startQuiz()">🔄 Nochmal</button></div>`;
+  if(pct>=70)konfetti();
+}
 
-// ── GAME 2: BRUCH-MATCH ──
-let matchState={};
-function buildMatchPairs(){return shuffleArr([{l:'1/2',r:'2/4'},{l:'1/3',r:'2/6'},{l:'2/3',r:'4/6'},{l:'3/4',r:'6/8'},{l:'1/4',r:'2/8'},{l:'2/5',r:'4/10'},{l:'3/5',r:'6/10'},{l:'1/6',r:'2/12'},{l:'5/6',r:'10/12'},{l:'1/8',r:'2/16'},{l:'1/5',r:'3/15'},{l:'4/5',r:'8/10'},{l:'2/7',r:'4/14'},{l:'5/8',r:'10/16'},{l:'3/7',r:'6/14'}]).slice(0,6);}
-function startZuordnung(){matchState={pairs:buildMatchPairs(),round:1,score:0,matched:0,selectedLeft:null,done:[]};showScreen('zuordnung');renderZuordnung();}
-function renderZuordnung(){
-  const rights=shuffleArr(matchState.pairs.map((p,i)=>({id:i,val:p.r})));
-  document.getElementById('zuordnung-content').innerHTML=`<div style="text-align:center;margin-bottom:12px"><div style="font-size:1.15rem;font-weight:900">🃏 Bruch-Match — Runde ${matchState.round}/3</div><div style="color:var(--text-muted);font-size:.78rem;margin-top:3px">Klicke links einen Bruch, dann rechts den gleichwertigen!</div><div style="margin-top:6px;color:var(--gold)">Punkte: ${matchState.score}</div></div>
-  <div class="duell-grid"><div class="duell-col"><h3>Brüche</h3><div class="duell-items">${matchState.pairs.map((p,i)=>`<div class="duell-item" id="left-${i}" onclick="selectMatch('left',${i})">${p.l}</div>`).join('')}</div></div>
-  <div class="duell-col"><h3>Gleichwertige</h3><div class="duell-items">${rights.map(r=>`<div class="duell-item" id="right-${r.id}" onclick="selectMatch('right',${r.id})">${r.val}</div>`).join('')}</div></div></div>
-  <div id="match-fb" style="text-align:center;font-size:.9rem;font-weight:700;min-height:26px;margin-top:7px"></div>`;
+// ═══════════════════════════════════════════════
+// GAME 2: BRUCH-MATCH
+// ═══════════════════════════════════════════════
+function startMatch(){
+  matchSt={pairs:shuffle([{l:'1/2',r:'2/4'},{l:'1/3',r:'2/6'},{l:'2/3',r:'4/6'},{l:'3/4',r:'6/8'},{l:'1/4',r:'2/8'},{l:'2/5',r:'4/10'},{l:'3/5',r:'6/10'},{l:'1/6',r:'2/12'},{l:'5/6',r:'10/12'},{l:'1/8',r:'2/16'},{l:'1/5',r:'3/15'},{l:'4/5',r:'8/10'},{l:'2/7',r:'4/14'},{l:'5/8',r:'10/16'}]).slice(0,6),round:1,score:0,matched:0,selL:null,done:[]};
+  showScreen('match');renderMatch();
 }
-function selectMatch(side,id){
-  if(matchState.done.includes(id))return;
-  if(side==='left'){document.querySelectorAll('[id^="left-"]').forEach(el=>el.classList.remove('selected'));matchState.selectedLeft=id;const el=document.getElementById('left-'+id);if(el)el.classList.add('selected');}
-  else{if(matchState.selectedLeft===null)return;const leftId=matchState.selectedLeft;const le=document.getElementById('left-'+leftId);const re=document.getElementById('right-'+id);
-    if(leftId===id){if(le)le.classList.add('matched-ok');if(re)re.classList.add('matched-ok');if(le)le.onclick=null;if(re)re.onclick=null;matchState.done.push(id);matchState.score+=15;addScore(15,re||document.getElementById('zuordnung-content'));document.getElementById('match-fb').innerHTML=`<span style="color:var(--correct)">✅ ${matchState.pairs[id].l} = ${matchState.pairs[id].r} ✓</span>`;matchState.matched++;
-      if(matchState.matched===matchState.pairs.length){setTimeout(()=>{matchState.round++;if(matchState.round>3)showMatchEnd();else{launchKonfetti();matchState.pairs=buildMatchPairs();matchState.matched=0;matchState.done=[];matchState.selectedLeft=null;renderZuordnung();}},1200);}
-    }else{if(re)re.classList.add('matched-err');document.getElementById('match-fb').innerHTML=`<span style="color:var(--wrong)">❌ Nicht gleich! Versuche nochmal.</span>`;setTimeout(()=>{if(re)re.classList.remove('matched-err');},700);resetStreak();}
-    matchState.selectedLeft=null;document.querySelectorAll('.duell-item.selected').forEach(el=>el.classList.remove('selected'));
+function renderMatch(){
+  const rights=shuffle(matchSt.pairs.map((p,i)=>({id:i,val:p.r})));
+  document.getElementById('match-content').innerHTML=`<div style="text-align:center;margin-bottom:11px"><div style="font-size:1.1rem;font-weight:900">🃏 Bruch-Match — Runde ${matchSt.round}/3</div><div style="color:var(--muted);font-size:.75rem;margin-top:2px">Links klicken, rechts den gleichwertigen!</div><div style="margin-top:5px;color:var(--gold)">Punkte: ${matchSt.score}</div></div>
+  <div class="dgrid"><div class="dcol"><h3>Brüche</h3><div class="ditems">${matchSt.pairs.map((p,i)=>`<div class="ditem" id="ml${i}" onclick="selMatch('l',${i})">${p.l}</div>`).join('')}</div></div>
+  <div class="dcol"><h3>Gleichwertige</h3><div class="ditems">${rights.map(r=>`<div class="ditem" id="mr${r.id}" onclick="selMatch('r',${r.id})">${r.val}</div>`).join('')}</div></div></div>
+  <div id="mfb" style="text-align:center;font-size:.88rem;font-weight:700;min-height:24px;margin-top:6px"></div>`;
+}
+function selMatch(side,id){
+  if(matchSt.done.includes(id))return;
+  if(side==='l'){document.querySelectorAll('[id^="ml"]').forEach(e=>e.classList.remove('sel'));matchSt.selL=id;document.getElementById('ml'+id)?.classList.add('sel');}
+  else{
+    if(matchSt.selL===null)return;const li=matchSt.selL;const le=document.getElementById('ml'+li);const re=document.getElementById('mr'+id);
+    if(li===id){le?.classList.add('mok');re?.classList.add('mok');le&&(le.onclick=null);re&&(re.onclick=null);matchSt.done.push(id);matchSt.score+=15;addScore(15,re||document.getElementById('match-content'));document.getElementById('mfb').innerHTML=`<span style="color:var(--ok)">✅ ${matchSt.pairs[id].l} = ${matchSt.pairs[id].r}</span>`;matchSt.matched++;
+      if(matchSt.matched===matchSt.pairs.length){setTimeout(()=>{matchSt.round++;if(matchSt.round>3)endMatch();else{konfetti();matchSt.pairs=shuffle([{l:'1/2',r:'2/4'},{l:'1/3',r:'2/6'},{l:'2/3',r:'4/6'},{l:'3/4',r:'6/8'},{l:'1/4',r:'2/8'},{l:'2/5',r:'4/10'},{l:'3/5',r:'6/10'},{l:'5/6',r:'10/12'}]).slice(0,6);matchSt.matched=0;matchSt.done=[];matchSt.selL=null;renderMatch();}},1200);}
+    }else{re?.classList.add('mng');document.getElementById('mfb').innerHTML=`<span style="color:var(--err)">❌ Nicht gleich!</span>`;setTimeout(()=>re?.classList.remove('mng'),700);resetStreak();}
+    matchSt.selL=null;document.querySelectorAll('.ditem.sel').forEach(e=>e.classList.remove('sel'));
   }
 }
-function showMatchEnd(){document.getElementById('zuordnung-content').innerHTML=`<div style="text-align:center;padding:36px 0"><div style="font-size:3.5rem">🏆</div><div style="font-size:1.7rem;font-weight:900;margin:8px 0">Alle 3 Runden geschafft!</div><div style="color:var(--gold);margin-bottom:18px">${matchState.score} Punkte</div><button class="btn-home" onclick="showScreen('home')">🏠 Menü</button><button class="btn-check" style="margin-left:10px" onclick="startZuordnung()">🔄 Nochmal</button></div>`;launchKonfetti();}
+function endMatch(){document.getElementById('match-content').innerHTML=`<div style="text-align:center;padding:32px 0"><div style="font-size:3.5rem">🏆</div><div style="font-size:1.6rem;font-weight:900;margin:8px 0">Alle 3 Runden!</div><div style="color:var(--gold);margin-bottom:16px">${matchSt.score} Punkte</div><button class="bhome" onclick="showScreen('home')">🏠 Menü</button><button class="bcheck" style="margin-left:9px" onclick="startMatch()">🔄 Nochmal</button></div>`;konfetti();}
 
-// ── GAME 3: RAKETENRENNEN (slow CPU, with step display, ungekürzte Ergebnisse ok) ──
+// ═══════════════════════════════════════════════
+// GAME 3: RAKETENRENNEN
+// ═══════════════════════════════════════════════
 function buildRaceQs(){
   const qs=[];
-  [[1,4,1],[2,5,1],[1,6,2],[3,8,3],[4,9,2],[3,11,5],[1,7,2],[5,12,3],[1,10,3],[2,13,4]].forEach(([n1,d,n2])=>{const s=n1+n2;qs.push({type:'add-gleich',label:`${n1}/${d} + ${n2}/${d}`,n1,n2,den:d,rrn:s,rrd:d});});
-  [[3,4,1],[5,7,2],[7,9,4],[5,6,1],[9,10,3],[7,8,3],[11,13,4],[8,11,3],[5,8,1]].forEach(([n1,d,n2])=>{const s=n1-n2;qs.push({type:'sub-gleich',label:`${n1}/${d} − ${n2}/${d}`,n1,n2,den:d,rrn:s,rrd:d});});
-  [[2,4,2],[3,6,3],[4,8,4],[6,8,2],[6,9,3],[8,12,4],[6,10,2],[9,12,3],[10,15,5],[12,16,4]].forEach(([n,d,gv])=>{qs.push({type:'kuerzen',label:`${n}/${d} kürzen`,n,d,gcd_val:gv,rrn:n/gv,rrd:d/gv});});
-  return shuffleArr(qs).slice(0,18);
-}
-function startRennen(){
-  clearInterval(raceState.cpuInterval);
-  raceState={questions:buildRaceQs(),index:0,playerScore:0,cpuScore:0,goal:18,cpuInterval:null};
-  showScreen('rennen');renderRennen();
-  // CPU: +1 alle 9 Sekunden
-  raceState.cpuInterval=setInterval(()=>{
-    if(raceState.cpuScore<raceState.goal){raceState.cpuScore+=1;updateRaceBars();}
-    else{clearInterval(raceState.cpuInterval);setTimeout(()=>endRennen(false),400);}
-  },9000);
-}
-function renderRennen(){
-  const ex=raceState.questions[raceState.index%raceState.questions.length];
-  let phaseHtml='';
-  if(ex.type==='add-gleich'||ex.type==='sub-gleich'){
-    const op=ex.type==='add-gleich'?'+':'−';
-    phaseHtml=`<div class="race-phase">
-      ${F(ex.n1,ex.den,'med')} <span class="op-sym">${op}</span> ${F(ex.n2,ex.den,'med')}
-      <span class="op-sym">=</span>
-      <span class="frac med"><span class="fn">${ex.n1} ${op} ${ex.n2}</span><span class="fl"></span><span class="fd">${ex.den}</span></span>
-      <span class="op-sym">=</span>
-      ${fracInp('race-rn','race-rd')}
-    </div>`;
-  } else if(ex.type==='kuerzen'){
-    phaseHtml=`<div class="race-phase">
-      ${F(ex.n,ex.d,'med')} <span class="op-sym">=</span>
-      ${Fbook_div(ex.n,ex.d,ex.gcd_val)}
-      <span class="op-sym">=</span>
-      ${fracInp('race-rn','race-rd')}
-    </div>`;
-  }
-  document.getElementById('rennen-content').innerHTML=`
-  <div style="text-align:center;margin-bottom:10px">
-    <div style="font-size:1.1rem;font-weight:900">🚀 Raketenrennen</div>
-    <div style="color:var(--text-muted);font-size:.72rem">CPU: +1 alle 9 Sekunden — Du: +2 pro richtiger Antwort</div>
-  </div>
-  <div class="race-track">
-    <div class="race-bg-inner"></div>
-    <div class="race-line">
-      <span class="race-label">🧑 Du</span>
-      <div class="race-bar-wrap">
-        <div class="race-bar" id="bar-player" style="width:${raceState.playerScore/raceState.goal*100}%;--bc1:var(--accent5);--bc2:var(--accent3)"></div>
-        <span class="race-score-badge">${raceState.playerScore}/${raceState.goal}</span>
-        <span class="finish-flag">🏁</span>
-      </div>
-    </div>
-    <div class="race-line">
-      <span class="race-label">🤖 CPU</span>
-      <div class="race-bar-wrap">
-        <div class="race-bar" id="bar-cpu" style="width:${raceState.cpuScore/raceState.goal*100}%;--bc1:var(--wrong);--bc2:var(--accent1)"></div>
-        <span class="race-score-badge">${raceState.cpuScore}/${raceState.goal}</span>
-        <span class="finish-flag">🏁</span>
-      </div>
-    </div>
-  </div>
-  <div class="race-question">
-    <div class="race-q-text">${ex.label} = ?</div>
-    <div class="race-input-row">${phaseHtml}</div>
-    <div style="text-align:center;margin-top:9px"><button class="race-submit" onclick="submitRace()">✓ Prüfen</button></div>
-    <div class="race-feedback" id="race-fb"></div>
-  </div>`;
-  const fi=document.querySelector('#rennen-content input');if(fi)fi.focus();
-}
-function updateRaceBars(){
-  ['player','cpu'].forEach(who=>{
-    const bar=document.getElementById('bar-'+who);if(!bar)return;
-    const score=who==='player'?raceState.playerScore:raceState.cpuScore;
-    bar.style.width=Math.min(score/raceState.goal*100,100)+'%';
-    const b=bar.parentElement.querySelector('.race-score-badge');if(b)b.textContent=score+'/'+raceState.goal;
-  });
-}
-function submitRace(){
-  const ex=raceState.questions[raceState.index%raceState.questions.length];
-  const fb=document.getElementById('race-fb');
-  const rn=g('race-rn'),rd=g('race-rd');
-  if(isNaN(rn)||isNaN(rd)){if(fb){fb.className='race-feedback err';fb.textContent='⚠️ Beide Felder ausfüllen!';}return;}
-  // In the race, ungekürzt is OK for add/sub, but kürzen must be exact
-  let correct=false;
-  if(ex.type==='kuerzen'){correct=(rn===ex.rrn&&rd===ex.rrd);}
-  else{correct=(rn===ex.rrn&&rd===ex.rrd);}  // ungekürzt exact answer required
-  if(correct){
-    raceState.playerScore+=2;raceState.index++;addScore(6,document.getElementById('rennen-content'));
-    if(fb){fb.className='race-feedback ok';fb.textContent='✅ Richtig! +2 Felder 🚀';}
-    if(raceState.playerScore>=raceState.goal){clearInterval(raceState.cpuInterval);setTimeout(()=>endRennen(true),400);return;}
-    updateRaceBars();setTimeout(()=>renderRennen(),700);
-  } else {
-    resetStreak();if(fb){fb.className='race-feedback err';fb.textContent=`❌ Falsch! Ergebnis: ${ex.rrn}/${ex.rrd}`;}
-    raceState.index++;setTimeout(()=>renderRennen(),1300);
-  }
-}
-function endRennen(won){
-  clearInterval(raceState.cpuInterval);const c=document.getElementById('rennen-content');if(!c)return;
-  c.innerHTML=`<div style="text-align:center;padding:36px 0"><div style="font-size:3.5rem">${won?'🚀':'🤖'}</div>
-  <div style="font-size:1.7rem;font-weight:900;margin:8px 0;color:${won?'var(--correct)':'var(--wrong)'}">${won?'Du hast gewonnen! 🎉':'Der Computer hat gewonnen...'}</div>
-  <div style="color:var(--text-muted);margin-bottom:20px">Du: ${raceState.playerScore} | CPU: ${raceState.cpuScore}</div>
-  <button class="btn-home" onclick="showScreen('home')">🏠 Menü</button>
-  <button class="race-submit" style="margin-left:10px" onclick="startRennen()">🔄 Nochmal</button></div>`;
-  if(won)launchKonfetti();
+  shuffle([[1,4,1],[2,5,1],[1,6,2],[3,8,1],[1,7,2]]).forEach(([n1,d,n2])=>{const s=n1+n2;qs.push({lbl:`${n1}/${d} + ${n2}/${d}`,type:'ag',n1,n2,den:d,rn:s,rd:d});});
+  shuffle([[3,4,1],[5,7,2],[7,9,2],[5,6,1],[7,8,1]]).forEach(([n1,d,n2])=>{const s=n1-n2;qs.push({lbl:`${n1}/${d} − ${n2}/${d}`,type:'sg',n1,n2,den:d,rn:s,rd:d});});
+  shuffle([[2,4,2],[3,6,3],[4,8,4],[6,8,2],[6,9,3]]).forEach(([n,d,gv])=>qs.push({lbl:`${n}/${d} kürzen`,type:'k',n,d,gv,rn:n/gv,rd:d/gv}));
+  shuffle([[5,12,3],[7,16,1],[4,9,2],[11,15,2],[8,21,4]]).forEach(([n1,d,n2])=>{const s=n1+n2;qs.push({lbl:`${n1}/${d} + ${n2}/${d}`,type:'ag',n1,n2,den:d,rn:s,rd:d});});
+  shuffle([[12,16,4],[8,12,4],[9,15,3],[10,14,4],[14,21,7]]).forEach(([n,d,gv])=>qs.push({lbl:`${n}/${d} kürzen`,type:'k',n,d,gv,rn:n/gv,rd:d/gv}));
+  return qs.slice(0,20);
 }
 
-updateScoreBar();
+function startRennen(){
+  clearInterval(rSt.ti);
+  rSt={qs:buildRaceQs(),idx:0,ps:0,cs:0,goal:20,ti:null};
+  showScreen('rennen');renderRace();
+  rSt.ti=setInterval(()=>{if(rSt.cs<rSt.goal){rSt.cs+=1;updRaceBars();}else{clearInterval(rSt.ti);setTimeout(()=>endRace(false),400);};},9000);
+}
+function renderRace(){
+  const ex=rSt.qs[rSt.idx%rSt.qs.length];let ph='';
+  if(ex.type==='ag'||ex.type==='sg'){
+    const op=ex.type==='ag'?'+':'−';
+    ph=`<div class="rph">${F(ex.n1,ex.den,'med')} <span class="op">${op}</span> ${F(ex.n2,ex.den,'med')} <span class="eq">=</span> <span class="frac med"><span class="fn">${ex.n1}${op}${ex.n2}</span><span class="fl"></span><span class="fd">${ex.den}</span></span> <span class="eq">=</span> ${FI('rrn','rrd')}</div>`;
+  } else {
+    ph=`<div class="rph">${F(ex.n,ex.d,'med')} <span class="eq">=</span> ${FdivBook(ex.n,ex.d,ex.gv)} <span class="eq">=</span> ${FI('rrn','rrd')}</div>`;
+  }
+  document.getElementById('rennen-content').innerHTML=`
+  <div style="text-align:center;margin-bottom:9px"><div style="font-size:1rem;font-weight:900">🚀 Raketenrennen</div><div style="color:var(--muted);font-size:.68rem">CPU: +1 alle 9 Sek | Du: +2 pro Antwort</div></div>
+  <div class="rtrack"><div class="rbg"></div>
+    <div class="rline"><span class="rlbl">🧑 Du</span><div class="rbwrap"><div class="rbar" id="rp" style="width:${rSt.ps/rSt.goal*100}%;--rc1:var(--a5);--rc2:var(--a3)"></div><span class="rsb">${rSt.ps}/${rSt.goal}</span><span class="rff">🏁</span></div></div>
+    <div class="rline"><span class="rlbl">🤖 CPU</span><div class="rbwrap"><div class="rbar" id="rc" style="width:${rSt.cs/rSt.goal*100}%;--rc1:var(--err);--rc2:var(--a1)"></div><span class="rsb">${rSt.cs}/${rSt.goal}</span><span class="rff">🏁</span></div></div>
+  </div>
+  <div class="rq"><div class="rqtxt">${ex.lbl} = ?</div>
+    <div class="rinrow">${ph}</div>
+    <div style="text-align:center;margin-top:8px"><button class="rsub" onclick="submitRace()">✓ Prüfen</button></div>
+    <div class="rfb" id="rfb"></div>
+  </div>`;
+  document.querySelector('#rennen-content input')?.focus();
+}
+function updRaceBars(){['p','c'].forEach(w=>{const b=document.getElementById('r'+w);if(!b)return;const sc=w==='p'?rSt.ps:rSt.cs;b.style.width=Math.min(sc/rSt.goal*100,100)+'%';const sb=b.parentElement.querySelector('.rsb');if(sb)sb.textContent=sc+'/'+rSt.goal;});}
+function submitRace(){
+  const ex=rSt.qs[rSt.idx%rSt.qs.length];const fb=document.getElementById('rfb');
+  const rn=g('rrn'),rd=g('rrd');
+  if(isNaN(rn)||isNaN(rd)){if(fb){fb.className='rfb ng';fb.textContent='⚠️ Beide Felder ausfüllen!';}return;}
+  const ok=(rn===ex.rn&&rd===ex.rd);
+  if(ok){rSt.ps+=2;rSt.idx++;addScore(6,document.getElementById('rennen-content'));if(fb){fb.className='rfb ok';fb.textContent='✅ +2 🚀';}
+    if(rSt.ps>=rSt.goal){clearInterval(rSt.ti);setTimeout(()=>endRace(true),400);return;}
+    updRaceBars();setTimeout(()=>renderRace(),700);
+  }else{resetStreak();if(fb){fb.className='rfb ng';fb.textContent=`❌ ${ex.rn}/${ex.rd}`;}rSt.idx++;setTimeout(()=>renderRace(),1200);}
+}
+function endRace(won){clearInterval(rSt.ti);const c=document.getElementById('rennen-content');if(!c)return;
+  c.innerHTML=`<div style="text-align:center;padding:32px 0"><div style="font-size:3.5rem">${won?'🚀':'🤖'}</div><div style="font-size:1.6rem;font-weight:900;margin:8px 0;color:${won?'var(--ok)':'var(--err)'}"}>${won?'Du gewinnst! 🎉':'CPU gewinnt...'}</div><div style="color:var(--muted);margin-bottom:18px">Du:${rSt.ps} | CPU:${rSt.cs}</div><button class="bhome" onclick="showScreen('home')">🏠 Menü</button><button class="rsub" style="margin-left:9px" onclick="startRennen()">🔄 Nochmal</button></div>`;
+  if(won)konfetti();
+}
+
+// ═══════════════════════════════════════════════
+// GAME 4: TEILER-JAGD
+// ═══════════════════════════════════════════════
+const TJ_PAIRS=shuffle([[12,18],[8,12],[15,20],[6,9],[12,16],[20,30],[18,24],[10,15],[14,21],[24,36],[16,24],[9,15],[21,28],[12,20]]);
+
+function startTeiler(){
+  tjSt={pairs:TJ_PAIRS,idx:0,score:0,round:0};
+  showScreen('teiler');renderTeiler();
+}
+function renderTeiler(){
+  if(tjSt.idx>=tjSt.pairs.length){endTeiler();return;}
+  const [a,b]=tjSt.pairs[tjSt.idx];
+  const allDiv=[];for(let i=1;i<=Math.min(a,b);i++)if(a%i===0&&b%i===0)allDiv.push(i);
+  const commonDiv=new Set(allDiv);
+  const fakeNums=[];for(let i=2;i<=Math.max(a,b)+2;i++)if(!commonDiv.has(i))fakeNums.push(i);
+  const candidates=shuffle([...allDiv,...shuffle(fakeNums).slice(0,6-allDiv.length)]).slice(0,Math.min(10,allDiv.length+5));
+  const displayNums=shuffle([...new Set([...allDiv,...candidates])].slice(0,10));
+  tjSt.current={a,b,allDiv,found:new Set(),total:allDiv.length,candidates:displayNums};
+  document.getElementById('teiler-content').innerHTML=`
+  <div style="text-align:center;margin-bottom:12px">
+    <div style="font-size:1rem;font-weight:900">🔍 Teiler-Jagd — Runde ${tjSt.idx+1}/${tjSt.pairs.length}</div>
+    <div style="color:var(--muted);font-size:.75rem">Klicke alle gemeinsamen Teiler!</div>
+    <div style="margin-top:5px;color:var(--gold)">Punkte: ${tjSt.score}</div>
+  </div>
+  <div style="text-align:center;font-size:1.6rem;font-weight:900;margin-bottom:10px;color:var(--a3)">${a} &amp; ${b}</div>
+  <div style="text-align:center;font-size:.82rem;color:var(--muted);margin-bottom:8px">Gefunden: <span id="tj-found">0</span> / ${allDiv.length}</div>
+  <div class="tjgrid" id="tj-btns">
+    ${displayNums.map(n=>`<button class="tjbtn" id="tjb${n}" onclick="clickTeiler(${n})">${n}</button>`).join('')}
+  </div>
+  <div id="tj-fb" style="text-align:center;font-size:.88rem;font-weight:700;min-height:24px;margin-top:8px"></div>
+  <button class="bhome" style="display:block;margin:14px auto 0" onclick="tjSt.idx++;renderTeiler()">Weiter →</button>`;
+}
+function clickTeiler(n){
+  const {a,b,allDiv,found,total}=tjSt.current;
+  const btn=document.getElementById('tjb'+n);if(!btn||btn.disabled)return;
+  if(a%n===0&&b%n===0){
+    btn.classList.add('tjok');btn.disabled=true;found.add(n);
+    const pts=n===gcd(a,b)?15:8;tjSt.score+=pts;addScore(pts,btn);
+    document.getElementById('tj-found').textContent=found.size;
+    document.getElementById('tj-fb').innerHTML=`<span style="color:var(--ok)">✅ ${n} teilt beide Zahlen!</span>${n===gcd(a,b)?` <span style="color:var(--gold)">⭐ ggT gefunden +${pts}P!</span>`:''}`;
+    if(found.size===total)document.getElementById('tj-fb').innerHTML+=` <span style="color:var(--ok)">Alle gefunden! 🎉</span>`;
+  }else{btn.classList.add('tjng');resetStreak();document.getElementById('tj-fb').innerHTML=`<span style="color:var(--err)">❌ ${n} teilt nicht beide Zahlen!</span>`;setTimeout(()=>btn.classList.remove('tjng'),700);}
+}
+function endTeiler(){document.getElementById('teiler-content').innerHTML=`<div style="text-align:center;padding:32px 0"><div style="font-size:3.5rem">🏆</div><div style="font-size:1.6rem;font-weight:900;margin:8px 0">Teiler-Jagd beendet!</div><div style="color:var(--gold);margin-bottom:16px">${tjSt.score} Punkte</div><button class="bhome" onclick="showScreen('home')">🏠 Menü</button><button class="bcheck" style="margin-left:9px" onclick="startTeiler()">🔄 Nochmal</button></div>`;konfetti();}
+
+// ═══════════════════════════════════════════════
+// GAME 5: VIELFACHEN-WETTLAUF
+// ═══════════════════════════════════════════════
+const VW_PAIRS=shuffle([[2,3],[2,4],[3,4],[2,5],[3,5],[4,6],[2,6],[3,6],[4,5],[3,7],[2,7],[5,6]]);
+
+function startVielfache(){
+  vSt={pairs:VW_PAIRS,idx:0,score:0,ti:null,round:0,nums:[],active:true};
+  showScreen('vielfache');nextVielfacheRound();
+}
+function nextVielfacheRound(){
+  clearInterval(vSt.ti);
+  if(vSt.idx>=vSt.pairs.length){endVielfache();return;}
+  const [a,b]=vSt.pairs[vSt.idx];
+  const commons=[];for(let i=1;i<=10;i++){const v=lcm(a,b)*i;if(v<=120)commons.push(v);}
+  const fakes=shuffle([...Array(30)].map((_,i)=>i+2).filter(n=>n%a!==0||n%b!==0)).slice(0,8);
+  const all=shuffle([...commons.slice(0,4),...fakes]).slice(0,10);
+  vSt.current={a,b,commons:new Set(commons),remaining:new Set(commons.filter(c=>all.includes(c))),nums:all,clicked:new Set()};
+  vSt.active=true;
+
+  document.getElementById('vielfache-content').innerHTML=`
+  <div style="text-align:center;margin-bottom:10px">
+    <div style="font-size:1rem;font-weight:900">💣 Vielfachen-Wettlauf — Runde ${vSt.idx+1}/${vSt.pairs.length}</div>
+    <div style="font-size:1.05rem;font-weight:700;margin-top:6px">
+      Klicke alle gemeinsamen Vielfachen von
+      <span style="color:var(--a3);font-size:1.4rem;font-weight:900"> ${a} </span>
+      und
+      <span style="color:var(--a1);font-size:1.4rem;font-weight:900"> ${b} </span>!
+    </div>
+    <div style="margin-top:5px;color:var(--gold)">Punkte: ${vSt.score}</div>
+  </div>
+  <div id="vw-track" class="vwtrack"></div>
+  <div id="vw-fb" style="text-align:center;font-size:.88rem;font-weight:700;min-height:24px;margin-top:8px"></div>
+  <button class="bhome" style="display:block;margin:12px auto 0" onclick="vSt.idx++;nextVielfacheRound()">Weiter →</button>`;
+
+  // Zahlen erst nach 3 Sekunden Verzögerung starten
+  const track=document.getElementById('vw-track');
+  all.forEach((n,i)=>{
+    const el=document.createElement('div');el.className='vwnum';el.textContent=n;el.id='vwn'+n;
+    el.style.right='-80px';el.style.top=(10+Math.random()*40)+'px';
+    el.onclick=()=>clickVielfache(n);track.appendChild(el);
+    const dur=4000+Math.random()*4000;
+    const startDelay=3000+i*500; // 3 Sekunden Basisverzögerung
+    setTimeout(()=>{
+      el.style.transition=`right ${dur}ms linear`;el.style.right='110%';
+      setTimeout(()=>{if(!vSt.current.clicked.has(n)&&vSt.current.remaining.has(n)){resetStreak();}el.remove();},dur);
+    },startDelay);
+  });
+}
+function clickVielfache(n){
+  if(!vSt.active)return;
+  const {a,b,commons,clicked}=vSt.current;
+  const el=document.getElementById('vwn'+n);if(!el)return;
+  clicked.add(n);
+  if(commons.has(n)){
+    el.classList.add('vwok');el.onclick=null;const pts=n===lcm(a,b)?12:7;vSt.score+=pts;addScore(pts,el);
+    document.getElementById('vw-fb').innerHTML=`<span style="color:var(--ok)">✅ ${n} ist gemeinsames Vielfaches!</span>${n===lcm(a,b)?` <span style="color:var(--gold)">⭐ kgV!+${pts}P</span>`:''}`;
+  }else{el.classList.add('vwng');resetStreak();document.getElementById('vw-fb').innerHTML=`<span style="color:var(--err)">❌ ${n} ist kein gemeinsames Vielfaches!</span>`;setTimeout(()=>{el.classList.remove('vwng');},700);}
+}
+function endVielfache(){document.getElementById('vielfache-content').innerHTML=`<div style="text-align:center;padding:32px 0"><div style="font-size:3.5rem">🏆</div><div style="font-size:1.6rem;font-weight:900;margin:8px 0">Vielfachen-Wettlauf beendet!</div><div style="color:var(--gold);margin-bottom:16px">${vSt.score} Punkte</div><button class="bhome" onclick="showScreen('home')">🏠 Menü</button><button class="bcheck" style="margin-left:9px" onclick="startVielfache()">🔄 Nochmal</button></div>`;konfetti();}
+
+// ═══════════════════════════════════════════════
+// GAME 6: BRUCH-SORTIERMASCHINE
+// ═══════════════════════════════════════════════
+const SM_ROUNDS=shuffle([
+  {label:'Größer als ½',test:(n,d)=>n/d>0.5,fracs:shuffle([[1,3],[2,3],[1,4],[3,4],[2,5],[3,5],[1,8],[5,8],[1,6],[5,6],[3,7],[5,7],[4,9],[7,9],[3,10],[7,10]])},
+  {label:'Kleiner als ¾',test:(n,d)=>n/d<0.75,fracs:shuffle([[1,2],[3,4],[1,3],[2,3],[5,6],[1,4],[5,8],[7,8],[3,5],[4,5],[2,7],[5,7],[3,8],[7,8],[1,6],[5,6]])},
+  {label:'Gleich wie 1/2 oder größer',test:(n,d)=>n/d>=0.5,fracs:shuffle([[1,4],[3,4],[1,2],[2,3],[1,3],[5,8],[3,8],[4,5],[1,5],[3,5],[7,10],[3,10],[5,6],[1,6],[4,7],[3,7]])},
+  {label:'Kleiner als ⅓',test:(n,d)=>n/d<1/3,fracs:shuffle([[1,4],[1,2],[1,3],[1,5],[2,5],[1,6],[3,7],[4,7],[1,8],[3,8],[1,10],[3,10],[2,9],[5,9]])},
+]);
+
+function startSortier(){
+  sortSt={rounds:SM_ROUNDS,idx:0,score:0};
+  showScreen('sortier');renderSortier();
+}
+function renderSortier(){
+  if(sortSt.idx>=sortSt.rounds.length){endSortier();return;}
+  const round=sortSt.rounds[sortSt.idx];
+  const fracs=round.fracs.slice(0,10);
+  sortSt.current={round,fracs,sorted:new Set(),errors:0};
+  document.getElementById('sortier-content').innerHTML=`
+  <div style="text-align:center;margin-bottom:10px">
+    <div style="font-size:1rem;font-weight:900">🗂️ Bruch-Sortiermaschine — Runde ${sortSt.idx+1}/${sortSt.rounds.length}</div>
+    <div style="color:var(--muted);font-size:.75rem">Klicke auf einen Bruch und dann in den richtigen Korb!</div>
+    <div style="margin-top:5px;color:var(--gold)">Punkte: ${sortSt.score}</div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:flex-start">
+    <div style="flex:1">
+      <div style="font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:6px">Zu sortierende Brüche:</div>
+      <div class="tjgrid" id="sm-fracs">
+        ${fracs.map(([n,d])=>`<div class="smfrac" id="smf${n}_${d}" onclick="selSortFrac(${n},${d})">${n}/${d}</div>`).join('')}
+      </div>
+    </div>
+    <div class="smbin">
+      <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);text-align:center;margin-bottom:4px">Körbe</div>
+      <div class="smbinbox" id="bin-ja" onclick="dropInBin('ja')" style="border-color:var(--ok);background:rgba(6,214,160,.05)">
+        <div style="color:var(--ok);font-weight:900;font-size:.8rem">✅ JA</div>
+        <div style="font-size:.68rem;color:var(--ok)">${round.label}</div>
+        <div class="smresult" id="bin-ja-cnt" style="color:var(--ok)"></div>
+      </div>
+      <div class="smbinbox" id="bin-nein" onclick="dropInBin('nein')" style="border-color:var(--err);background:rgba(239,35,60,.05)">
+        <div style="color:var(--err);font-weight:900;font-size:.8rem">❌ NEIN</div>
+        <div style="font-size:.68rem;color:var(--err)">Nicht ${round.label.toLowerCase()}</div>
+        <div class="smresult" id="bin-nein-cnt" style="color:var(--err)"></div>
+      </div>
+    </div>
+  </div>
+  <div id="sm-fb" style="text-align:center;font-size:.88rem;font-weight:700;min-height:24px;margin-top:10px"></div>
+  <button class="bhome" style="display:block;margin:12px auto 0" onclick="sortSt.idx++;renderSortier()">Weiter →</button>`;
+  sortSt.selFrac=null;
+}
+function selSortFrac(n,d){
+  sortSt.selFrac=[n,d];
+  document.querySelectorAll('.smfrac').forEach(e=>e.style.background='var(--surface)');
+  document.getElementById(`smf${n}_${d}`)?.style.setProperty('background','rgba(155,93,229,.25)');
+  document.getElementById('sm-fb').textContent='👆 Jetzt in einen Korb klicken!';
+}
+function dropInBin(bin){
+  if(!sortSt.selFrac)return;
+  const [n,d]=sortSt.selFrac;const el=document.getElementById(`smf${n}_${d}`);if(!el)return;
+  const isJa=sortSt.current.round.test(n,d);const choseJa=bin==='ja';
+  const correct=isJa===choseJa;
+  if(correct){el.style.opacity='.3';el.style.pointerEvents='none';sortSt.current.sorted.add(`${n}/${d}`);const pts=12;sortSt.score+=pts;addScore(pts,el);
+    document.getElementById('sm-fb').innerHTML=`<span style="color:var(--ok)">✅ Richtig! ${n}/${d} gehört in "${choseJa?sortSt.current.round.label:'NEIN'}"</span>`;
+    const cnt=document.getElementById(`bin-${bin}-cnt`);if(cnt)cnt.textContent=`+${sortSt.current.sorted.size}`;
+    if(sortSt.current.sorted.size===sortSt.current.fracs.length){document.getElementById('sm-fb').innerHTML+=` <span style="color:var(--gold)"> Alle sortiert! 🎉</span>`;konfetti();}
+  }else{resetStreak();document.getElementById('sm-fb').innerHTML=`<span style="color:var(--err)">❌ Falsch! ${n}/${d} = ${(n/d).toFixed(2)} gehört ${isJa?'ins JA-Feld':'ins NEIN-Feld'}</span>`;}
+  sortSt.selFrac=null;document.querySelectorAll('.smfrac').forEach(e=>e.style.background='var(--surface)');
+}
+function endSortier(){document.getElementById('sortier-content').innerHTML=`<div style="text-align:center;padding:32px 0"><div style="font-size:3.5rem">🏆</div><div style="font-size:1.6rem;font-weight:900;margin:8px 0">Sortiermaschine beendet!</div><div style="color:var(--gold);margin-bottom:16px">${sortSt.score} Punkte</div><button class="bhome" onclick="showScreen('home')">🏠 Menü</button><button class="bcheck" style="margin-left:9px" onclick="startSortier()">🔄 Nochmal</button></div>`;konfetti();}
+
+updBar();
 </script>
 </body>
 </html>
